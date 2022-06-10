@@ -1,9 +1,10 @@
+import matplotlib.pyplot as plt
+from ReadCal import ReadCal
+from BinningInputs import BinningInputs
+from VisirWavenumbers import VisirWavenumbers
+from SetWave import SetWave
+
 def PlotProfiles(singles, spectrals, ksingles, kspectrals):
-    import matplotlib.pyplot as plt
-    from ReadCal import ReadCal
-    from BinningInputs import BinningInputs
-    from VisirWavenumbers import VisirWavenumbers
-    from SetWave import SetWave
     
     # Read in Voyager and Cassini data into arrays
     calfile = "../visir.jup.filtered-iris-cirs.10-12-15.data.v3"
