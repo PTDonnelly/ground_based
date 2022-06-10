@@ -13,6 +13,10 @@ def main():
     from CreateMeridProfiles import CreateMeridProfiles
     from CalibrateMeridProfiles import CalibrateMeridProfiles
     from WriteProfiles import WriteProfiles
+    from PlotProfiles import PlotProfiles
+    from PlotMaps import PlotMaps
+    from WriteSpx import WriteSpx
+
     
     ##### Define global inputs #####
     files       = FindFiles(mode='images')           # Point to location of all input observations
@@ -48,10 +52,10 @@ def main():
             PlotProfiles(calsingles, calspectrals, ksingles, kspectrals)
         if calc == 1:
             # Point to stored meridional profiles and calibration coefficients
-            profiles1 = find_files(mode='singles')
-            profiles2 = find_files(mode='spectrals')
-            coeffs1   = find_files(mode='ksingles')
-            coeffs2   = find_files(mode='kspectrals')
+            profiles1 = FindFiles(mode='singles')
+            profiles2 = FindFiles(mode='spectrals')
+            coeffs1   = FindFiles(mode='ksingles')
+            coeffs2   = FindFiles(mode='kspectrals')
             PlotProfiles(singles=profiles1, spectrals=profiles2, ksingles=coeffs1, kspectrals=coeffs2)
 
     # Plot cylindrical maps (optionally read stored numpy arrays from Step 8)
@@ -60,8 +64,8 @@ def main():
             PlotMaps(files, ksingles, kspectrals)
         if calc == 1:
             # Point to stored calibration coefficients
-            coeffs1   = find_files(mode='ksingles')
-            coeffs2   = find_files(mode='kspectrals')
+            coeffs1   = FindFiles(mode='ksingles')
+            coeffs2   = FindFiles(mode='kspectrals')
             PlotMaps(filesksingles=coeffs1, kspectrals=coeffs2)
     
     # Generate spectral inputs for NEMESIS (optionally read stored numpy arrays from Step 8)
@@ -70,7 +74,7 @@ def main():
             WriteSpx(calspectrals)
         if calc == 1:
             # Point to stored individual meridional profiles
-            profiles = find_files(mode='spectrals')
+            profiles = FindFiles(mode='spectrals')
             WriteSpx(spectrals=profiles)
 
     end = time.time()
