@@ -1,0 +1,20 @@
+def PlotProfiles(singles, spectrals, ksingles, kspectrals):
+    a = 1
+    print('Plotting')
+
+    # plt.figure(dpi=900)
+    # ax1 = plt.subplot2grid((2, 1), (0, 0))
+    # ax1.plot(lat_grid, calib, color='k', lw=1, label='calib_full')
+    # ax1.plot(lat_grid[calibkeep], calibdata, color='k', lw=3, label='calib_keep')
+    # ax1.plot(lat_grid[visirkeep], visirdata, color='skyblue', lw=0, marker='o', markersize=3, label='visir_raw')
+    # ax1.plot(lat_grid[visirkeep], visirdata/(visirmean/calibmean), color='orange', lw=0, marker='o', markersize=3, label='visir_calib')
+    # ax1.set_xlim((-90, 90))
+    # ax1.set_ylim((0, 20e-8))
+    # ax1.legend()
+    # ax2 = plt.subplot2grid((2, 1), (1, 0))
+    # ax2.plot(lat_grid[singlekeep], singledata, color='black', lw=0, marker='.', markersize=5, label='single')
+    # ax2.plot(lat_grid[spectralkeep], spectraldata, color='red', lw=2, label='spectral')
+    # ax2.set_xlim((-90, 90))
+    # ax2.set_ylim((0, 20e-8))
+    # ax2.legend()
+    # plt.savefig('figure.png', dpi=900)

@@ -24,8 +24,17 @@ Step 8: Store all cmap profiles and calibration parameters (individual and spect
 
 These calibrated profiles (and associated calibration coefficients) can then be used to:
 
-(1) Plot meridional profiles
+1. Plot meridional profiles
 
-(2) Create spectra from stored profiles (.spx files for input into NEMESIS)
+2. Create spectra from stored profiles (.spx files for input into NEMESIS)
 
-(3) Create cylindrical maps using the individual calibration coefficients derived from Step 7 (to help reduce global deviations from the mean in a given filter)
+3. Create cylindrical maps using the individual calibration coefficients derived from Step 7 (to help reduce global deviations from the mean in a given filter)
+
+### UNDER CONSTRUCTION ###
+
+1. Better calculation of errors
+2. Saving of calibration coefficients
+3. Reading arrays into PlotProfiles and WriteSpx
+3a. Adding the files to FindFiles under relevant "mode"
+4. Plotting profiles in PlotProfiles
+5. Writing spxfiles in WriteSpx

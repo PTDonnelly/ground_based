@@ -1,0 +1,181 @@
+# LAT    LCM    MU    RAD    ERROR    NU    VIEW
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+-2.50 151.08 10.07 2.08671e-07 1.04335e-08 563.97095 1.0
+-1.50 151.08 1.01 2.13509e-07 1.06754e-08 563.97095 1.0
+-0.50 151.08 2.15 2.15146e-07 1.07573e-08 563.97095 1.0
+0.50 151.08 3.87 2.14825e-07 1.07412e-08 563.97095 1.0
+1.50 151.08 4.44 2.14364e-07 1.07182e-08 563.97095 1.0
+2.50 151.08 5.58 2.14698e-07 1.07349e-08 563.97095 1.0
+3.50 151.08 6.72 2.15964e-07 1.07982e-08 563.97095 1.0
+4.50 151.08 7.87 2.18043e-07 1.09022e-08 563.97095 1.0
+5.50 151.08 9.01 2.20924e-07 1.10462e-08 563.97095 1.0
+6.50 151.08 10.15 2.25989e-07 1.12995e-08 563.97095 1.0
+7.50 151.08 11.29 2.34292e-07 1.17146e-08 563.97095 1.0
+8.50 151.08 12.42 2.46635e-07 1.23317e-08 563.97095 1.0
+9.50 151.08 13.56 2.61751e-07 1.30876e-08 563.97095 1.0
+10.50 151.08 14.69 2.78302e-07 1.39151e-08 563.97095 1.0
+11.50 151.08 15.83 2.94362e-07 1.47181e-08 563.97095 1.0
+12.50 151.08 16.95 3.07370e-07 1.53685e-08 563.97095 1.0
+13.50 151.08 18.08 3.15120e-07 1.57560e-08 563.97095 1.0
+14.50 151.08 19.21 3.15594e-07 1.57797e-08 563.97095 1.0
+15.50 151.08 20.33 3.08863e-07 1.54432e-08 563.97095 1.0
+16.50 151.08 21.45 2.95972e-07 1.47986e-08 563.97095 1.0
+17.50 151.08 22.56 2.79382e-07 1.39691e-08 563.97095 1.0
+18.50 151.08 23.68 2.63808e-07 1.31904e-08 563.97095 1.0
+19.50 151.08 24.79 2.54444e-07 1.27222e-08 563.97095 1.0
+20.50 151.08 25.89 2.53243e-07 1.26621e-08 563.97095 1.0
+21.50 151.08 26.99 2.59170e-07 1.29585e-08 563.97095 1.0
+22.50 151.08 28.09 2.67519e-07 1.33760e-08 563.97095 1.0
+23.50 151.08 29.19 2.71179e-07 1.35590e-08 563.97095 1.0
+24.50 151.08 30.28 2.68047e-07 1.34024e-08 563.97095 1.0
+25.50 151.08 31.36 2.62394e-07 1.31197e-08 563.97095 1.0
+26.50 151.08 32.44 2.56686e-07 1.28343e-08 563.97095 1.0
+27.50 151.08 33.52 2.49377e-07 1.24688e-08 563.97095 1.0
+28.50 151.08 34.59 2.43187e-07 1.21594e-08 563.97095 1.0
+29.50 151.08 35.66 2.38183e-07 1.19091e-08 563.97095 1.0
+30.50 151.08 36.73 2.35252e-07 1.17626e-08 563.97095 1.0
+31.50 151.08 37.79 2.36945e-07 1.18472e-08 563.97095 1.0
+32.50 151.08 38.84 2.41212e-07 1.20606e-08 563.97095 1.0
+33.50 151.08 39.89 2.42591e-07 1.21295e-08 563.97095 1.0
+34.50 151.08 40.94 2.41957e-07 1.20979e-08 563.97095 1.0
+35.50 151.08 41.98 2.39364e-07 1.19682e-08 563.97095 1.0
+36.50 151.08 43.01 2.34688e-07 1.17344e-08 563.97095 1.0
+37.50 151.08 44.05 2.31617e-07 1.15809e-08 563.97095 1.0
+38.50 151.08 45.07 2.32495e-07 1.16248e-08 563.97095 1.0
+39.50 151.08 46.09 2.36772e-07 1.18386e-08 563.97095 1.0
+40.50 151.08 47.11 2.41072e-07 1.20536e-08 563.97095 1.0
+41.50 151.08 48.12 2.42679e-07 1.21339e-08 563.97095 1.0
+42.50 151.08 49.13 2.42582e-07 1.21291e-08 563.97095 1.0
+43.50 151.08 50.13 2.42898e-07 1.21449e-08 563.97095 1.0
+44.50 151.08 51.13 2.43333e-07 1.21666e-08 563.97095 1.0
+45.50 151.08 52.12 2.42068e-07 1.21034e-08 563.97095 1.0
+46.50 151.08 53.11 2.39693e-07 1.19847e-08 563.97095 1.0
+47.50 151.08 54.10 2.37211e-07 1.18606e-08 563.97095 1.0
+48.50 151.08 55.08 2.35281e-07 1.17641e-08 563.97095 1.0
+49.50 151.08 56.05 2.33789e-07 1.16895e-08 563.97095 1.0
+50.50 151.08 57.02 2.32662e-07 1.16331e-08 563.97095 1.0
+51.50 151.08 57.99 2.32737e-07 1.16369e-08 563.97095 1.0
+52.50 151.08 58.95 2.33751e-07 1.16875e-08 563.97095 1.0
+53.50 151.08 59.91 2.35286e-07 1.17643e-08 563.97095 1.0
+54.50 151.08 60.86 2.36324e-07 1.18162e-08 563.97095 1.0
+55.50 151.08 61.81 2.35718e-07 1.17859e-08 563.97095 1.0
+56.50 151.08 62.76 2.33821e-07 1.16910e-08 563.97095 1.0
+57.50 151.08 63.70 2.31837e-07 1.15919e-08 563.97095 1.0
+58.50 151.08 64.64 2.29892e-07 1.14946e-08 563.97095 1.0
+59.50 151.08 65.57 2.28275e-07 1.14137e-08 563.97095 1.0
+60.50 151.08 66.50 2.26902e-07 1.13451e-08 563.97095 1.0
+61.50 151.08 67.43 2.25740e-07 1.12870e-08 563.97095 1.0
+62.50 151.08 68.36 2.23397e-07 1.11698e-08 563.97095 1.0
+63.50 151.08 69.28 2.19406e-07 1.09703e-08 563.97095 1.0
+64.50 151.08 70.19 2.12878e-07 1.06439e-08 563.97095 1.0
+65.50 151.08 71.11 2.04722e-07 1.02361e-08 563.97095 1.0
+66.50 151.08 72.02 1.96362e-07 9.81808e-09 563.97095 1.0
+67.50 151.08 72.93 1.88203e-07 9.41013e-09 563.97095 1.0
+68.50 151.08 73.83 1.80886e-07 9.04431e-09 563.97095 1.0
+69.50 151.08 74.74 1.74452e-07 8.72262e-09 563.97095 1.0
+70.50 151.08 75.64 1.68957e-07 8.44785e-09 563.97095 1.0
+71.50 151.08 76.54 1.64662e-07 8.23310e-09 563.97095 1.0
+72.50 151.08 77.43 1.61049e-07 8.05246e-09 563.97095 1.0
+73.50 151.08 78.32 1.58117e-07 7.90587e-09 563.97095 1.0
+74.50 151.08 79.22 1.56069e-07 7.80343e-09 563.97095 1.0
+75.50 151.08 80.11 1.53972e-07 7.69859e-09 563.97095 1.0
+76.50 151.08 80.99 1.52248e-07 7.61242e-09 563.97095 1.0
+77.50 151.08 81.88 1.49997e-07 7.49984e-09 563.97095 1.0
+78.50 151.08 82.76 1.48056e-07 7.40282e-09 563.97095 1.0
+79.50 151.08 83.65 1.45083e-07 7.25416e-09 563.97095 1.0
+80.50 151.08 84.53 1.42502e-07 7.12512e-09 563.97095 1.0
+81.50 151.08 85.41 1.40258e-07 7.01291e-09 563.97095 1.0
+82.50 151.08 86.29 1.37710e-07 6.88548e-09 563.97095 1.0
+83.50 151.08 87.16 1.35507e-07 6.77536e-09 563.97095 1.0
+84.50 151.08 88.04 1.34149e-07 6.70746e-09 563.97095 1.0
+85.50 151.08 88.92 1.33130e-07 6.65649e-09 563.97095 1.0
+86.50 151.08 89.59 1.33391e-07 6.66954e-09 563.97095 1.0
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
+ nan   nan  nan      nan      nan      nan nan
