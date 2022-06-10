@@ -32,7 +32,7 @@ These calibrated profiles (and associated calibration coefficients) can then be 
 
 ### UNDER CONSTRUCTION ###
 
-1. Better calculation of errors
+1. Better calculation of errors (Done)
 2. Saving of calibration coefficients
 3. Reading arrays into PlotProfiles and WriteSpx: (a) Add the different "modes" to FindFiles, (b) Add the files to FindFiles under relevant
 4. Plotting profiles in PlotProfiles
