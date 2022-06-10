@@ -22,18 +22,6 @@ def main():
     save        = 1                                   # (0) Do not save (1) save meridional profiles
     plot        = 0                                   # (0) Do not plot (1) plot meridional profiles
     spx         = 0                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
-
-    ##### Run code #####
-    # Step 1: Read img, cmap and mufiles
-    # Step 2: Geometric registration of pixel information
-    # Step 3: Gather pixel information for all files
-    # Step 4: Create central meridian average for each observation
-    # Step 5: Create central meridian average for each wavelength
-    # Step 6: Calibrate result of Step 5 to spacecraft data
-    # Step 7: Calibrate individual cmaps to result of Step 6
-    # Step 8: Store all cmap profiles and calibration parameters (individual and average)
-    # Step 9: Plot profiles
-    # Step 10: Create spectra from stored profiles
     
     if calc == 0:
         # Steps 1-3: Generate nested dictionaries containing spatial and spectral information of each cylindrical map

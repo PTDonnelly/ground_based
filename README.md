@@ -5,7 +5,7 @@ This code currently deals entirely with observations from the VLT/VISIR instrume
 
 This code simply takes these cylindrical maps of pixel values (or radiance if pre-calibrated) and emission angles to produce central meridian averages of flux at all latitudes for each observation and then all observations in given filter for the entire observing epoch. These steps are as follows:
 
-1. Read img, cmap and mufiles
+1. Read files: images (img), cylindrical maps (cmap) and emission angle maps (mumap)
 
 2. Geometric registration of pixel information
 
