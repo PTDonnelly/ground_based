@@ -5,21 +5,21 @@ This code currently deals entirely with observations from the VLT/VISIR instrume
 
 This code simply takes these cylindrical maps of pixel values (or radiance if pre-calibrated) and emission angles to produce central meridian averages of flux at all latitudes for each observation and then all observations in given filter for the entire observing epoch. These steps are as follows:
 
-Step 1: Read img, cmap and mufiles
+1. Read img, cmap and mufiles
 
-Step 2: Geometric registration of pixel information
+2. Geometric registration of pixel information
 
-Step 3: Gather pixel information for all files
+3. Gather pixel information for all files
 
-Step 4: Create central meridian average for each observation
+4. Create central meridian average for each observation
 
-Step 5: Create central meridian average for each wavelength
+5. Create central meridian average for each wavelength
 
-Step 6: Calibrate result of Step 5 to spacecraft data
+6. Calibrate result of Step 5 to spacecraft data
 
-Step 7: Calibrate individual cmaps to result of Step 6
+7. Calibrate individual cmaps to result of Step 6
 
-Step 8: Store all cmap profiles and calibration parameters (individual and spectral)
+8. Store all cmap profiles and calibration parameters (individual and spectral)
 
 
 These calibrated profiles (and associated calibration coefficients) can then be used to:
@@ -34,8 +34,6 @@ These calibrated profiles (and associated calibration coefficients) can then be 
 
 1. Better calculation of errors
 2. Saving of calibration coefficients
-3. Reading arrays into PlotProfiles and WriteSpx
---a. Add the different "modes" to FindFiles
---b. Add the files to FindFiles under relevant
+3. Reading arrays into PlotProfiles and WriteSpx: (a) Add the different "modes" to FindFiles, (b) Add the files to FindFiles under relevant
 4. Plotting profiles in PlotProfiles
 5. Writing spxfiles in WriteSpx
