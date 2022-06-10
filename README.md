@@ -21,6 +21,7 @@ Step 7: Calibrate individual cmaps to result of Step 6
 
 Step 8: Store all cmap profiles and calibration parameters (individual and spectral)
 
+
 These calibrated profiles (and associated calibration coefficients) can then be used to:
 
 (1) Plot meridional profiles
