@@ -52,19 +52,31 @@ def main():
         if save == 1:
             WriteProfiles(files, calsingles, calspectrals, ksingles, kspectrals)
 
-    # Step 9: Plot meridional profiles (optionally read stored numpy arrays from Step 8)
+    ###
+
+    # Plot meridional profiles (optionally read stored numpy arrays from Step 8)
     if plot == 1:
         if calc == 0:
             PlotProfiles(calsingles, calspectrals, ksingles, kspectrals)
         if calc == 1:
-            # Point to stored individual meridional profiles
+            # Point to stored meridional profiles and calibration coefficients
             profiles1 = find_files(mode='singles')
             profiles2 = find_files(mode='spectrals')
             coeffs1   = find_files(mode='ksingles')
             coeffs2   = find_files(mode='kspectrals')
-            PlotProfiles(singles=profiles1, spectrals=profiles2, ksingles=k1, kspectrals=k2)
+            PlotProfiles(singles=profiles1, spectrals=profiles2, ksingles=coeffs1, kspectrals=coeffs2)
+
+    # Plot cylindrical maps (optionally read stored numpy arrays from Step 8)
+    if plot == 1:
+        if calc == 0:
+            PlotMaps(files, ksingles, kspectrals)
+        if calc == 1:
+            # Point to stored calibration coefficients
+            coeffs1   = find_files(mode='ksingles')
+            coeffs2   = find_files(mode='kspectrals')
+            PlotMaps(filesksingles=coeffs1, kspectrals=coeffs2)
     
-    # Step 10: Generate spectral inputs for NEMESIS (optionally read stored numpy arrays from Step 8)
+    # Generate spectral inputs for NEMESIS (optionally read stored numpy arrays from Step 8)
     if spx == 1:
         if calc == 0:
             WriteSpx(calspectrals)

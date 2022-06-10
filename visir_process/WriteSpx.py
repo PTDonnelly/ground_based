@@ -1,4 +1,4 @@
-def write_spx(spectrals):
+def WriteSpx(spectrals):
     b = 2
     print('spxing')
 
