@@ -23,8 +23,9 @@ def main():
     Nfiles      = len(files)
     # Flags
     calc        = 0                                   # (0) Calculate meridional profiles, (1) read stored profiles
-    save        = 1                                   # (0) Do not save (1) save meridional profiles
+    save        = 0                                   # (0) Do not save (1) save meridional profiles
     plot        = 0                                   # (0) Do not plot (1) plot meridional profiles
+    maps        = 0                                   # (0) Do not plot (1) plot cylindrical maps
     spx         = 0                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
     
     if calc == 0:
@@ -59,7 +60,7 @@ def main():
             PlotProfiles(singles=profiles1, spectrals=profiles2, ksingles=coeffs1, kspectrals=coeffs2)
 
     # Plot cylindrical maps (optionally read stored numpy arrays from Step 8)
-    if plot == 1:
+    if maps == 1:
         if calc == 0:
             PlotMaps(files, ksingles, kspectrals)
         if calc == 1:
@@ -79,7 +80,7 @@ def main():
 
     end = time.time()
     print(f"Elapsed time: {np.round(end-start, 3)} s")
-    print(f"Time per file: {np.round(end-start, 3)/len(files)} s")
+    print(f"Time per file: {np.round((end-start)/len(files), 3)} s")
 
 if __name__ == '__main__':
     main()

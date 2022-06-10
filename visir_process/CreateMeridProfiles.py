@@ -13,7 +13,7 @@ def CreateMeridProfiles(Nfiles, spectrum, LCMIII):
     spectral_merids = np.zeros((BinningInputs.Nlatbins, BinningInputs.nfilters, 6))
 
     # Loop over latitudes and create individual mean profiles
-    print('Binning singles:')
+    print('Binning singles...')
     for ilat, _ in enumerate(BinningInputs.latgrid):
         # Define centre and edges of latitude bin
         clat = BinningInputs.latrange[0] + (BinningInputs.latstep)*ilat + (BinningInputs.latstep/2)
@@ -50,7 +50,7 @@ def CreateMeridProfiles(Nfiles, spectrum, LCMIII):
                     single_merids[ilat, ifile, 6] = view
 
     # Loop over filters and create mean spectral profiles
-    print('Binning spectrals:')
+    print('Binning spectrals...')
     for ifilt in range(BinningInputs.nfilters):
         # Loop over latitudes and create individual mean profiles
         for ilat, _ in enumerate(BinningInputs.latgrid):
