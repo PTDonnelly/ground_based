@@ -56,6 +56,9 @@ def RegisterMaps(files):
         wavelen, wavenum, _, _  = SetWave(wavelength=cylhead['lambda'], wavenumber=False)
         wavelength[ifile] = wavelen
         wavenumber[ifile] = wavenum
+
+        # Calulate radiance error
+        rad_error = CalculateErrors(imgdata, view)
         
         # Loop over each pixel to assign to the structure.
         xstart  = float(naxis1) - BinningInputs.lonrange[0]/(360/naxis1)
@@ -79,7 +82,6 @@ def RegisterMaps(files):
                     mu  = 180/pi * acos(mu_ang)
                     # Calculate pixel radiance and error
                     rad = cyldata[iy, ix] * 1e-7
-                    rad_error = CalculateErrors(imgdata)
                     
                     ## Step 3: Gather pixel information for all files
                     # Store spectral information in spectrum array
