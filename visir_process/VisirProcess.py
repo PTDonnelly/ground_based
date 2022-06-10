@@ -23,7 +23,7 @@ def main():
     Nfiles      = len(files)
     # Flags
     calc        = 0                                   # (0) Calculate meridional profiles, (1) read stored profiles
-    save        = 1                                   # (0) Do not save (1) save meridional profiles
+    save        = 0                                   # (0) Do not save (1) save meridional profiles
     plot        = 0                                   # (0) Do not plot (1) plot meridional profiles
     spx         = 0                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
     
@@ -79,7 +79,7 @@ def main():
 
     end = time.time()
     print(f"Elapsed time: {np.round(end-start, 3)} s")
-    print(f"Time per file: {np.round(end-start, 3)/len(files)} s")
+    print(f"Time per file: {np.round((end-start)/len(files), 3)} s")
 
 if __name__ == '__main__':
     main()

@@ -20,7 +20,7 @@ def CalibrateMeridProfiles(Nfiles, single_merids, spectral_merids, wavenumber):
     iris, cirs = ReadCal(calfile)
 
     # Calculate calibration coefficients for the spectral merid profiles
-    print('Calibrating spectrals:')
+    print('Calibrating spectrals...')
     for iwave in range(BinningInputs.nfilters):
         # Get filter index for calibration file
         waves = spectral_merids[:, iwave, 5]
@@ -59,7 +59,7 @@ def CalibrateMeridProfiles(Nfiles, single_merids, spectral_merids, wavenumber):
         # print(ifilt_sc, visirmean, calibmean, calib_coeff_spectral[iwave, 1])
 
     # Calculate calibration coefficients for the single merid profiles
-    print('Calibrating singles:')
+    print('Calibrating singles...')
     for ifile, wave in enumerate(wavenumber):
         # Get filter index for spectral profiles
         _, _, ifilt_sc, ifilt_v = SetWave(wavelength=False, wavenumber=wave)
