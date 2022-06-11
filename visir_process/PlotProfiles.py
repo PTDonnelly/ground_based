@@ -8,8 +8,11 @@ from VisirWavenumbers import VisirWavenumbers
 from SetWave import SetWave
 
 def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
+    """ DB: Plot meridian profiles and spacecraft data to illustrate 
+            the calibration method """
+    
     # If wavenumber=False, we need to retrieve wavenumber from each "singles" file/array
-    #if wavenumber==False:
+    #if wavenumber=False:
     #    print("blablabla, you have to code it!")
 
     # Read in Voyager and Cassini data into arrays
@@ -26,7 +29,7 @@ def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
         # Get filter index for plotting spacecraft and calibrated data
         waves = spectrals[:, ifilt, 5]
         wave  = waves[(waves > 0)][0]
-        
+
         # Get filter index for spectral profiles
         _, _, ifilt_sc, ifilt_v = SetWave(wavelength=False, wavenumber=wave)
         # Create a figure per filter
