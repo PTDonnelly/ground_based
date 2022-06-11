@@ -4,7 +4,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from BinningInputs import BinningInputs
-from Observations.ground_based.visir_process.VisirWavelengths import VisirWavelengths
+from VisirWavelengths import VisirWavelengths
 from ReadFits import ReadFits
 from VisirWavenumbers import VisirWavenumbers
 from VisirWavelengths import VisirWavelengths
