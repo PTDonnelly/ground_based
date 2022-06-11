@@ -18,18 +18,25 @@ def PlotPseudoWindShear(windshear):
         os.makedirs(dir)
 
     for ifilt in range(BinningInputs.nfilters):
-
-        lat=BinningInputs.latgrid
         pdata=windshear[ifilt,:]
-        plt.plot(lat[np.where(lat <-5)],pdata[np.where(lat <-5)],linewidth=3.0,color="black")
-        plt.plot(lat[np.where(lat >5)],pdata[np.where(lat >5)],linewidth=3.0,color="black")
-        plt.plot(lat[np.where((lat <-5) & (pdata<0))],pdata[np.where((lat <-5) & (pdata<0))],"ro")
-        plt.plot(lat[np.where((lat <-5) & (pdata>0))],pdata[np.where((lat <-5) & (pdata>0))],"bo")
-        plt.plot(lat[np.where((lat >5) & (pdata<0))],pdata[np.where((lat >5) & (pdata<0))],"ro")
-        plt.plot(lat[np.where((lat >5) & (pdata>0))],pdata[np.where((lat >5) & (pdata>0))],"bo")
-        plt.legend(loc="upper right")
-        plt.set_xlim(-90,90)
-        plt.set_ylim([-0.7,0.7])
+        lat=BinningInputs.latgrid
+        
+        # Subplot for the southern hemisphere
+        ax1 = plt.subplot2grid((1, 2), (0, 0))
+        ax1.plot(lat[np.where(lat <-5)],pdata[np.where(lat <-5)],linewidth=3.0,color="black")
+        ax1.plot(lat[np.where((lat <-5) & (pdata<0))],pdata[np.where((lat <-5) & (pdata<0))],"ro")
+        ax1.plot(lat[np.where((lat <-5) & (pdata>0))],pdata[np.where((lat <-5) & (pdata>0))],"bo")
+        ax1.set_ylim([-0.7,0.7])
+        ax1.set_xlim(-90,-10)
+
+        # Subplot for the northern hemisphere
+        ax2 = plt.subplot2grid((1, 2), (0, 1))
+        ax2.plot(lat[np.where(lat >5)],pdata[np.where(lat >5)],linewidth=3.0,color="black")
+        ax2.plot(lat[np.where((lat >5) & (pdata<0))],pdata[np.where((lat >5) & (pdata<0))],"ro")
+        ax2.plot(lat[np.where((lat >5) & (pdata>0))],pdata[np.where((lat >5) & (pdata>0))],"bo")
+        ax2.set_ylim([-0.7,0.7])        
+        ax2.set_xlim(10,90)
+
         for i in range(0,nejet):
             plt[ifilt].plot([ejets_c[i],ejets_c[i]],[-15,15],color='black',linestyle="dashed")
         for i in range(0,nwjet):
