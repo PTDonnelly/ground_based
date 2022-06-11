@@ -6,6 +6,7 @@ from scipy.interpolate import interp1d
 def ReadGravity(filename, lat):
     """ DB: Function to load Jupiter gravity data
             and calculate some planet parameters """
+    
     # Load Jupiter gravity data to calculate pseudo-
     # windshear using TB and mu array array
     lines = np.loadtxt(filename)
@@ -34,4 +35,5 @@ def ReadGravity(filename, lat):
     # Planet rotation 
     omega=2.*math.pi/period
     Coriolis = 2. * omega * np.sin(lat*deg2rad)
+    
     return grav, Coriolis, y, inlat, rad2deg, omega 

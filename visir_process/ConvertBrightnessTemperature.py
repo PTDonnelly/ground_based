@@ -1,8 +1,9 @@
 import numpy as np
 
 def ConvertBrightnessTemperature(data, wavelength):
-    # Function to convert radiance in brightness temperature
-    rad = data *1.e-7
+    """Function to convert radiance in brightness temperature"""
+
+    rad = data * 1.e-7
     h = 6.626e-34 # Planck constant
     c = 2.9979e8  # speed of light
     k = 1.3806e-23 # Boltzmann constant
@@ -13,4 +14,5 @@ def ConvertBrightnessTemperature(data, wavelength):
     c2 = (h*c)/k
     a = c1 * v * v * v / rad
     temperature = c2 * v / np.log(a+1)
+    
     return temperature

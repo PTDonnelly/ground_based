@@ -4,10 +4,11 @@ PTD 01/06/22: Code to calibrate VISIR cylindrical maps and
 """
 
 def main():
-    import time
     import numpy as np
-    start = time.time()
-    
+    import time
+    import cProfile
+    import io
+    import pstats
     from FindFiles import FindFiles
     from RegisterMaps import RegisterMaps
     from CreateMeridProfiles import CreateMeridProfiles
@@ -17,14 +18,20 @@ def main():
     from PlotMaps import PlotMaps
     from WriteSpx import WriteSpx
 
+    # Create profiler
+    pr = cProfile.Profile()
+    # Start profiler
+    pr.enable()
+    # Start clock
+    start = time.time()
     
     ##### Define global inputs #####
     files       = FindFiles(mode='images')           # Point to location of all input observations
     Nfiles      = len(files)
     # Flags
     calc        = 0                                   # (0) Calculate meridional profiles, (1) read stored profiles
-    save        = 1                                   # (0) Do not save (1) save meridional profiles
-    plot        = 1                                   # (0) Do not plot (1) plot meridional profiles
+    save        = 0                                   # (0) Do not save (1) save meridional profiles
+    plot        = 0                                   # (0) Do not plot (1) plot meridional profiles
     maps        = 0                                   # (0) Do not plot (1) plot cylindrical maps
     spx         = 0                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
     
@@ -78,9 +85,20 @@ def main():
             profiles = FindFiles(mode='spectrals')
             WriteSpx(spectrals=profiles)
 
+    # Stop clock
     end = time.time()
+    # Print elapsed time
     print(f"Elapsed time: {np.round(end-start, 3)} s")
     print(f"Time per file: {np.round((end-start)/len(files), 3)} s")
+    # Stop profiler
+    pr.disable()
+    # Print profiler output to file
+    s = io.StringIO()
+    ps = pstats.Stats(pr, stream=s).sort_stats('tottime')
+    ps.print_stats()
+
+    with open('../cProfiler_output.txt', 'w+') as f:
+        f.write(s.getvalue())
 
 if __name__ == '__main__':
     main()

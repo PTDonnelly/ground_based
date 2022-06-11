@@ -3,7 +3,8 @@ def FindFiles(mode):
 
     if mode == 'images':
         # files = ['cal_wvisir_NEII_2_2018-05-24T02_45_35.7531_Jupiter_clean_withchop_calib_coeff.npy']
-        data_dir = '/Users/db496/Documents/Research/Observations/GBdata/visir/jupiter/global_maps_dataset/'
+        # data_dir = '/Users/db496/Documents/Research/Observations/GBdata/visir/jupiter/global_maps_dataset/'
+        data_dir = '/Users/ptdonnelly/Documents/Research/projects/shared/dbardet/data/'
         files = [f"{data_dir}cal_wvisir_ARIII_2018-05-25T03:45:53.1419_Jupiter_clean_withchop.fits.gz",
                 f"{data_dir}cal_wvisir_ARIII_2018-05-26T00:03:13.9569_Jupiter_clean_withchop.fits.gz",
                 f"{data_dir}cal_wvisir_ARIII_2018-05-26T05:44:15.9897_Jupiter_clean_withchop.fits.gz",

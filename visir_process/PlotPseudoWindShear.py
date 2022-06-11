@@ -9,11 +9,11 @@ from ReadZonalWind import ReadZonalWind
 
 def PlotPseudoWindShear(windshear):
     #  Load Jupiter zonal jets data to determine belts and zones location
-    ejets_c, wjets_c, nejet, nwjet = ReadZonalWind("2003porco_zonalu.dat")
+    ejets_c, wjets_c, nejet, nwjet = ReadZonalWind("../2003porco_zonalu.dat")
 
     print('Plotting pseudo wind shear...')
     # If subdirectory does not exist, create it
-    dir = 'pseudo_wind_shear_profiles_figures/'
+    dir = '../pseudo_wind_shear_profiles_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 
