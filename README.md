@@ -39,3 +39,6 @@ These calibrated profiles (and associated calibration coefficients) can then be 
 5. Writing spxfiles in WriteSpx
 6. Plotting global maps in PlotMaps
 7. Plotting polar projection maps in PlotPoles (to be create)
+8. For maps, define a module with both mapping options inside so that we can simply import PlotMaps and call PlotMaps.Cylindrical or PlotMaps.Polar for whatever case we need. This is also expandable in future.
+9. Repeat with MeridProfiles? I.e. MeridProfiles.Create and MeridProfiles.Calibrate? To cut down on the number of separate functions in the directory.
+10. Repeat with VisirFilters? I.e. VisirFilters.Wavelengths and VisirFilters.Wavenumbers? Although this is a non-ideal and dirty fix anyway, so maybe that is a chance to generalise those functions. Possibly combine with SetWave?
