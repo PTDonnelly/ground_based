@@ -24,7 +24,7 @@ This code simply takes these cylindrical maps of pixel values (or radiance if pr
 
 These calibrated profiles (and associated calibration coefficients) can then be used to:
 
-1. Plot meridional profiles
+1. Plot meridional profiles, using PlotProfiles subroutine
 
 2. Create spectra from stored profiles (.spx files for input into NEMESIS)
 
@@ -33,7 +33,9 @@ These calibrated profiles (and associated calibration coefficients) can then be 
 ### UNDER CONSTRUCTION ###
 
 1. Better calculation of errors (Done)
-2. Saving of calibration coefficients
-3. Reading arrays into PlotProfiles and WriteSpx: (a) Add the different "modes" to FindFiles, (b) Add the files to FindFiles under relevant
-4. Plotting profiles in PlotProfiles
+2. Saving of calibration coefficients (Done)
+3. Reading arrays into PlotProfiles and WriteSpx: (a) Add the different "modes" to FindFiles (Done), (b) Add the files to FindFiles under relevant (Done)
+4. Plotting profiles in PlotProfiles (Done)
 5. Writing spxfiles in WriteSpx
+6. Plotting global maps in PlotMaps
+7. Plotting polar projection maps in PlotPoles (to be create)
