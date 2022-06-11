@@ -23,8 +23,8 @@ def main():
     Nfiles      = len(files)
     # Flags
     calc        = 0                                   # (0) Calculate meridional profiles, (1) read stored profiles
-    save        = 0                                   # (0) Do not save (1) save meridional profiles
-    plot        = 0                                   # (0) Do not plot (1) plot meridional profiles
+    save        = 1                                   # (0) Do not save (1) save meridional profiles
+    plot        = 1                                   # (0) Do not plot (1) plot meridional profiles
     maps        = 0                                   # (0) Do not plot (1) plot cylindrical maps
     spx         = 0                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
     
@@ -50,14 +50,14 @@ def main():
     # Plot meridional profiles (optionally read stored numpy arrays from Step 8)
     if plot == 1:
         if calc == 0:
-            PlotProfiles(calsingles, calspectrals, ksingles, kspectrals)
+            PlotProfiles(calsingles, calspectrals, ksingles, kspectrals, wavenumber)
         if calc == 1:
             # Point to stored meridional profiles and calibration coefficients
             profiles1 = FindFiles(mode='singles')
             profiles2 = FindFiles(mode='spectrals')
             coeffs1   = FindFiles(mode='ksingles')
             coeffs2   = FindFiles(mode='kspectrals')
-            PlotProfiles(singles=profiles1, spectrals=profiles2, ksingles=coeffs1, kspectrals=coeffs2)
+            PlotProfiles(singles=profiles1, spectrals=profiles2, ksingles=coeffs1, kspectrals=coeffs2, wavenumber=False)
 
     # Plot cylindrical maps (optionally read stored numpy arrays from Step 8)
     if maps == 1:
