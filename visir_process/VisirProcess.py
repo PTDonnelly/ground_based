@@ -74,7 +74,7 @@ def main():
             # Point to stored calibration coefficients
             coeffs1   = FindFiles(mode='ksingles')
             coeffs2   = FindFiles(mode='kspectrals')
-            PlotMaps(filesksingles=coeffs1, kspectrals=coeffs2)
+            PlotMaps(files, ksingles=coeffs1, kspectrals=coeffs2)
     
     # Generate spectral inputs for NEMESIS (optionally read stored numpy arrays from Step 8)
     if spx == 1:
