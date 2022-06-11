@@ -65,12 +65,12 @@ def RegisterMaps(files):
         xstop   = float(naxis1) - BinningInputs.lonrange[1]/(360/naxis1) 
         ystart  = (float(naxis2)/2) + BinningInputs.latrange[0]/(180/naxis2)
         ystop   = (float(naxis2)/2) + BinningInputs.latrange[1]/(180/naxis2) 
-        x_range = np.arange(xstart, xstop, 1)
-        y_range = np.arange(ystart, ystop, 1)
-        for ix, x in enumerate(x_range):
-            for iy, y in enumerate(y_range): 
+        x_range = np.arange(xstart, xstop, 1, dtype=int)
+        y_range = np.arange(ystart, ystop, 1, dtype=int)
+        for x in x_range:
+            for y in y_range:
                 # Only assign latitude and longitude if non-zero pixel value
-                if (cyldata[iy, ix] > 0):
+                if (cyldata[y, x] > 0):
                     # Calculate finite spatial element (lat-lon co-ordinates)
                     lat = BinningInputs.latrange[0] + ((180 / naxis2) * y)
                     lon = BinningInputs.lonrange[0] - ((360 / naxis1) * x)
@@ -78,20 +78,19 @@ def RegisterMaps(files):
                     lat = lat + BinningInputs.latstep/res
                     lon = lon - BinningInputs.latstep/res
                     # Convert from planetographic to planetocentric latitudes
-                    mu_ang = mudata[iy, ix]
+                    mu_ang = mudata[y, x]
                     mu  = 180/pi * acos(mu_ang)
-                    # Calculate pixel radiance and error
-                    rad = cyldata[iy, ix] * 1e-7
-                    
-                    ## Step 3: Gather pixel information for all files
+                    # Calculate pxel radiance and error
+                    rad = cyldata[y, x] * 1e-7
+                    ## Step 3: Gather pxel information for all files
                     # Store spectral information in spectrum array
-                    spectrum[iy, ix, ifile, 0] = lat
-                    spectrum[iy, ix, ifile, 1] = LCMIII[ifile]
-                    spectrum[iy, ix, ifile, 2] = mu
-                    spectrum[iy, ix, ifile, 3] = rad
-                    spectrum[iy, ix, ifile, 4] = rad_error * rad
-                    spectrum[iy, ix, ifile, 5] = wavenum
-                    spectrum[iy, ix, ifile, 6] = view
+                    spectrum[y, x, ifile, 0] = lat
+                    spectrum[y, x, ifile, 1] = LCMIII[ifile]
+                    spectrum[y, x, ifile, 2] = mu
+                    spectrum[y, x, ifile, 3] = rad
+                    spectrum[y, x, ifile, 4] = rad_error * rad
+                    spectrum[y, x, ifile, 5] = wavenum
+                    spectrum[y, x, ifile, 6] = view
     # Throw away zeros
     spectrum[spectrum == 0] = np.nan
 
