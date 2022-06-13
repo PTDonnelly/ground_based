@@ -42,6 +42,7 @@ def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
         ax1.plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3]*kspectrals[ifilt_v, 1], color='skyblue', lw=0, marker='o', markersize=3, label='VLT/VISIR av')
         ax1.set_xlim((-90, 90))
         #ax1.set_ylim((0, 20e-8))
+        ax1.set_ylabel('Radiance (W)', size=15)
         ax1.legend()
         # subplot showing the calibration of the spectral merid profile to spacecraft data
         ax2 = plt.subplot2grid((2, 1), (1, 0))
@@ -54,7 +55,9 @@ def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
         ax2.plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3], color='orange', lw=0, marker='v', markersize=3, label='VLT/VISIR calib')
         ax2.plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3]*kspectrals[ifilt_v, 1], color='skyblue', lw=0,  marker='o', markersize=3, label='VLT/VISIR av')
         ax2.set_xlim((-90, 90))
+        ax2.set_xlabel('Latitude', size=15)
         #ax2.set_ylim((0, 20e-8))
+        ax2.set_ylabel('Radiance (W)', size=15)
         ax2.legend()
         # Save figure showing calibation method 
         filt = VisirWavenumbers(ifilt)
