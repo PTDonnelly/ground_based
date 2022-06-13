@@ -63,6 +63,8 @@ def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
         filt = VisirWavenumbers(ifilt)
         plt.savefig(f"{dir}{filt}_calibration_merid_profiles.png", dpi=900)
         plt.savefig(f"{dir}{filt}_calibration_merid_profiles.eps", dpi=900)
+    # Clear figure to avoid overlapping between plotting subroutines
+    plt.clf()
 
 def ColorNuance(colorm, ncolor, i):
     pal = get_cmap(name=colorm)
