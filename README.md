@@ -17,9 +17,9 @@ This code simply takes these cylindrical maps of pixel values (or radiance if pr
 
 6. Calibrate result of Step 5 to spacecraft data
 
-7. Calibrate individual cmaps to result of Step 6
+7. Calibrate result of Step 4 to result of Step 6
 
-8. Store all cmap profiles and calibration parameters (individual and spectral)
+8. Store all meridional cmap profiles and calibration parameters (individual and spectral)
 
 
 These calibrated profiles (and associated calibration coefficients) can then be used to:
