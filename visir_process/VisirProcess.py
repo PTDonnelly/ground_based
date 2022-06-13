@@ -32,7 +32,7 @@ def main():
     calc        = 0                                   # (0) Calculate meridional profiles, (1) read stored profiles
     save        = 0                                   # (0) Do not save (1) save meridional profiles
     plot        = 0                                   # (0) Do not plot (1) plot meridional profiles
-    maps        = 0                                   # (0) Do not plot (1) plot cylindrical maps
+    maps        = 1                                   # (0) Do not plot (1) plot cylindrical maps
     spx         = 0                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
     
     if calc == 0:
@@ -69,12 +69,12 @@ def main():
     # Plot cylindrical maps (optionally read stored numpy arrays from Step 8)
     if maps == 1:
         if calc == 0:
-            PlotMaps(files, ksingles, kspectrals)
+            PlotMaps(files, spectrals, ksingles, wavenumber)
         if calc == 1:
-            # Point to stored calibration coefficients
-            coeffs1   = FindFiles(mode='ksingles')
-            coeffs2   = FindFiles(mode='kspectrals')
-            PlotMaps(files, ksingles=coeffs1, kspectrals=coeffs2)
+            # Point to stored mu profiles and calibration coefficients
+            profiles = FindFiles(mode='spectrals')
+            coeffs   = FindFiles(mode='ksingles')
+            PlotMaps(files, spectrals=profiles, ksingles=coeffs, wavenumber=False)
     
     # Generate spectral inputs for NEMESIS (optionally read stored numpy arrays from Step 8)
     if spx == 1:
