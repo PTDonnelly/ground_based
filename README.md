@@ -32,13 +32,18 @@ These calibrated profiles (and associated calibration coefficients) can then be 
 
 ### UNDER CONSTRUCTION ###
 
-1. Better calculation of errors (Done)
-2. Saving of calibration coefficients (Done)
-3. Reading arrays into PlotProfiles and WriteSpx: (a) Add the different "modes" to FindFiles (Done), (b) Add the files to FindFiles under relevant (Done)
-4. Plotting profiles in PlotProfiles (Done)
 5. Writing spxfiles in WriteSpx
 6. Plotting global maps in PlotMaps
-7. Plotting polar projection maps in PlotPoles (to be create)
-8. For maps, define a module with both mapping options inside so that we can simply import PlotMaps and call PlotMaps.Cylindrical or PlotMaps.Polar for whatever case we need. This is also expandable in future.
-9. Repeat with MeridProfiles? I.e. MeridProfiles.Create and MeridProfiles.Calibrate? To cut down on the number of separate functions in the directory.
-10. Repeat with VisirFilters? I.e. VisirFilters.Wavelengths and VisirFilters.Wavenumbers? Although this is a non-ideal and dirty fix anyway, so maybe that is a chance to generalise those functions. Possibly combine with SetWave?
+
+Thoughts for next version: consolidate codes into groups of functions and subfunctions for expansion in future
+1. For Mapping: define the module with both mapping options inside so that we can simply import Mapping and call Mapping.Cylindrical or Mapping.Polar.
+2. For Profiles: define the module MeridProfiles, such that MeridProfiles.Create and MeridProfiles.Calibrate. Eventually this could even become Binning.MeridProfile.Create, Binning.CTLProfile.Create, etc. (depending on what is needed).
+3. For filter information, define the module VisirFilters.Wavelengths and VisirFilters.Wavenumbers. Although this is a non-ideal and dirty fix anyway, so maybe that is a chance to generalise those functions. Possibly combine with SetWave?
+4. For Winds: define the module PlotWinds, such that PlotWinds.Pseudo, PlotWinds.Retrieved, PlotWinds.DYNAMICO etc.
+5. For reading input files: define the module ReadInput, such that ReadInput.Gravity, ReadInput.Calib, ReadInput.ZonalWind, ReadInput.Fits.
+6. For writing output files: define the module WriteOutput, such that WriteOutput.MeridProfiles, WriteOutput.Calibration, WriteOutput.Spx.
+7. For now, RegisterMaps is fine since we are dealing with VISIR observations in .fits format. When the instrument or data format changes, we will need to expand and maybe generalise.
+
+We can also ask ourselves, do we want plotting routines to be nested inside the relevant area? I.e. Mapping.Cylindrical.Plot, MeridProfiles.Plot, Winds.Pseudo.Plot? Or keep all plotting routines in one module with different areas nested inside that? I.e. Plot.MeridProfiles, Plot.Winds.Pesudo, Plot.Mapping.Cylindrical?
+
+Maybe the secondway is better because then you can have the function Mapping.Cylindrical() and at the very end you can call Plot.Mapping.Cylindrical()? I am not sure at this point.
