@@ -38,7 +38,7 @@ These calibrated profiles (and associated calibration coefficients) can then be 
 Thoughts for next version: consolidate codes into groups of functions and subfunctions for expansion in future
 1. For Mapping: define a module with both mapping options inside so that we can simply import Mapping and call Mapping.Cylindrical or Mapping.Polar.
 2. For Profiles: define the module MeridProfiles, such that MeridProfiles.Create and MeridProfiles.Calibrate. Eventually this could even become Binning.MeridProfile.Create, Binning.CTLProfile.Create, etc. (depending on what is needed).
-3. For filter information, define the module VisirFilters.Wavelengths and VisirFilters.Wavenumbers. Although this is a non-ideal and dirty fix anyway, so maybe that is a chance to generalise those functions. Possibly combine with SetWave?
+3. For filter information, define the module VisirFilters, such that VisirFilters.Wavelengths and VisirFilters.Wavenumbers. Although this is a non-ideal and dirty fix anyway, so maybe that is a chance to generalise those functions. Possibly combine with SetWave?
 4. For Winds: define the module PlotWinds, such that PlotWinds.Pseudo, PlotWinds.Retrieved, PlotWinds.DYNAMICO etc.
 5. For reading input files: define the module ReadInput, such that ReadInput.Gravity, ReadInput.Calib, ReadInput.ZonalWind, ReadInput.Fits.
 6. For writing output files: define the module WriteOutput, such that WriteOutput.MeridProfiles, WriteOutput.Calibration, WriteOutput.Spx.
