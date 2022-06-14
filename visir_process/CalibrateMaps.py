@@ -1,6 +1,5 @@
-import numpy as np
-from math import acos, cos, radians, pi
 from ReadFits import ReadFits
+# from WriteFits import WriteFits
 
 def CalibrateMaps(files, ksingles):
     """Calibrate (or re-calibrate) cylindrical maps using calculated calibration coefficients.
