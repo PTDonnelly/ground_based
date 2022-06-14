@@ -69,5 +69,6 @@ def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
 def ColorNuance(colorm, ncolor, i):
     pal = get_cmap(name=colorm)
     coltab = [pal(icolor) for icolor in np.linspace(0,0.9,ncolor)]
+    
     return coltab[i]
 
