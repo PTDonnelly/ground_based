@@ -61,12 +61,12 @@ def main():
     if maps == 1:
         if calc == 0:
             # Create plots
-            PlotMaps(files, ksingles, kspectrals)
+            PlotMaps(files, spectrals, ksingles, wavenumber)
         if calc == 1:
             # Read in coefficients
-            _, _, ksingles, kspectrals = ReadNpy(return_singles=False, return_spectrals=False, return_ksingles=True, return_kspectrals=True)
+            _, spectrals, ksingles, _ = ReadNpy(return_singles=False, return_spectrals=False, return_ksingles=True, return_kspectrals=True)
             # Create plots
-            PlotMaps(files, ksingles=coeffs1, kspectrals=coeffs2)
+            PlotMaps(files, spectrals, ksingles, wavenumber=False)
     
     # Generate spectral inputs for NEMESIS
     if spx == 1:
