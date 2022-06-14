@@ -16,7 +16,7 @@ def CalibrateMeridProfiles(Nfiles, single_merids, spectral_merids, wavenumber):
     calib_coeff_spectral = np.ones((BinningInputs.nfilters, 2))
     
     # Read in Voyager and Cassini data into arrays
-    calfile = "../visir.jup.filtered-iris-cirs.10-12-15.data.v3"
+    calfile = "../inputs/visir.jup.filtered-iris-cirs.10-12-15.data.v3"
     iris, cirs = ReadCal(calfile)
 
     # Calculate calibration coefficients for the spectral merid profiles

@@ -21,7 +21,7 @@ def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
 
     print('Plotting profiles...')
     # If subdirectory does not exist, create it
-    dir = 'calibration_profiles_figures/'
+    dir = '../outputs/calibration_profiles_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 

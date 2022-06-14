@@ -13,7 +13,7 @@ def PlotPseudoWindShear(windshear):
 
     print('Plotting pseudo wind shear...')
     # If subdirectory does not exist, create it
-    dir = '../pseudo_wind_shear_profiles_figures/'
+    dir = '../inputs/pseudo_wind_shear_profiles_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 

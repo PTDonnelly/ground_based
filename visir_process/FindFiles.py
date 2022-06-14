@@ -97,7 +97,7 @@ def FindFiles(mode):
                 f"{data_dir}cal_wvisir_SIV_2018-05-27T03:54:48.9331_Jupiter_clean_withchop.fits.gz"]
 
     if mode == 'singles':
-        profile_dir = 'individual_merid_profiles/'
+        profile_dir = '../outputs/individual_merid_profiles/'
         files = [f"{profile_dir}cal_wvisir_ARIII_2018-05-25T03:45:53.1419_Jupiter_clean_withchop_merid_profile.npy",
                 f"{profile_dir}cal_wvisir_ARIII_2018-05-26T00:03:13.9569_Jupiter_clean_withchop_merid_profile.npy",
                 f"{profile_dir}cal_wvisir_ARIII_2018-05-26T05:44:15.9897_Jupiter_clean_withchop_merid_profile.npy",
@@ -190,7 +190,7 @@ def FindFiles(mode):
                 f"{profile_dir}cal_wvisir_SIV_2018-05-27T03:54:48.9331_Jupiter_clean_withchop_merid_profile.npy"]
 
     if mode == 'ksingles':
-        profile_dir = 'individual_merid_profiles/'
+        profile_dir = '../outputs/individual_merid_profiles/'
         files = [f"{profile_dir}cal_wvisir_ARIII_2018-05-25T03:45:53.1419_Jupiter_clean_withchop_calib_coeff.npy",
                 f"{profile_dir}cal_wvisir_ARIII_2018-05-26T00:03:13.9569_Jupiter_clean_withchop_calib_coeff.npy",
                 f"{profile_dir}cal_wvisir_ARIII_2018-05-26T05:44:15.9897_Jupiter_clean_withchop_calib_coeff.npy",
@@ -283,7 +283,7 @@ def FindFiles(mode):
                 f"{profile_dir}cal_wvisir_SIV_2018-05-27T03:54:48.9331_Jupiter_clean_withchop_calib_coeff.npy"]
     
     if mode == 'spectrals':
-        profile_dir = 'spectral_merid_profiles/'
+        profile_dir = '../outputs/spectral_merid_profiles/'
         files = [f"{profile_dir}511.97345_merid_profile.npy",
                 f"{profile_dir}532.73522_merid_profile.npy",
                 f"{profile_dir}563.97095_merid_profile.npy",
@@ -299,7 +299,7 @@ def FindFiles(mode):
                 f"{profile_dir}1253.0625_merid_profile.npy"]
     
     if mode == 'kspectrals':
-        profile_dir = 'spectral_merid_profiles/'
+        profile_dir = '../outputs/spectral_merid_profiles/'
         files = [f"{profile_dir}766.75227_calib_coeff.npy",
                 f"{profile_dir}815.7001_calib_coeff.npy",
                 f"{profile_dir}852.115_calib_coeff.npy",
