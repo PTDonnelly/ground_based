@@ -1,1 +1,7 @@
 *.pyc
+*.png
+*.eps
+*.dat
+*.txt
+*.npy
+*.data.v3
