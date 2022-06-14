@@ -2,9 +2,12 @@ import numpy as np
 from BinningInputs import BinningInputs
 
 def WriteSpx(spectrals):
-    b = 2
+    """Create spectral input for NEMESIS. Take calculated profiles and 
+    populate .spxfile with radiances, meaurement errors, and geometries."""
+
     print('Creating spectra...')
     print(np.shape(spectrals))
+
     # for ilat in range(BinningInputs.Nlatbins):
     #     lats     = spectrals[ilat, :, 0]
     #     # LCMs     = spectrals[ilat, :, 1]
