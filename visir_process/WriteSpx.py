@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import bottleneck as bn
 from BinningInputs import BinningInputs
 
 def WriteSpx(spectrals):
@@ -11,7 +10,7 @@ def WriteSpx(spectrals):
         # Loop over NGEOM geometries (no. of geometries = no. of emission angle points)
         for igeom, mu in enumerate(mus):
             # Calculate NCONV spectral points (NCONV = no. of wavenumbers at each geometry = 1 for merid binning)
-            nconv = 1 #len(waves[igeom])
+            nconv = 1
             # I can't remember what NAV is... check the NEMESIS manual
             nav   = 1
             # The "angles line": this defines a "geometry" that holds a "spectrum"

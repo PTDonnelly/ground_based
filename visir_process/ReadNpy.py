@@ -20,7 +20,6 @@ def ReadNpy(return_singles, return_spectrals, return_ksingles, return_kspectrals
         # Load .npy files
         spectrals    = np.asarray([np.load(p) for p in profiles])
         # Fix shape (numpy changes array shape when storing)
-        # spectrals = np.flip(np.rollaxis(spectrals, 1), 1)
         spectrals = np.flip(np.rollaxis(spectrals, 1), 1)
     else:
         spectrals = None

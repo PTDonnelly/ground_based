@@ -5,14 +5,16 @@ from ReadCal import ReadCal
 from SetWave import SetWave
 # from VisirWavenumbers import VisirWavenumbers
 
-def CalibrateMeridProfiles(Nfiles, single_merids, spectral_merids, wavenumber):
+def CalibrateMeridProfiles(nfiles, single_merids, spectral_merids, wavenumber):
     """ Step 6: Calibrate spectral_merids to spacecraft data
                 (i.e. create calib_spectral_merids)
         Step 7: Calibrate single_merids to calib_spectral_merids
                 (i.e. create calib_single_merids)"""
 
+    print('Calibrating meridional profiles...')
+    
     # Create arrays to store calibration coefficients
-    calib_coeff_single   = np.ones((Nfiles, 2))
+    calib_coeff_single   = np.ones((nfiles, 2))
     calib_coeff_spectral = np.ones((BinningInputs.nfilters, 2))
     
     # Read in Voyager and Cassini data into arrays
@@ -79,7 +81,7 @@ def CalibrateMeridProfiles(Nfiles, single_merids, spectral_merids, wavenumber):
         # print(ifile, singlemean, spectralmean, calib_coeff_single[ifile, 1])
 
     # Save calibration
-    for ifile in range(Nfiles):
+    for ifile in range(nfiles):
         # Calibrate individual merid profiles using individual calibration coefficients
         calib_single_merids = single_merids
         calib_single_merids[:, ifile, 3] /= calib_coeff_single[ifile, 1]

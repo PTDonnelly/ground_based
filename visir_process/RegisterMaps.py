@@ -1,6 +1,5 @@
 import numpy as np
 from math import acos, cos, radians, pi
-
 from BinningInputs import BinningInputs
 from ReadFits import ReadFits
 from SetWave import SetWave
@@ -10,6 +9,8 @@ def RegisterMaps(files):
     """ Step 1: Read img, cmap and mufiles
         Step 2: Geometric registration of pixel information
         Step 3: Gather pixel information for all files"""
+    
+    print('Registering maps...')
     
     # Define local inputs
     nx, ny = 720, 360                  # Dimensions of an individual cylindrical map (needed for dictionary definition)

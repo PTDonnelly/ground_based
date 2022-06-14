@@ -33,8 +33,8 @@ def ReadCal(filename):
     irisdata = np.asarray(caldata[0:niris-1], dtype='float')
     cirsdata = np.asarray(caldata[niris:niris+ncirs-1], dtype='float')
     # Interpolate spacecraft profiles onto "lat_grid" (common with data)
-    iris = np.zeros((BinningInputs.Nlatbins, nfilt, 2))
-    cirs = np.zeros((BinningInputs.Nlatbins, nfilt, 2))
+    iris = np.zeros((BinningInputs.nlatbins, nfilt, 2))
+    cirs = np.zeros((BinningInputs.nlatbins, nfilt, 2))
     for ifilt in range(nfilt):
         # Interp IRIS to VISIR
         f = interp1d(irisdata[:, 0], irisdata[:, ifilt+1])

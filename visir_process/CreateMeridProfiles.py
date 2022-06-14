@@ -6,6 +6,8 @@ from VisirWavenumbers import VisirWavenumbers
 def CreateMeridProfiles(Nfiles, spectrum, LCMIII):
     """ Step 4: Create central meridian average for each observation
         Step 5: Create central meridian average for each wavelength"""
+    
+    print('Calculating meridional profiles...')
 
     def singles(Nfiles, spectrum, LCMIII):
         """Create central meridian average for each observation"""
