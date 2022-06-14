@@ -54,7 +54,7 @@ def CreateMeridProfiles(Nfiles, spectrum, LCMIII):
 
         return single_merids
 
-    def spectrals((Nfiles, spectrum, LCMIII, single_merids)
+    def spectrals(Nfiles, spectrum, LCMIII, single_merids):
         """Create central meridian average for each wavelength"""
 
         # Create np.array for all spectral mean profiles (one per filter)
