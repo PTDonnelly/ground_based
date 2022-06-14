@@ -53,7 +53,7 @@ def main():
             PlotProfiles(calsingles, calspectrals, ksingles, kspectrals, wavenumber)
         if calc == 1:
             # Read in profiles and coefficients
-            singles, spectrals, ksingles, kspectrals = ReadNpy()
+            singles, spectrals, ksingles, kspectrals = ReadNpy(return_singles=True, return_spectrals=True, return_ksingles=True, return_kspectrals=True)
             # Create plots
             PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber=False)
 
@@ -64,7 +64,7 @@ def main():
             PlotMaps(files, ksingles, kspectrals)
         if calc == 1:
             # Read in coefficients
-            _, _, ksingles, kspectrals = ReadNpy()
+            _, _, ksingles, kspectrals = ReadNpy(return_singles=False, return_spectrals=False, return_ksingles=True, return_kspectrals=True)
             # Create plots
             PlotMaps(files, ksingles=coeffs1, kspectrals=coeffs2)
     
@@ -75,7 +75,7 @@ def main():
             WriteSpx(calspectrals)
         if calc == 1:
             # Read in profiles
-            _, spectrals, _, _ = ReadNpy()
+            _, spectrals, _, _ = ReadNpy(return_singles=False, return_spectrals=True, return_ksingles=False, return_kspectrals=False)
             # Create spectra
             WriteSpx(spectrals)
 

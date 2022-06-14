@@ -1,29 +1,51 @@
 import numpy as np
 from FindFiles import FindFiles
 
-def ReadNpy():
+def ReadNpy(return_singles, return_spectrals, return_ksingles, return_kspectrals):
     """Read in pre-calculated profiles and/or coefficients from local .npy files"""
 
-    # Point to stored meridional profiles and calibration coefficients
-    profiles1  = FindFiles(mode='singles')
-    profiles2  = FindFiles(mode='spectrals')
-    coeffs1    = FindFiles(mode='ksingles')
-    coeffs2    = FindFiles(mode='kspectrals')
-
-    # Load .npy files
-    singles    = [np.load(p) for p in profiles1]
-    spectrals  = [np.load(p) for p in profiles2]
-    ksingles   = [np.load(c) for c in coeffs1]
-    kspectrals = [np.load(c) for c in coeffs1]
+    if return_singles:
+        # Point to stored meridional profiles and calibration coefficients
+        profiles  = FindFiles(mode='singles')
+        # Load .npy files
+        singles    = [np.load(p) for p in profiles]
+        # Fix shape (numpy changes array shape when storing)
+        layers, rows, cols = np.shape(singles)
+        singles = np.reshape(singles, (rows, layers, cols))
+    else:
+        singles = None
     
-    # Fix shape (numpy changes array shape when storing)
-    layers, rows, cols = np.shape(singles)
-    singles = np.reshape(singles, (rows, layers, cols))
-    layers, rows, cols = np.shape(spectrals)
-    spectrals = np.reshape(spectrals, (rows, layers, cols))
-    layers, rows, cols = np.shape(ksingles)
-    ksingles = np.reshape(ksingles, (rows, layers, cols))
-    layers, rows, cols = np.shape(kspectrals)
-    kspectrals = np.reshape(kspectrals, (rows, layers, cols))
+    if return_spectrals:
+        # Point to stored meridional profiles and calibration coefficients
+        profiles  = FindFiles(mode='spectrals')
+        # Load .npy files
+        spectrals    = [np.load(p) for p in profiles]
+        # Fix shape (numpy changes array shape when storing)
+        layers, rows, cols = np.shape(spectrals)
+        spectrals = np.reshape(spectrals, (rows, layers, cols))
+    else:
+        spectrals = None
+    
+    if return_ksingles:
+        # Point to stored meridional profiles and calibration coefficients
+        coeffs  = FindFiles(mode='ksingles')
+        # Load .npy files
+        ksingles    = [np.load(p) for p in coeffs]
+        # Fix shape (numpy changes array shape when storing)
+        layers, rows, cols = np.shape(ksingles)
+        ksingles = np.reshape(ksingles, (rows, layers, cols))
+    else:
+        ksingles = None
+    
+    if return_kspectrals:
+        # Point to stored meridional profiles and calibration coefficients
+        coeffs  = FindFiles(mode='kspectrals')
+        # Load .npy files
+        kspectrals    = [np.load(c) for c in coeffs]
+        # Fix shape (numpy changes array shape when storing)
+        layers, rows, cols = np.shape(kspectrals)
+        kspectrals = np.reshape(kspectrals, (rows, layers, cols))
+    else:
+        kspectrals = None
 
     return singles, spectrals, ksingles, kspectrals
