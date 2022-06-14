@@ -10,18 +10,19 @@ def CalibrateMaps(files, ksingles):
     print(np.shape(files), np.shape(ksingles))
     # kcoeffs = ksingles[1, :]
 
-    for i in range(90)
+    for i in range(90):
+        print(files[i], ksingles[0,i])
 
-    # Loop over files and calibration coefficients
-    # for (ifile, fname), (ik, ksingle) in zip(files, ksingles):
-    for fname, ksingle in zip(files, kcoeffs):
-        print(fname, ksingle)
+    # # Loop over files and calibration coefficients
+    # # for (ifile, fname), (ik, ksingle) in zip(files, ksingles):
+    # for fname, ksingle in zip(files, kcoeffs):
+    #     print(fname, ksingle)
 
-        # _, imgdata, _, cyldata, _, _ = ReadFits(filename=f"{fname}")
+    #     # _, imgdata, _, cyldata, _, _ = ReadFits(filename=f"{fname}")
 
-        # print(np.shape(imgdata), np.shape(cyldata))
+    #     # print(np.shape(imgdata), np.shape(cyldata))
 
-        exit()
+    #     exit()
 
 
 
