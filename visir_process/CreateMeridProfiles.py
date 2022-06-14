@@ -94,7 +94,7 @@ def CreateMeridProfiles(Nfiles, spectrum, LCMIII):
         return spectral_merids
 
     singles = singles(Nfiles, spectrum, LCMIII)
-    spectrals = spectrals(Nfiles, spectrum, LCMIII, single_merids)
+    spectrals = spectrals(Nfiles, spectrum, LCMIII, singles)
 
     # # Clear spectrum array from local variables
     # del locals()['spectrum']
