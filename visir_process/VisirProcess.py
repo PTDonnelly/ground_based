@@ -11,6 +11,7 @@ def main():
     from CreateMeridProfiles import CreateMeridProfiles
     from CalibrateMeridProfiles import CalibrateMeridProfiles
     from WriteProfiles import WriteProfiles
+    from ReadNpy import ReadNpy
     from PlotProfiles import PlotProfiles
     from PlotMaps import PlotMaps
     from WriteSpx import WriteSpx
@@ -45,67 +46,36 @@ def main():
         if save == 1:
             WriteProfiles(files, calsingles, calspectrals, ksingles, kspectrals)
 
-    # Plot meridional profiles (optionally read stored numpy arrays from Step 8)
+    # Plot meridional profiles
     if plot == 1:
         if calc == 0:
             # Create plots
             PlotProfiles(calsingles, calspectrals, ksingles, kspectrals, wavenumber)
         if calc == 1:
-            # Point to stored meridional profiles and calibration coefficients
-            profiles1  = FindFiles(mode='singles')
-            profiles2  = FindFiles(mode='spectrals')
-            coeffs1    = FindFiles(mode='ksingles')
-            coeffs2    = FindFiles(mode='kspectrals')
-            # Load .npy files
-            singles    = [np.load(p) for p in profiles1]
-            spectrals  = [np.load(p) for p in profiles2]
-            ksingles   = [np.load(c) for c in coeffs1]
-            kspectrals = [np.load(c) for c in coeffs1]
-            # Fix shape (numpy changes array shape when storing)
-            layers, rows, cols = np.shape(singles)
-            singles = np.reshape(singles, (rows, layers, cols))
-            layers, rows, cols = np.shape(spectrals)
-            spectrals = np.reshape(spectrals, (rows, layers, cols))
-            layers, rows, cols = np.shape(ksingles)
-            ksingles = np.reshape(ksingles, (rows, layers, cols))
-            layers, rows, cols = np.shape(kspectrals)
-            kspectrals = np.reshape(kspectrals, (rows, layers, cols))
+            # Read in profiles and coefficients
+            singles, spectrals, ksingles, kspectrals = ReadNpy()
             # Create plots
-            PlotProfiles(singles=profiles1, spectrals=profiles2, ksingles=coeffs1, kspectrals=coeffs2, wavenumber=False)
+            PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber=False)
 
-    # Plot cylindrical maps (optionally read stored numpy arrays from Step 8)
+    # Plot cylindrical maps
     if maps == 1:
         if calc == 0:
             # Create plots
             PlotMaps(files, ksingles, kspectrals)
         if calc == 1:
-            # Point to stored calibration coefficients
-            coeffs1    = FindFiles(mode='ksingles')
-            coeffs2    = FindFiles(mode='kspectrals')
-            # Load .npy files
-            ksingles   = [np.load(c) for c in coeffs1]
-            kspectrals = [np.load(c) for c in coeffs1]
-            # Fix shape (numpy changes array shape when storing)
-            layers, rows, cols = np.shape(ksingles)
-            ksingles = np.reshape(ksingles, (rows, layers, cols))
-            layers, rows, cols = np.shape(kspectrals)
-            kspectrals = np.reshape(kspectrals, (rows, layers, cols))
+            # Read in coefficients
+            _, _, ksingles, kspectrals = ReadNpy()
             # Create plots
             PlotMaps(files, ksingles=coeffs1, kspectrals=coeffs2)
     
-    # Generate spectral inputs for NEMESIS (optionally read stored numpy arrays from Step 8)
+    # Generate spectral inputs for NEMESIS
     if spx == 1:
         if calc == 0:
             # Create spectra
             WriteSpx(calspectrals)
         if calc == 1:
-            # Point to stored individual meridional profiles
-            profiles = FindFiles(mode='spectrals')
-            # Load .npy files
-            spectrals = [np.load(p) for p in profiles]
-            # Fix shape (numpy changes array shape when storing)
-            layers, rows, cols = np.shape(spectrals)
-            spectrals = np.reshape(spectrals, (rows, layers, cols))
+            # Read in profiles
+            _, spectrals, _, _ = ReadNpy()
             # Create spectra
             WriteSpx(spectrals)
 
