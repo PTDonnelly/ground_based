@@ -6,9 +6,6 @@ PTD 01/06/22: Code to calibrate VISIR cylindrical maps and
 def main():
     import numpy as np
     import time
-    import cProfile
-    import io
-    import pstats
     from FindFiles import FindFiles
     from RegisterMaps import RegisterMaps
     from CreateMeridProfiles import CreateMeridProfiles
@@ -17,11 +14,7 @@ def main():
     from PlotProfiles import PlotProfiles
     from PlotMaps import PlotMaps
     from WriteSpx import WriteSpx
-
-    # Create profiler
-    pr = cProfile.Profile()
-    # Start profiler
-    pr.enable()
+    
     # Start clock
     start = time.time()
     
@@ -29,11 +22,11 @@ def main():
     files       = FindFiles(mode='images')           # Point to location of all input observations
     Nfiles      = len(files)
     # Flags
-    calc        = 0                                   # (0) Calculate meridional profiles, (1) read stored profiles
+    calc        = 1                                   # (0) Calculate meridional profiles, (1) read stored profiles
     save        = 0                                   # (0) Do not save (1) save meridional profiles
     plot        = 0                                   # (0) Do not plot (1) plot meridional profiles
-    maps        = 1                                   # (0) Do not plot (1) plot cylindrical maps
-    spx         = 0                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
+    maps        = 0                                   # (0) Do not plot (1) plot cylindrical maps
+    spx         = 1                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
     
     if calc == 0:
         # Steps 1-3: Generate nested dictionaries containing spatial and spectral information of each cylindrical map
@@ -52,29 +45,33 @@ def main():
         if save == 1:
             WriteProfiles(files, calsingles, calspectrals, ksingles, kspectrals)
 
-    ###
-
     # Plot meridional profiles (optionally read stored numpy arrays from Step 8)
     if plot == 1:
         if calc == 0:
             PlotProfiles(calsingles, calspectrals, ksingles, kspectrals, wavenumber)
         if calc == 1:
             # Point to stored meridional profiles and calibration coefficients
-            profiles1 = FindFiles(mode='singles')
-            profiles2 = FindFiles(mode='spectrals')
-            coeffs1   = FindFiles(mode='ksingles')
-            coeffs2   = FindFiles(mode='kspectrals')
+            profiles1  = FindFiles(mode='singles')
+            profiles2  = FindFiles(mode='spectrals')
+            singles    = [np.load(p) for p in profiles1]
+            spectrals  = [np.load(p) for p in profiles2]
+            coeffs1    = FindFiles(mode='ksingles')
+            coeffs2    = FindFiles(mode='kspectrals')
+            ksingles   = [np.load(c) for c in coeffs1]
+            kspectrals = [np.load(c) for c in coeffs1]
             PlotProfiles(singles=profiles1, spectrals=profiles2, ksingles=coeffs1, kspectrals=coeffs2, wavenumber=False)
 
     # Plot cylindrical maps (optionally read stored numpy arrays from Step 8)
     if maps == 1:
         if calc == 0:
-            PlotMaps(files, spectrals, ksingles, wavenumber)
+            PlotMaps(files, ksingles, kspectrals)
         if calc == 1:
-            # Point to stored mu profiles and calibration coefficients
-            profiles = FindFiles(mode='spectrals')
-            coeffs   = FindFiles(mode='ksingles')
-            PlotMaps(files, spectrals=profiles, ksingles=coeffs, wavenumber=False)
+            # Point to stored calibration coefficients
+            coeffs1    = FindFiles(mode='ksingles')
+            coeffs2    = FindFiles(mode='kspectrals')
+            ksingles   = [np.load(c) for c in coeffs1]
+            kspectrals = [np.load(c) for c in coeffs1]
+            PlotMaps(files, ksingles=coeffs1, kspectrals=coeffs2)
     
     # Generate spectral inputs for NEMESIS (optionally read stored numpy arrays from Step 8)
     if spx == 1:
@@ -83,22 +80,31 @@ def main():
         if calc == 1:
             # Point to stored individual meridional profiles
             profiles = FindFiles(mode='spectrals')
-            WriteSpx(spectrals=profiles)
+            spectrals = [np.load(p) for p in profiles]
+            WriteSpx(spectrals)
 
     # Stop clock
     end = time.time()
     # Print elapsed time
     print(f"Elapsed time: {np.round(end-start, 3)} s")
     print(f"Time per file: {np.round((end-start)/len(files), 3)} s")
-    # Stop profiler
-    pr.disable()
-    # Print profiler output to file
-    s = io.StringIO()
-    ps = pstats.Stats(pr, stream=s).sort_stats('tottime')
-    ps.print_stats()
-
-    with open('../cProfiler_output.txt', 'w+') as f:
-        f.write(s.getvalue())
 
 if __name__ == '__main__':
+    # import cProfile, io, pstats
+    # # Create profiler
+    # pr = cProfile.Profile()
+    # # Start profiler
+    # pr.enable()
+
     main()
+    
+    # # Stop profiler
+    # pr.disable()
+    # # Print profiler output to file
+    # s = io.StringIO()
+    # ps = pstats.Stats(pr, stream=s).sort_stats('tottime')
+    # ps.strip_dirs()
+    # ps.print_stats()
+
+    # with open('../cProfiler_output.txt', 'w+') as f:
+    #     f.write(s.getvalue())
