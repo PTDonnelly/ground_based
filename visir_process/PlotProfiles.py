@@ -16,7 +16,7 @@ def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
     #    print("blablabla, you have to code it!")
 
     # Read in Voyager and Cassini data into arrays
-    calfile = "../visir.jup.filtered-iris-cirs.10-12-15.data.v3"
+    calfile = "../inputs/visir.jup.filtered-iris-cirs.10-12-15.data.v3"
     iris, cirs = ReadCal(calfile)
 
     print('Plotting profiles...')
