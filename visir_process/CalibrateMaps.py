@@ -6,23 +6,18 @@ def CalibrateMaps(files, ksingles):
     """Calibrate (or re-calibrate) cylindrical maps using calculated calibration coefficients.
        Used for creating global maps and different binning schemes."""
 
+    # Pull out the calibration coefficients
+    kcoeffs = ksingles[:, 1]
 
-    print(np.shape(files), np.shape(ksingles))
-    # kcoeffs = ksingles[1, :]
+    # Loop over files and calibration coefficients
+    for fname, ksingle in zip(files, kcoeffs):
+        print(fname, ksingle)
 
-    for i in range(90):
-        print(files[i], ksingles[0,i])
+        # _, imgdata, _, cyldata, _, _ = ReadFits(filename=f"{fname}")
 
-    # # Loop over files and calibration coefficients
-    # # for (ifile, fname), (ik, ksingle) in zip(files, ksingles):
-    # for fname, ksingle in zip(files, kcoeffs):
-    #     print(fname, ksingle)
+        # print(np.shape(imgdata), np.shape(cyldata))
 
-    #     # _, imgdata, _, cyldata, _, _ = ReadFits(filename=f"{fname}")
-
-    #     # print(np.shape(imgdata), np.shape(cyldata))
-
-    #     exit()
+        exit()
 
 
 

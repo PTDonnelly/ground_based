@@ -23,6 +23,7 @@ def main():
     
     ##### Define global inputs #####
     files       = FindFiles(mode='images')           # Point to location of all input observations
+    nfiles      = len(files)
     # Flags
     calc        = 1                                   # (0) Calculate meridional profiles, (1) read stored profiles
     save        = 0                                   # (0) Do not save (1) save meridional profiles
@@ -37,10 +38,10 @@ def main():
         spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files)
 
         # Steps 4-5: Generate average meridional profiles for each observation and each filter
-        singles, spectrals = CreateMeridProfiles(BinningInputs.nfiles, spectrum, LCMIII)
+        singles, spectrals = CreateMeridProfiles(nfiles, spectrum, LCMIII)
         
         # Steps 6-7: Generate calibrated versions of the profiles from Steps 4 and 5
-        calsingles, calspectrals, ksingles, kspectrals = CalibrateMeridProfiles(BinningInputs.nfiles, singles, spectrals, wavenumber)
+        calsingles, calspectrals, ksingles, kspectrals = CalibrateMeridProfiles(nfiles, singles, spectrals, wavenumber)
 
         # Step 8: Store all cmap profiles and calibration parameters
         if save == 1:
