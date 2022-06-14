@@ -7,9 +7,17 @@ def WriteSpx(spectrals):
     populate .spxfile with radiances, measurement errors, and geometries."""
     
     def create_merid_spx(f, lats, LCMs, mus, rads, rad_errs, waves):
+        """Write spxfile for meridional binning method """
+
+        # Write first line of texfile with relevant formatting
+        clat = lats[0]
+        LCM  = np.mean(LCMs)
+        nmu  = len(mus)
+        f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:12.5f}\n".format(0, clat, LCM, nmu))
+
         # Loop over NGEOM geometries (no. of geometries = no. of emission angle points)
         for igeom, mu in enumerate(mus):
-            # Calculate NCONV spectral points (NCONV = no. of wavenumbers at each geometry = 1 for merid binning)
+            # Calculate NCONV spectral points (NCONV = no. of wavenumbers per geometry = 1 for merid binning)
             nconv = 1
             # I can't remember what NAV is... check the NEMESIS manual
             nav   = 1
