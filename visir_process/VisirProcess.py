@@ -26,10 +26,10 @@ def main():
     # Flags
     calc        = 1                                   # (0) Calculate meridional profiles, (1) read stored profiles
     save        = 0                                   # (0) Do not save (1) save meridional profiles
-    recal       = 0                                   # (0) Do not calibrate (1) calibrate cylindrical maps (with ksingles)
+    recal       = 1                                   # (0) Do not calibrate (1) calibrate cylindrical maps (with ksingles)
     plot        = 0                                   # (0) Do not plot (1) plot meridional profiles
     maps        = 0                                   # (0) Do not plot (1) plot cylindrical maps
-    spx         = 1                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
+    spx         = 0                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
     
     ### Calibrate cylindrical maps and produce meridional profiles
     if calc == 0:

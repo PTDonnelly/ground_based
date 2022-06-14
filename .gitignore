@@ -6,3 +6,7 @@
 *.npy
 *.data.v3
 *.spx
+
+.DS_store
+outputs/
+outputs/.DS_store
