@@ -32,8 +32,7 @@ These calibrated profiles (and associated calibration coefficients) can then be 
 
 ### UNDER CONSTRUCTION ###
 
-1. Writing spxfiles in WriteSpx
-2. Plotting global maps in PlotMaps
+1. Plotting global maps in PlotMaps
 
 Thoughts for next version: consolidate codes into groups of functions and subfunctions for expansion in future
 1. For Mapping: define a module with both mapping options inside so that we can simply import Mapping and call Mapping.Cylindrical or Mapping.Polar.

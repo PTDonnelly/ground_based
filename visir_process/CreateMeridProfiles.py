@@ -11,7 +11,7 @@ def CreateMeridProfiles(Nfiles, spectrum, LCMIII):
         """Create central meridian average for each observation"""
 
         # Create np.array for all individual mean profiles (one per file)
-        single_merids = np.zeros((BinningInputs.Nlatbins, Nfiles, 7))
+        single_merids = np.zeros((BinningInputs.nlatbins, Nfiles, 7))
 
         # Loop over latitudes and create individual mean profiles
         print('Binning singles...')
@@ -58,7 +58,7 @@ def CreateMeridProfiles(Nfiles, spectrum, LCMIII):
         """Create central meridian average for each wavelength"""
 
         # Create np.array for all spectral mean profiles (one per filter)
-        spectral_merids = np.zeros((BinningInputs.Nlatbins, BinningInputs.nfilters, 6))
+        spectral_merids = np.zeros((BinningInputs.nlatbins, BinningInputs.nfilters, 6))
 
         print('Binning spectrals...')
         # Loop over filters and create mean spectral profiles
