@@ -1,22 +1,19 @@
 from cmath import nan
 from fileinput import filename
 import os
-
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
-from scipy import interpolate
 from BinningInputs import BinningInputs
-from ReadFits import ReadFits
+from CorrectMaps import PolynomialAdjust
 from SetWave import SetWave
 from VisirWavenumbers import VisirWavenumbers
-from VisirWavelengths import VisirWavelengths
-from ConvertBrightnessTemperature import ConvertBrightnessTemperature
+from CorrectMaps import PolynomialAdjust
 
 def PlotMaps(files, spectrals, ksingles, wavenumber):
     """ DB: Mapping global maps for each VISIR filter """
 
-    print('Correcting and mapping global maps...')
+    print('Correcting global maps...')
     # If subdirectory does not exist, create it
     dir = '../outputs/global_maps_figures/'
     if not os.path.exists(dir):
@@ -32,48 +29,13 @@ def PlotMaps(files, spectrals, ksingles, wavenumber):
     mumaps     = np.empty((Nfiles, ny, nx))
     TBmaps     = np.empty((Nfiles, ny, nx))
     globalmaps = np.empty((BinningInputs.nfilters, ny, nx))
-    mumin      = np.empty((BinningInputs.nfilters,ny, nx))
-    wavelength = np.empty(Nfiles)
+    #mumin      = np.empty((BinningInputs.nfilters,ny, nx))
 
-    # Loop over file to load individual (and original) cylindrical maps
-    for ifile, fname in enumerate(files):
-        ## Step 1: Read img, cmap and mufiles
-        imghead, _, cylhead, cyldata, _, mudata = ReadFits(filename=f"{fname}")
+    cmaps, mumaps = PolynomialAdjust(dir, files, wavenumber, spectrals, ksingles)
 
-        ## Step 2: Geometric registration of pixel information
-        # Save flag depending on Northern (1) or Southern (-1) viewing
-        chopang = imghead['HIERARCH ESO TEL CHOP POSANG']
-        posang  = imghead['HIERARCH ESO ADA POSANG'] + 360
-
-        # Set the central wavelengths for each filter. Must be
-        # identical to the central wavelength specified for the
-        # production of the k-tables
-        wavelen, _, _, _  = SetWave(wavelength=cylhead['lambda'], wavenumber=False)
-        wavelength[ifile] = wavelen
-
-        # Store corrected spectral information in np.array 
-        # with ignoring negative beam on each cyldata maps
-        if chopang == posang:
-            # Northern view
-            cmaps[ifile, int((ny-10)/2):ny, :] = cyldata[int((ny-10)/2):ny, :] * ksingles[ifile, 1]
-            cmaps[ifile, 0:int((ny-10)/2), :]  = np.nan
-        else:
-            # Southern view
-            cmaps[ifile, 0:int((ny+10)/2), :]  = cyldata[0:int((ny+10)/2), :] * ksingles[ifile, 1]
-            cmaps[ifile, int((ny+10)/2):ny, :] = np.nan
-        mumaps[ifile, :, :] = mudata
-        # Convert radiance maps to brightness temperature maps
-        cmaps[ifile, :, :] = ConvertBrightnessTemperature(cmaps[ifile, :, :],wavelength=wavelength[ifile])
+    print('Mapping global maps...')
 
     for ifilt in range(BinningInputs.nfilters):
-        # Retrieve emision angle profiles from spectrals, interpolate it over cmaps latitude grid 
-        # and create a minimum emission angle map for each filter
-        spec_length = np.arange(0, 180)
-        mu_prof = spectrals[:, ifilt, 2]
-        f = interpolate.interp1d(spec_length, mu_prof, fill_value="extrapolate")
-        for x in range(nx):
-            lat = np.arange(0,ny)
-            mumin[ifilt, :, x] = f(lat)
         # Empty local TBmaps array to avoid overlapping between filter
         TBmaps[:, :, :] = np.nan
         # Get filter index for spectral profiles
@@ -85,7 +47,7 @@ def PlotMaps(files, spectrals, ksingles, wavenumber):
                 # Store only the cmaps for the current ifilt 
                 TBmaps[ifile, :, :] = cmaps[ifile, :, :]                
                
-                res = ma.masked_where(mumaps[ifile, :, :] < mumin[ifilt, :, :], TBmaps[ifile, :, :])
+                res = ma.masked_where(mumaps[ifile, :, :] < 0.2, TBmaps[ifile, :, :])
                 #res = ma.masked_where(((res > 161)), res)
                 #res = ma.masked_where(((res < 135)), res)
                 TBmaps[ifile,:,:] = res.filled(np.nan)
