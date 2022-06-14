@@ -10,14 +10,19 @@ def CalibrateMaps(files, ksingles):
     kcoeffs = ksingles[:, 1]
 
     # Loop over files and calibration coefficients
-    for fname, ksingle in zip(files, kcoeffs):
-        print(fname, ksingle)
+    for fname, kcoeff in zip(files, kcoeffs):
+        # Read in uncalibrated observations (images and cmaps) from .fits files
+        imghead, imgdata, cylhead, cyldata, _, _ = ReadFits(filename=f"{fname}")
 
-        # _, imgdata, _, cyldata, _, _ = ReadFits(filename=f"{fname}")
+        # Do calibration: divide raw radiances by calibration coefficient
+        imgdata /= kcoeff
+        cyldata /= kcoeff
 
-        # print(np.shape(imgdata), np.shape(cyldata))
+        # # Write calibrated observations (images and cmaps) to .fits files
+        # imghead, imgdata, cylhead, cyldata, muhead, mudata = WriteFits(imghead, imgdata, cylhead, cyldata)
 
-        exit()
+
+
 
 
 
