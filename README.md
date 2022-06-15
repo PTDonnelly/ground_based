@@ -32,8 +32,6 @@ These calibrated profiles (and associated calibration coefficients) can then be 
 
 ### UNDER CONSTRUCTION ###
 
-1. Plotting global maps in PlotMaps
-
 Thoughts for next version: consolidate codes into groups of functions and subfunctions for expansion in future
 1. For Mapping: define a module with both mapping options inside so that we can simply import Mapping and call Mapping.Cylindrical or Mapping.Polar.
 2. For Profiles: define the module MeridProfiles, such that MeridProfiles.Create and MeridProfiles.Calibrate. Eventually this could even become Binning.MeridProfile.Create, Binning.CTLProfile.Create, etc. (depending on what is needed).
@@ -46,3 +44,8 @@ Thoughts for next version: consolidate codes into groups of functions and subfun
 We can also ask ourselves, do we want plotting routines to be nested inside the relevant area? I.e. Mapping.Cylindrical.Plot, MeridProfiles.Plot, Winds.Pseudo.Plot? Or keep all plotting routines in one module with different areas nested inside that? I.e. Plot.MeridProfiles, Plot.Winds.Pesudo, Plot.Mapping.Cylindrical?
 
 Maybe the secondway is better because then you can have the function Mapping.Cylindrical() and at the very end you can call Plot.Mapping.Cylindrical()? I am not sure at this point.
+
+# UPDATE #
+
+Implemented the above approach with subdirectories first rather than submodules first. Submodules can come later as and when we need more diverse applications to the code.
+
