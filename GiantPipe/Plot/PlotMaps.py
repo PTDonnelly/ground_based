@@ -9,7 +9,7 @@ from Tools.CorrectMaps import PolynomialAdjust
 from Tools.SetWave import SetWave
 from Tools.VisirFilterInfo import Wavenumbers
 
-def PlotMaps(files, spectrals, ksingles, wavenumber):
+def PlotMaps(files, spectrals, ksingles):
     """ DB: Mapping global maps for each VISIR filter """
 
     print('Correcting global maps...')
@@ -26,11 +26,12 @@ def PlotMaps(files, spectrals, ksingles, wavenumber):
     # Create np.arrays for all pixels in all cmaps and mumaps
     cmaps      = np.empty((Nfiles, ny, nx))
     mumaps     = np.empty((Nfiles, ny, nx))
+    wavenumber = np.empty(Nfiles)
     TBmaps     = np.empty((Nfiles, ny, nx))
     globalmaps = np.empty((Globals.nfilters, ny, nx))
     #mumin      = np.empty((Globals.nfilters,ny, nx))
 
-    cmaps, mumaps = PolynomialAdjust(dir, files, wavenumber, spectrals)
+    cmaps, mumaps, wavenumber = PolynomialAdjust(dir, files, spectrals)
 
     print('Mapping global maps...')
 
@@ -46,7 +47,7 @@ def PlotMaps(files, spectrals, ksingles, wavenumber):
                 # Store only the cmaps for the current ifilt 
                 TBmaps[ifile, :, :] = cmaps[ifile, :, :]                
                
-                res = ma.masked_where(mumaps[ifile, :, :] < 0.2, TBmaps[ifile, :, :])
+                res = ma.masked_where(mumaps[ifile, :, :] < 0.02, TBmaps[ifile, :, :])
                 #res = ma.masked_where(((res > 161)), res)
                 #res = ma.masked_where(((res < 135)), res)
                 TBmaps[ifile,:,:] = res.filled(np.nan)
@@ -72,7 +73,7 @@ def PlotMaps(files, spectrals, ksingles, wavenumber):
         #cbar.ax.tick_params(labelsize=15)
         cbar.set_label("Brightness Temperature [K]")
 
-        # Save figure showing calibation method 
+        # Save global map figure of the current filter 
         filt = Wavenumbers(ifilt)
         plt.savefig(f"{dir}{filt}_global_maps.png", dpi=900)
         plt.savefig(f"{dir}{filt}_global_maps.eps", dpi=900)
