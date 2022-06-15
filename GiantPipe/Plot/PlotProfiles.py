@@ -7,7 +7,7 @@ from Read.ReadCal import ReadCal
 from Tools.VisirFilterInfo import Wavenumbers
 from Tools.SetWave import SetWave
 
-def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
+def PlotMeridProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
     """ DB: Plot meridian profiles and spacecraft data to illustrate 
             the calibration method """
     

@@ -2,10 +2,10 @@ import os
 import numpy as np
 import Globals
 
-def WriteSpx(spectrals):
-    """Create spectral input for NEMESIS. Take calculated profiles and 
-    populate .spxfile with radiances, measurement errors, and geometries."""
-    
+def WriteMeridSpx(spectrals):
+    """Create spectral input for NEMESIS using central meridian profiles.
+       Populate .spxfile with radiances, measurement errors, and geometries."""
+
     def create_merid_spx(f, lats, LCMs, mus, rads, rad_errs, waves):
         """Write spxfile for meridional binning method """
 
@@ -62,3 +62,9 @@ def WriteSpx(spectrals):
             # Open spxfile
             with open(f"../outputs/spxfiles/lat_{lats[0]}.spx", 'w') as f:
                 create_merid_spx(f, lats, LCMs, mus, rads, rad_errs, waves)
+
+def WriteCTLSpx():
+    """Create spectral input for NEMESIS using centre-to-limb profiles.
+       Populate .spxfile with radiances, measurement errors, and geometries."""
+    
+    a = 1
