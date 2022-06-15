@@ -9,7 +9,7 @@ from Tools.CorrectMaps import PolynomialAdjust
 from Tools.SetWave import SetWave
 from Tools.VisirFilterInfo import Wavenumbers
 
-def PlotMaps(files, spectrals, ksingles):
+def PlotMaps(files, spectrals):
     """ DB: Mapping global maps for each VISIR filter """
 
     print('Correcting global maps...')

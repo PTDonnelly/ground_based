@@ -134,12 +134,12 @@ def main():
     ### Plot cylindrical maps
         if bin_cmerid == 0:
             # Create plots
-            PlotMaps(files, spectrals, ksingles, wavenumber)
+            PlotMaps(files, spectrals)
         if bin_cmerid == 1:
             # Read in individual calibration coefficients
-            _, spectrals, ksingles, _ = ReadNpy(return_singles=False, return_spectrals=True, return_ksingles=True, return_kspectrals=False)
+            _, spectrals, _, _ = ReadNpy(return_singles=False, return_spectrals=True, return_ksingles=True, return_kspectrals=False)
             # Create plots
-            PlotMaps(files, spectrals, ksingles, wavenumber=False)
+            PlotMaps(files, spectrals)
     
     ############################################################
     # Read in relevant calculated profiles (bin_cmerid or bin_ctl)
