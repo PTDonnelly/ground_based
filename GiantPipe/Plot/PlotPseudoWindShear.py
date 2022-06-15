@@ -12,7 +12,7 @@ def PlotPseudoWindShear(windshear):
 
     print('Plotting pseudo wind shear...')
     # If subdirectory does not exist, create it
-    dir = '../inputs/pseudo_wind_shear_profiles_figures/'
+    dir = '../../outputs/pseudo_wind_shear_profiles_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 
@@ -55,6 +55,6 @@ def PlotPseudoWindShear(windshear):
         ax2.xlabel('Planetocentric Latitude',size=25)
 
         # Save figure showing calibation method 
-        filt = VisirWavenumbers(ifilt)
+        filt = Wavenumbers(ifilt)
         plt.savefig(f"{dir}{filt}_pseudo_wind_shear.png", dpi=900)
         plt.savefig(f"{dir}{filt}_pseudo_wind_shear.eps", dpi=900)

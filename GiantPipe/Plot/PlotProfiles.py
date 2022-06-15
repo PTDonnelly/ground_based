@@ -16,12 +16,12 @@ def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
     #    print("blablabla, you have to code it!")
 
     # Read in Voyager and Cassini data into arrays
-    calfile = "../inputs/visir.jup.filtered-iris-cirs.10-12-15.data.v3"
+    calfile = "../../inputs/visir.jup.filtered-iris-cirs.10-12-15.data.v3"
     iris, cirs = ReadCal(calfile)
 
     print('Plotting profiles...')
     # If subdirectory does not exist, create it
-    dir = '../outputs/calibration_profiles_figures/'
+    dir = '../../outputs/calibration_profiles_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 
@@ -60,7 +60,7 @@ def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
         ax2.set_ylabel('Radiance (W)', size=15)
         ax2.legend()
         # Save figure showing calibation method 
-        filt = VisirWavenumbers(ifilt)
+        filt = Wavenumbers(ifilt)
         plt.savefig(f"{dir}{filt}_calibration_merid_profiles.png", dpi=900)
         plt.savefig(f"{dir}{filt}_calibration_merid_profiles.eps", dpi=900)
     # Clear figure to avoid overlapping between plotting subroutines
