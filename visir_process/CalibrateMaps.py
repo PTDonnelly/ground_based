@@ -1,5 +1,5 @@
 from ReadFits import ReadFits
-# from WriteFits import WriteFits
+from WriteFits import WriteFits
 
 def CalibrateMaps(files, ksingles):
     """Calibrate (or re-calibrate) cylindrical maps using calculated calibration coefficients.
@@ -9,16 +9,16 @@ def CalibrateMaps(files, ksingles):
     kcoeffs = ksingles[:, 1]
 
     # Loop over files and calibration coefficients
-    for fname, kcoeff in zip(files, kcoeffs):
+    for fpath, kcoeff in zip(files, kcoeffs):
         # Read in uncalibrated observations (images and cmaps) from .fits files
-        imghead, imgdata, cylhead, cyldata, _, _ = ReadFits(filename=f"{fname}")
+        imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filepath=f"{fpath}")
 
         # Do calibration: divide raw radiances by calibration coefficient
         imgdata /= kcoeff
         cyldata /= kcoeff
 
-        # # Write calibrated observations (images and cmaps) to .fits files
-        # imghead, imgdata, cylhead, cyldata, muhead, mudata = WriteFits(imghead, imgdata, cylhead, cyldata)
+        # Write calibrated observations (images and cmaps) to .fits files
+        WriteFits(filepath=f"{fpath}", imghead=imghead, imgdata=imgdata, cylhead=cylhead, cyldata=cyldata, muhead=muhead, mudata=mudata)
 
 
 

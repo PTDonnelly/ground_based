@@ -1,13 +1,13 @@
 from astropy.io import fits
 
-def ReadFits(filename):
+def ReadFits(filepath):
     """Open file, store to float array then close file"""
 
-    # Extract filename
-    name = filename.split('.gz')
+    # Extract filepath
+    name = filepath.split('.gz')
 
     # Header information
-    with fits.open(filename) as hdu:
+    with fits.open(filepath) as hdu:
         imghead = hdu[0].header
         imgdata = hdu[0].data
     # Cylindrical map data

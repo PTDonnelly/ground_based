@@ -30,10 +30,10 @@ def RegisterMaps(files):
     pg2pc = 0                   # Optional conversion of latitudes from planetographic to planetocentric
 
     # Loop over files
-    for ifile, fname in enumerate(files):
-        print(ifile, fname)
+    for ifile, fpath in enumerate(files):
+        print(ifile, fpath)
         ## Step 1: Read img, cmap and mufiles
-        imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filename=f"{fname}")
+        imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filepath=f"{fpath}")
 
         ## Step 2: Geometric registration of pixel information
         # Save flag depending on Northern (1) or Southern (-1) viewing
