@@ -60,7 +60,7 @@ def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
         ax2.set_ylabel('Radiance (W)', size=15)
         ax2.legend()
         # Save figure showing calibation method 
-        filt = VisirWavenumbers(ifilt)
+        filt = Wavenumbers(ifilt)
         plt.savefig(f"{dir}{filt}_calibration_merid_profiles.png", dpi=900)
         plt.savefig(f"{dir}{filt}_calibration_merid_profiles.eps", dpi=900)
     # Clear figure to avoid overlapping between plotting subroutines

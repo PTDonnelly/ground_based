@@ -55,6 +55,6 @@ def PlotPseudoWindShear(windshear):
         ax2.xlabel('Planetocentric Latitude',size=25)
 
         # Save figure showing calibation method 
-        filt = VisirWavenumbers(ifilt)
+        filt = Wavenumbers(ifilt)
         plt.savefig(f"{dir}{filt}_pseudo_wind_shear.png", dpi=900)
         plt.savefig(f"{dir}{filt}_pseudo_wind_shear.eps", dpi=900)

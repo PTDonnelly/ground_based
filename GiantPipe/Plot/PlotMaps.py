@@ -73,7 +73,7 @@ def PlotMaps(files, spectrals, ksingles, wavenumber):
         cbar.set_label("Brightness Temperature [K]")
 
         # Save figure showing calibation method 
-        filt = VisirWavenumbers(ifilt)
+        filt = Wavenumbers(ifilt)
         plt.savefig(f"{dir}{filt}_global_maps.png", dpi=900)
         plt.savefig(f"{dir}{filt}_global_maps.eps", dpi=900)
         # Clear figure to avoid overlapping between plotting subroutines
