@@ -2,7 +2,6 @@ import numpy as np
 import math
 from scipy.interpolate import interp1d
 
-
 def ReadGravity(filename, lat):
     """ DB: Function to load Jupiter gravity data
             and calculate some planet parameters """

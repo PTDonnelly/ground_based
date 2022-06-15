@@ -4,11 +4,10 @@ import os
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
-from BinningInputs import BinningInputs
-from CorrectMaps import PolynomialAdjust
-from SetWave import SetWave
-from VisirWavenumbers import VisirWavenumbers
-from CorrectMaps import PolynomialAdjust
+import Globals
+from Tools.CorrectMaps import PolynomialAdjust
+from Tools.SetWave import SetWave
+from Tools.VisirFilterInfo import Wavenumbers
 
 def PlotMaps(files, spectrals, ksingles, wavenumber):
     """ DB: Mapping global maps for each VISIR filter """
@@ -28,14 +27,14 @@ def PlotMaps(files, spectrals, ksingles, wavenumber):
     cmaps      = np.empty((Nfiles, ny, nx))
     mumaps     = np.empty((Nfiles, ny, nx))
     TBmaps     = np.empty((Nfiles, ny, nx))
-    globalmaps = np.empty((BinningInputs.nfilters, ny, nx))
-    #mumin      = np.empty((BinningInputs.nfilters,ny, nx))
+    globalmaps = np.empty((Globals.nfilters, ny, nx))
+    #mumin      = np.empty((Globals.nfilters,ny, nx))
 
     cmaps, mumaps = PolynomialAdjust(dir, files, wavenumber, spectrals, ksingles)
 
     print('Mapping global maps...')
 
-    for ifilt in range(BinningInputs.nfilters):
+    for ifilt in range(Globals.nfilters):
         # Empty local TBmaps array to avoid overlapping between filter
         TBmaps[:, :, :] = np.nan
         # Get filter index for spectral profiles

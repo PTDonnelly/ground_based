@@ -6,17 +6,17 @@ PTD 01/06/22: Code to calibrate VISIR cylindrical maps and
 def main():
     import numpy as np
     import time
-    from BinningInputs import BinningInputs
     from FindFiles import FindFiles
-    from ReadNpy import ReadNpy
     from RegisterMaps import RegisterMaps
-    from CreateMeridProfiles import CreateMeridProfiles
-    from CalibrateMeridProfiles import CalibrateMeridProfiles
-    from WriteProfiles import WriteProfiles
-    from CalibrateMaps import CalibrateMaps
-    from PlotProfiles import PlotProfiles
-    from PlotMaps import PlotMaps
-    from WriteSpx import WriteSpx
+    from Binning.CentralMerid import BinCentralMerid
+    from Binning.CentreToLimb import BinCentreToLimb
+    from Calibrate.CentralMerid import CalCentralMerid
+    from Calibrate.CylindricalMaps import CalCylindricalMaps
+    from Read.ReadNpy import ReadNpy
+    from Plot.PlotProfiles import PlotProfiles
+    from Plot.PlotMaps import PlotMaps
+    from Write.WriteProfiles import WriteProfiles
+    from Write.WriteSpx import WriteSpx
     
     # Start clock
     start = time.time()
@@ -27,21 +27,21 @@ def main():
     # Flags
     calc        = 1                                   # (0) Calculate meridional profiles, (1) read stored profiles
     save        = 0                                   # (0) Do not save (1) save meridional profiles
-    recal       = 1                                   # (0) Do not calibrate (1) calibrate cylindrical maps (with ksingles)
+    recal       = 0                                   # (0) Do not calibrate (1) calibrate cylindrical maps (with ksingles)
     plot        = 0                                   # (0) Do not plot (1) plot meridional profiles
     maps        = 0                                   # (0) Do not plot (1) plot cylindrical maps
-    spx         = 0                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
+    spx         = 1                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
     
     ### Calibrate cylindrical maps and produce meridional profiles
-    if bin_merid == 0:
+    if calc == 0:
         # Steps 1-3: Generate arrays containing spatial and spectral information of each cylindrical map
         spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files)
 
         # Steps 4-5: Generate average meridional profiles for each observation and each filter
-        singles, spectrals = CreateMeridProfiles(nfiles, spectrum, LCMIII)
+        singles, spectrals = BinCentralMerid(nfiles, spectrum, LCMIII)
         
         # Steps 6-7: Generate calibrated versions of the profiles from Steps 4 and 5
-        calsingles, calspectrals, ksingles, kspectrals = CalibrateMeridProfiles(nfiles, singles, spectrals, wavenumber)
+        calsingles, calspectrals, ksingles, kspectrals = CalCentralMerid(nfiles, singles, spectrals, wavenumber)
 
         # Step 8: Store all cmap profiles and calibration parameters
         if save == 1:
@@ -49,20 +49,20 @@ def main():
 
         # Step 9: Calibrate (or re-calibrate) cylindrical maps using calculated calibration coefficients
         if recal == 1:
-            CalibrateMaps(files, ksingles)
-    if bin_merid == 1:
+            CalCylindricalMaps(files, ksingles)
+    if calc == 1:
         # Calibrate (or re-calibrate) cylindrical maps using pre-calculated calibration coefficients
         if recal == 1:
             # Read in individual calibration coefficients
             _, _, ksingles, _ = ReadNpy(return_singles=False, return_spectrals=False, return_ksingles=True, return_kspectrals=False)
-            CalibrateMaps(files, ksingles)
+            CalCylindricalMaps(files, ksingles)
 
     ### Plot meridional profiles
     if plot == 1:
-        if bin_merid == 0:
+        if calc == 0:
             # Create plots
             PlotProfiles(calsingles, calspectrals, ksingles, kspectrals, wavenumber)
-        if bin_merid == 1:
+        if calc == 1:
             # Read in profiles and coefficients
             singles, spectrals, ksingles, kspectrals = ReadNpy(return_singles=True, return_spectrals=True, return_ksingles=True, return_kspectrals=True)
             # Create plots
@@ -70,10 +70,10 @@ def main():
 
     ### Plot cylindrical maps
     if maps == 1:
-        if bin_merid == 0:
+        if calc == 0:
             # Create plots
             PlotMaps(files, spectrals, ksingles, wavenumber)
-        if bin_merid == 1:
+        if calc == 1:
             # Read in individual calibration coefficients
             _, spectrals, ksingles, _ = ReadNpy(return_singles=False, return_spectrals=True, return_ksingles=True, return_kspectrals=False)
             # Create plots
@@ -81,10 +81,10 @@ def main():
     
     ### Generate spectral inputs for NEMESIS
     if spx == 1:
-        if bin_merid == 0:
+        if calc == 0:
             # Create spectra
             WriteSpx(calspectrals)
-        if bin_merid == 1:
+        if calc == 1:
             # Read in profiles
             _, spectrals, _, _ = ReadNpy(return_singles=False, return_spectrals=True, return_ksingles=False, return_kspectrals=False)
             # Create spectra

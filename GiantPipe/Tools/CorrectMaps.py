@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt 
-from BinningInputs import BinningInputs
-from ReadFits import ReadFits
-from SetWave import SetWave
-from VisirWavenumbers import VisirWavenumbers
-from ConvertBrightnessTemperature import ConvertBrightnessTemperature
+import Globals
+from Read.ReadFits import ReadFits
+from Tools.SetWave import SetWave
+from Tools.VisirFilterInfo import Wavenumbers
+from Tools.ConvertBrightnessTemperature import ConvertBrightnessTemperature
 
 def PolynomialAdjust(directory, files, wavenumber, spectrals, ksingles):
     # Define local inputs
@@ -21,8 +21,8 @@ def PolynomialAdjust(directory, files, wavenumber, spectrals, ksingles):
     viewing_mode   = np.empty(Nfiles)
 
     # Define local arrays to store selected latitude band spectral data
-    bandcmaps   = np.empty((BinningInputs.nfilters, ny, nx))
-    bandmumaps  = np.empty((BinningInputs.nfilters, ny, nx))
+    bandcmaps   = np.empty((Globals.nfilters, ny, nx))
+    bandmumaps  = np.empty((Globals.nfilters, ny, nx))
     keepdata  = np.empty((Nfiles, ny, nx))
     keepmu    = np.empty((Nfiles, ny, nx))
     selectdata  = np.empty((Nfiles, ny, nx))
@@ -75,7 +75,7 @@ def PolynomialAdjust(directory, files, wavenumber, spectrals, ksingles):
         keepdata[ifile, keep, :]  = cmaps[ifile, keep, :]  
         keepmu[ifile, keep, :]    = mumaps[ifile, keep, :]
 
-    for ifilt in range(BinningInputs.nfilters):
+    for ifilt in range(Globals.nfilters):
         # Get filter index for spectral profiles
         waves = spectrals[:, ifilt, 5]
         wave  = waves[(waves > 0)][0]

@@ -2,7 +2,6 @@ def FindFiles(mode):
     """Put all input data in a single list"""
 
     if mode == 'images':
-        # files = ['cal_wvisir_NEII_2_2018-05-24T02_45_35.7531_Jupiter_clean_withchop_calib_coeff.npy']
         # data_dir = '/Users/db496/Documents/Research/Observations/GBdata/visir/jupiter/global_maps_dataset/'
         data_dir = '/Users/ptdonnelly/Documents/Research/projects/shared/dbardet/data/'
         files = [f"{data_dir}recal_wvisir_ARIII_2018-05-25T03:45:53.1419_Jupiter_clean_withchop.fits.gz",

@@ -1,7 +1,7 @@
-from ReadFits import ReadFits
-from WriteFits import WriteFits
+from Read.ReadFits import ReadFits
+from Write.WriteFits import WriteFits
 
-def CalibrateMaps(files, ksingles):
+def CalCylindricalMaps(files, ksingles):
     """Calibrate (or re-calibrate) cylindrical maps using calculated calibration coefficients.
        Used for creating global maps and different binning schemes."""
 

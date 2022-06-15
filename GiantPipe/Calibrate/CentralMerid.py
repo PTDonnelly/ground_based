@@ -1,11 +1,9 @@
 import numpy as np
+import Globals
+from Read.ReadCal import ReadCal
+from Tools.SetWave import SetWave
 
-from BinningInputs import BinningInputs
-from ReadCal import ReadCal
-from SetWave import SetWave
-# from VisirWavenumbers import VisirWavenumbers
-
-def CalibrateMeridProfiles(nfiles, single_merids, spectral_merids, wavenumber):
+def CalCentralMerid(nfiles, single_merids, spectral_merids, wavenumber):
     """ Step 6: Calibrate spectral_merids to spacecraft data
                 (i.e. create calib_spectral_merids)
         Step 7: Calibrate single_merids to calib_spectral_merids
@@ -15,7 +13,7 @@ def CalibrateMeridProfiles(nfiles, single_merids, spectral_merids, wavenumber):
     
     # Create arrays to store calibration coefficients
     calib_coeff_single   = np.ones((nfiles, 2))
-    calib_coeff_spectral = np.ones((BinningInputs.nfilters, 2))
+    calib_coeff_spectral = np.ones((Globals.nfilters, 2))
     
     # Read in Voyager and Cassini data into arrays
     calfile = "../inputs/visir.jup.filtered-iris-cirs.10-12-15.data.v3"
@@ -23,7 +21,7 @@ def CalibrateMeridProfiles(nfiles, single_merids, spectral_merids, wavenumber):
 
     # Calculate calibration coefficients for the spectral merid profiles
     print('Calibrating spectrals...')
-    for iwave in range(BinningInputs.nfilters):
+    for iwave in range(Globals.nfilters):
         # Get filter index for calibration file
         waves = spectral_merids[:, iwave, 5]
         wave  = waves[(waves > 0)][0]
@@ -86,7 +84,7 @@ def CalibrateMeridProfiles(nfiles, single_merids, spectral_merids, wavenumber):
         calib_single_merids = single_merids
         calib_single_merids[:, ifile, 3] /= calib_coeff_single[ifile, 1]
         calib_single_merids[:, ifile, 4] /= calib_coeff_single[ifile, 1]
-    for ifilt in range(BinningInputs.nfilters):
+    for ifilt in range(Globals.nfilters):
         # Calibrate spectral merid profiles using spectral calibration coefficients
         calib_spectral_merids = spectral_merids
         calib_spectral_merids[:, ifilt, 3] /= calib_coeff_spectral[ifilt, 1]

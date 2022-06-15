@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from BinningInputs import BinningInputs
+import Globals
 
 def WriteSpx(spectrals):
     """Create spectral input for NEMESIS. Take calculated profiles and 
@@ -46,14 +46,14 @@ def WriteSpx(spectrals):
 
     print('Creating spectra...')
     # Loop over latitudes to create one .spxfile per latitude
-    for ilat in range(BinningInputs.nlatbins):
+    for ilat in range(Globals.nlatbins):
         # Extract variables and throw NaNs
-        lats     = [spectrals[ilat, ifilt, 0] for ifilt in range(BinningInputs.nfilters) if np.isnan(spectrals[ilat, ifilt, 0]) == False]
-        LCMs     = [spectrals[ilat, ifilt, 1] for ifilt in range(BinningInputs.nfilters) if np.isnan(spectrals[ilat, ifilt, 1]) == False]
-        mus      = [spectrals[ilat, ifilt, 2] for ifilt in range(BinningInputs.nfilters) if np.isnan(spectrals[ilat, ifilt, 2]) == False]
-        rads     = [spectrals[ilat, ifilt, 3] for ifilt in range(BinningInputs.nfilters) if np.isnan(spectrals[ilat, ifilt, 3]) == False]
-        rad_errs = [spectrals[ilat, ifilt, 4] for ifilt in range(BinningInputs.nfilters) if np.isnan(spectrals[ilat, ifilt, 4]) == False]
-        waves = [spectrals[ilat, ifilt, 5] for ifilt in range(BinningInputs.nfilters) if np.isnan(spectrals[ilat, ifilt, 5]) == False]
+        lats     = [spectrals[ilat, ifilt, 0] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ifilt, 0]) == False]
+        LCMs     = [spectrals[ilat, ifilt, 1] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ifilt, 1]) == False]
+        mus      = [spectrals[ilat, ifilt, 2] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ifilt, 2]) == False]
+        rads     = [spectrals[ilat, ifilt, 3] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ifilt, 3]) == False]
+        rad_errs = [spectrals[ilat, ifilt, 4] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ifilt, 4]) == False]
+        waves = [spectrals[ilat, ifilt, 5] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ifilt, 5]) == False]
         # Only write spxfile for latitudes with spectral information
         if lats:
             # Open textfile

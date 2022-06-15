@@ -1,8 +1,8 @@
 import os 
 import numpy as np 
 
-from BinningInputs import BinningInputs
-from VisirWavenumbers import VisirWavenumbers
+import Globals
+from Tools.VisirFilterInfo import Wavenumbers
 
 def WriteProfiles(files, singles, spectrals, ksingles, kspectrals):
     """Save calibrated profiles as numpy arrays and textfiles"""
@@ -33,7 +33,7 @@ def WriteProfiles(files, singles, spectrals, ksingles, kspectrals):
     if not os.path.exists(dir):
         os.makedirs(dir)
     # Save spectral meridional profiles
-    for ifilt in range(BinningInputs.nfilters):
+    for ifilt in range(Globals.nfilters):
         # Write spectral mean profiles and calibrated coefficient to np.array
         filt = VisirWavenumbers(ifilt)
         np.save(f"{dir}{filt}_merid_profile", spectrals[:, ifilt, :])

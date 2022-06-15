@@ -1,9 +1,9 @@
 import numpy as np
 from math import acos, cos, radians, pi
-from BinningInputs import BinningInputs
-from ReadFits import ReadFits
-from SetWave import SetWave
-from CalculateErrors import CalculateErrors
+import Globals
+from Read.ReadFits import ReadFits
+from Tools.SetWave import SetWave
+from Tools.CalculateErrors import CalculateErrors
 
 def RegisterMaps(files):
     """ Step 1: Read img, cmap and mufiles
@@ -62,10 +62,10 @@ def RegisterMaps(files):
         rad_error = CalculateErrors(imgdata, view)
         
         # Loop over each pixel to assign to the structure.
-        xstart  = float(naxis1) - BinningInputs.lonrange[0]/(360/naxis1)
-        xstop   = float(naxis1) - BinningInputs.lonrange[1]/(360/naxis1) 
-        ystart  = (float(naxis2)/2) + BinningInputs.latrange[0]/(180/naxis2)
-        ystop   = (float(naxis2)/2) + BinningInputs.latrange[1]/(180/naxis2) 
+        xstart  = float(naxis1) - Globals.lonrange[0]/(360/naxis1)
+        xstop   = float(naxis1) - Globals.lonrange[1]/(360/naxis1) 
+        ystart  = (float(naxis2)/2) + Globals.latrange[0]/(180/naxis2)
+        ystop   = (float(naxis2)/2) + Globals.latrange[1]/(180/naxis2) 
         x_range = np.arange(xstart, xstop, 1, dtype=int)
         y_range = np.arange(ystart, ystop, 1, dtype=int)
         for x in x_range:
@@ -73,11 +73,11 @@ def RegisterMaps(files):
                 # Only assign latitude and longitude if non-zero pixel value
                 if (cyldata[y, x] > 0):
                     # Calculate finite spatial element (lat-lon co-ordinates)
-                    lat = BinningInputs.latrange[0] + ((180 / naxis2) * y)
-                    lon = BinningInputs.lonrange[0] - ((360 / naxis1) * x)
+                    lat = Globals.latrange[0] + ((180 / naxis2) * y)
+                    lon = Globals.lonrange[0] - ((360 / naxis1) * x)
                     # Adjust co-ordinates from edge to centre of bins
-                    lat = lat + BinningInputs.latstep/res
-                    lon = lon - BinningInputs.latstep/res
+                    lat = lat + Globals.latstep/res
+                    lon = lon - Globals.latstep/res
                     # Convert from planetographic to planetocentric latitudes
                     mu_ang = mudata[y, x]
                     mu  = 180/pi * acos(mu_ang)

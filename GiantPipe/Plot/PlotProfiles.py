@@ -2,10 +2,10 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
-from ReadCal import ReadCal
-from BinningInputs import BinningInputs
-from VisirWavenumbers import VisirWavenumbers
-from SetWave import SetWave
+import Globals
+from Read.ReadCal import ReadCal
+from Tools.VisirFilterInfo import Wavenumbers
+from Tools.SetWave import SetWave
 
 def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
     """ DB: Plot meridian profiles and spacecraft data to illustrate 
@@ -25,7 +25,7 @@ def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-    for ifilt in range(BinningInputs.nfilters):
+    for ifilt in range(Globals.nfilters):
         # Get filter index for plotting spacecraft and calibrated data
         waves = spectrals[:, ifilt, 5]
         wave  = waves[(waves > 0)][0]

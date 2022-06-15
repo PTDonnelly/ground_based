@@ -1,7 +1,6 @@
 import numpy as np 
 from scipy.interpolate import interp1d
-
-from BinningInputs import BinningInputs
+import Globals
 
 def ReadCal(filename):
     """Read calibration file and return array of profiles"""
@@ -33,23 +32,23 @@ def ReadCal(filename):
     irisdata = np.asarray(caldata[0:niris-1], dtype='float')
     cirsdata = np.asarray(caldata[niris:niris+ncirs-1], dtype='float')
     # Interpolate spacecraft profiles onto "lat_grid" (common with data)
-    iris = np.zeros((BinningInputs.nlatbins, nfilt, 2))
-    cirs = np.zeros((BinningInputs.nlatbins, nfilt, 2))
+    iris = np.zeros((Globals.nlatbins, nfilt, 2))
+    cirs = np.zeros((Globals.nlatbins, nfilt, 2))
     for ifilt in range(nfilt):
         # Interp IRIS to VISIR
         f = interp1d(irisdata[:, 0], irisdata[:, ifilt+1])
         lmin, lmax = np.min(irisdata[:, 0]), np.max(irisdata[:, 0])
-        keep = (BinningInputs.latgrid > lmin) & (BinningInputs.latgrid < lmax)
+        keep = (Globals.latgrid > lmin) & (Globals.latgrid < lmax)
         # Store interpolated profile
-        iris[keep, ifilt, 0] = BinningInputs.latgrid[keep]
-        iris[keep, ifilt, 1] = f(BinningInputs.latgrid[keep]) * 10E-8
+        iris[keep, ifilt, 0] = Globals.latgrid[keep]
+        iris[keep, ifilt, 1] = f(Globals.latgrid[keep]) * 10E-8
         # Interp CIRS to VISIR
         f = interp1d(cirsdata[:, 0], cirsdata[:, ifilt+1])
         lmin, lmax = np.min(cirsdata[:, 0]), np.max(cirsdata[:, 0])
-        keep = (BinningInputs.latgrid > lmin) & (BinningInputs.latgrid < lmax)
+        keep = (Globals.latgrid > lmin) & (Globals.latgrid < lmax)
         # Store interpolated profile
-        cirs[keep, ifilt, 0] = BinningInputs.latgrid[keep]
-        cirs[keep, ifilt, 1] = f(BinningInputs.latgrid[keep]) * 10E-8
+        cirs[keep, ifilt, 0] = Globals.latgrid[keep]
+        cirs[keep, ifilt, 1] = f(Globals.latgrid[keep]) * 10E-8
 
     # Throw away zeros
     iris[iris == 0] = np.nan

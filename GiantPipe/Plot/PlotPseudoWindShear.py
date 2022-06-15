@@ -1,10 +1,9 @@
 import os
-
-import matplotlib.pyplot as plt
 import numpy as np
-from BinningInputs import BinningInputs
-from VisirWavenumbers import VisirWavenumbers
-from ReadZonalWind import ReadZonalWind
+import matplotlib.pyplot as plt
+import Globals
+from Tools.VisirFilterInfo import Wavenumbers
+from Read.ReadZonalWind import ReadZonalWind
 
 
 def PlotPseudoWindShear(windshear):
@@ -17,8 +16,8 @@ def PlotPseudoWindShear(windshear):
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-    for ifilt in range(BinningInputs.nfilters):
-        lat=BinningInputs.latgrid
+    for ifilt in range(Globals.nfilters):
+        lat=Globals.latgrid
 
         # Subplot for the southern hemisphere
         ax1 = plt.subplot2grid((1, 2), (0, 0))

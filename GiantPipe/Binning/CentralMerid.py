@@ -1,9 +1,8 @@
 import numpy as np
+import Globals
+from Tools.VisirFilterInfo import Wavenumbers
 
-from BinningInputs import BinningInputs
-from VisirWavenumbers import VisirWavenumbers
-
-def CreateMeridProfiles(Nfiles, spectrum, LCMIII):
+def BinCentralMerid(Nfiles, spectrum, LCMIII):
     """ Step 4: Create central meridian average for each observation
         Step 5: Create central meridian average for each wavelength"""
     
@@ -13,20 +12,20 @@ def CreateMeridProfiles(Nfiles, spectrum, LCMIII):
         """Create central meridian average for each observation"""
 
         # Create np.array for all individual mean profiles (one per file)
-        single_merids = np.zeros((BinningInputs.nlatbins, Nfiles, 7))
+        single_merids = np.zeros((Globals.nlatbins, Nfiles, 7))
 
         # Loop over latitudes and create individual mean profiles
         print('Binning singles...')
-        for ilat, _ in enumerate(BinningInputs.latgrid):
+        for ilat, _ in enumerate(Globals.latgrid):
             # Define centre and edges of latitude bin
-            clat = BinningInputs.latrange[0] + (BinningInputs.latstep)*ilat + (BinningInputs.latstep/2)
-            lat1 = BinningInputs.latrange[0] + (BinningInputs.latstep)*ilat
-            lat2 = BinningInputs.latrange[0] + (BinningInputs.latstep)*(ilat+1)
+            clat = Globals.latrange[0] + (Globals.latstep)*ilat + (Globals.latstep/2)
+            lat1 = Globals.latrange[0] + (Globals.latstep)*ilat
+            lat2 = Globals.latrange[0] + (Globals.latstep)*(ilat+1)
             # Loop over the spectrum array of each input file
             for ifile in range(Nfiles):
                 clon = LCMIII[ifile]
-                lon1 = LCMIII[ifile] + BinningInputs.merid_width
-                lon2 = LCMIII[ifile] - BinningInputs.merid_width
+                lon1 = LCMIII[ifile] + Globals.merid_width
+                lon2 = LCMIII[ifile] - Globals.merid_width
                 # Select lat-lon region around central meridian to calculate average
                 lats = spectrum[:, :, ifile, 0]
                 lons = spectrum[:, :, ifile, 1]
@@ -60,17 +59,17 @@ def CreateMeridProfiles(Nfiles, spectrum, LCMIII):
         """Create central meridian average for each wavelength"""
 
         # Create np.array for all spectral mean profiles (one per filter)
-        spectral_merids = np.zeros((BinningInputs.nlatbins, BinningInputs.nfilters, 6))
+        spectral_merids = np.zeros((Globals.nlatbins, Globals.nfilters, 6))
 
         print('Binning spectrals...')
         # Loop over filters and create mean spectral profiles
-        for ifilt in range(BinningInputs.nfilters):
+        for ifilt in range(Globals.nfilters):
             # Loop over latitudes and create individual mean profiles
-            for ilat, _ in enumerate(BinningInputs.latgrid):
+            for ilat, _ in enumerate(Globals.latgrid):
                 # Define centre and edges of latitude bin
-                clat = BinningInputs.latrange[0] + (BinningInputs.latstep)*ilat + (BinningInputs.latstep/2)
-                lat1 = BinningInputs.latrange[0] + (BinningInputs.latstep)*ilat
-                lat2 = BinningInputs.latrange[0] + (BinningInputs.latstep)*(ilat+1)
+                clat = Globals.latrange[0] + (Globals.latstep)*ilat + (Globals.latstep/2)
+                lat1 = Globals.latrange[0] + (Globals.latstep)*ilat
+                lat2 = Globals.latrange[0] + (Globals.latstep)*(ilat+1)
                 # Select a filter to calculate average
                 wave = VisirWavenumbers(ifilt)
                 filters = single_merids[ilat, :, 5]
