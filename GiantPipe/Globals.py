@@ -1,7 +1,8 @@
+"""Manual define global parameters that configure many parts of the pipeline,
+   such as the binning, calibration, plotting, and writing."""
+
 import numpy as np
 
-
-# Manual define global inputs to configure the pipeline
 latrange    = -90, 90          			         # Latitude range for binning pixels (planetographic)
 latstep     = 1                                  # Latitude increment for binning pixels (planetographic)
 latgrid     = np.arange(-89.5, 90, latstep)      # Latitude range from pole-to-pole
