@@ -4,72 +4,131 @@ PTD 01/06/22: Code to calibrate VISIR cylindrical maps and
 """
 
 def main():
-    import numpy as np
-    import time
     from FindFiles import FindFiles
     from RegisterMaps import RegisterMaps
-    from Binning.CentralMerid import BinCentralMerid
-    from Binning.CentreToLimb import BinCentreToLimb
-    from Calibrate.CentralMerid import CalCentralMerid
-    from Calibrate.CylindricalMaps import CalCylindricalMaps
-    from Read.ReadNpy import ReadNpy
-    from Plot.PlotProfiles import PlotProfiles
+    # from Binning.CentralMerid import BinCentralMerid
+    # from Binning.CentreToLimb import BinCentreToLimb
+    # from Calibrate.CentralMerid import CalCentralMerid
+    # from Calibrate.CylindricalMaps import CalCylindricalMaps
+    # from Plot.PlotProfiles import PlotMeridProfiles
     from Plot.PlotMaps import PlotMaps
-    from Write.WriteProfiles import WriteProfiles
-    from Write.WriteSpx import WriteSpx
+    from Read.ReadNpy import ReadNpy
+    # from Write.WriteProfiles import WriteMeridProfiles
+    # from Write.WriteProfiles import WriteCTLProfiles
+    # from Write.WriteSpx import WriteMeridSpx
+    # from Write.WriteSpx import WriteCTLSpx
     
-    # Start clock
-    start = time.time()
+    # Define flags to configure pipeline
+    source      = 0     # Raw data (to be calibrated) (0), or calibrated data (1), pre-calculated .npy profiles (2)
+    # Binning
+    bin_cmerid  = 0     # Use central meridian binning scheme (1), or not (0)
+    bin_ctl     = 0     # Use centre-to-limb binning scheme (1), or not (0)
+    # Output
+    save        = 0     # Store calculated profiles to local files (1), or not (0)
+    plotting    = 0     # Plot calculated profiles (1), or not (0)
+    mapping     = 0     # Plot maps of observations or retrieval (1), or not (0)
+    spx         = 0     # Write spxfiles as spectral input for NEMESIS (1), or not (0)
+
+
+    ############################################################
+    # Perform geometric registration and radiometric calibration
+    # of cylindrically-mapped data through central meridian binning
+    # and comparison to spacecraft data, then output calculated
+    # profiles and coefficients. Recommended as a first pass. For 
+    # plotting, mapping and spxing use calibrated data and .npy files
+    ############################################################
+
+    if source == 0:
+        from Binning.CentralMerid import BinCentralMerid
+        from Calibrate.CentralMerid import CalCentralMerid
+        from Calibrate.CylindricalMaps import CalCylindricalMaps
+        from Plot.PlotProfiles import PlotMeridProfiles
+        from Write.WriteProfiles import WriteMeridProfiles
+        from Write.WriteSpx import WriteMeridSpx
     
-    ##### Define global inputs #####
-    files       = FindFiles(mode='images')           # Point to location of all input observations
-    nfiles      = len(files)
-    # Flags
-    calc        = 1                                   # (0) Calculate meridional profiles, (1) read stored profiles
-    save        = 0                                   # (0) Do not save (1) save meridional profiles
-    recal       = 0                                   # (0) Do not calibrate (1) calibrate cylindrical maps (with ksingles)
-    plot        = 0                                   # (0) Do not plot (1) plot meridional profiles
-    maps        = 0                                   # (0) Do not plot (1) plot cylindrical maps
-    spx         = 1                                   # (0) Do not write (1) do write spxfiles for NEMESIS input
-    
-    ### Calibrate cylindrical maps and produce meridional profiles
-    if calc == 0:
+        # Point to location of observations
+        files       = FindFiles(mode='images')
+        nfiles      = len(files)
+
         # Steps 1-3: Generate arrays containing spatial and spectral information of each cylindrical map
-        spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files)
+        spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files)
 
         # Steps 4-5: Generate average meridional profiles for each observation and each filter
-        singles, spectrals = BinCentralMerid(nfiles, spectrum, LCMIII)
+        rawsingles, rawspectrals = BinCentralMerid(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
         
         # Steps 6-7: Generate calibrated versions of the profiles from Steps 4 and 5
-        calsingles, calspectrals, ksingles, kspectrals = CalCentralMerid(nfiles, singles, spectrals, wavenumber)
+        singles, spectrals, ksingles, kspectrals = CalCentralMerid(nfiles=nfiles, singles=rawsingles, spectrals=rawspectrals, wavenumber=wavenumber)
 
-        # Step 8: Store all cmap profiles and calibration parameters
-        if save == 1:
-            WriteProfiles(files, calsingles, calspectrals, ksingles, kspectrals)
+        # Step 8: Calibrate cylindrical maps using calculated calibration coefficients
+        CalCylindricalMaps(files, ksingles)
 
-        # Step 9: Calibrate (or re-calibrate) cylindrical maps using calculated calibration coefficients
-        if recal == 1:
-            CalCylindricalMaps(files, ksingles)
-    if calc == 1:
-        # Calibrate (or re-calibrate) cylindrical maps using pre-calculated calibration coefficients
-        if recal == 1:
-            # Read in individual calibration coefficients
-            _, _, ksingles, _ = ReadNpy(return_singles=False, return_spectrals=False, return_ksingles=True, return_kspectrals=False)
-            CalCylindricalMaps(files, ksingles)
+        # Step 9: Store calculated profiles and calibration parameters
+        WriteMeridProfiles(files=files, singles=singles, spectrals=spectrals, ksingles=ksingles, kspectrals=kspectrals)
 
-    ### Plot meridional profiles
-    if plot == 1:
-        if calc == 0:
-            # Create plots
-            PlotProfiles(calsingles, calspectrals, ksingles, kspectrals, wavenumber)
-        if calc == 1:
+
+    ############################################################
+    # Read in calibrated cylindrical maps of radiance, emission
+    # angle (and optionally Doppler velocity) and create profiles
+    # depending on the chosen binning scheme.
+    ############################################################
+
+    if source == 1:
+        # Point to location of observations
+        files       = FindFiles(mode='images')
+        nfiles      = len(files)
+
+        # Generate arrays containing spatial and spectral information of each cylindrical map
+        spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files)
+
+        if bin_cmerid == 1:
+            # Execute the central meridian binning scheme
+            singles, spectrals = BinCentralMerid(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
+
+            if save == 1:
+                # Store calculated profiles
+                WriteMeridProfiles(files=files, singles=singles, spectrals=spectrals, ksingles=False, kspectrals=False)
+
+            if plotting == 1:
+                # Create plots
+                PlotMeridProfiles(singles=singles, spectrals=spectrals, ksingles=ksingles, kspectrals=kspectrals, wavenumber=wavenumber)
+        
+        if bin_ctl == 1:
+            # Execute the centre-to-limb binning scheme
+            output = BinCTL(nfiles, spectrum)
+
+            if save == 1:
+                # Store calculated profiles
+                WriteCTLProfiles(files=files)
+
+
+    ############################################################
+    # Read in pre-calculated and locally-stored numpy arrays (.npy)
+    # of radiance
+    ############################################################
+
+    if source == 2:
+        
+        if bin_cmerid == 1:
+
             # Read in profiles and coefficients
             singles, spectrals, ksingles, kspectrals = ReadNpy(return_singles=True, return_spectrals=True, return_ksingles=True, return_kspectrals=True)
-            # Create plots
-            PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber=False)
 
+            if save == 1:
+                # Store calculated profiles
+                WriteMeridProfiles(files=files, singles=singles, spectrals=spectrals, ksingles=None, kspectrals=None)
+
+            if plotting == 1:
+                # Create plots
+                PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber=False)
+
+
+    ############################################################
+    # Read in calibrated data, calculated profiles or retrieved
+    # maps and and create maps (cylindrical, polar, etc.)
+    ############################################################
+
+    if mapping == 1:
     ### Plot cylindrical maps
-    if maps == 1:
         if calc == 0:
             # Create plots
             PlotMaps(files, spectrals, ksingles, wavenumber)
@@ -79,31 +138,43 @@ def main():
             # Create plots
             PlotMaps(files, spectrals, ksingles, wavenumber=False)
     
-    ### Generate spectral inputs for NEMESIS
+    ############################################################
+    # Read in relevant calculated profiles (bin_cmerid or bin_ctl)
+    # and generate spectral inputs for NEMESIS
+    ############################################################
     if spx == 1:
+
         if calc == 0:
             # Create spectra
-            WriteSpx(calspectrals)
+            WriteMeridSpx(calspectrals)
         if calc == 1:
             # Read in profiles
             _, spectrals, _, _ = ReadNpy(return_singles=False, return_spectrals=True, return_ksingles=False, return_kspectrals=False)
             # Create spectra
             WriteSpx(spectrals)
 
-    # Stop clock
-    end = time.time()
-    # Print elapsed time
-    print(f"Elapsed time: {np.round(end-start, 3)} s")
-    print(f"Time per file: {np.round((end-start)/len(files), 3)} s")
 
 if __name__ == '__main__':
-    # import cProfile, io, pstats
+    import numpy as np
+    import time
+    import cProfile
+    import io
+    import pstats
     # # Create profiler
     # pr = cProfile.Profile()
     # # Start profiler
     # pr.enable()
 
+    # Start clock
+    start = time.time()
+
     main()
+
+    # Stop clock
+    end = time.time()
+    # Print elapsed time
+    print(f"Elapsed time: {np.round(end-start, 3)} s")
+    print(f"Time per file: {np.round((end-start)/90, 3)} s")
     
     # # Stop profiler
     # pr.disable()
