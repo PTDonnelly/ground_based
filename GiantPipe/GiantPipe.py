@@ -73,6 +73,9 @@ def main():
     ############################################################
 
     if source == 1:
+        from Binning.CentreToLimb import BinCentreToLimb
+        from Write.WriteProfiles import WriteCTLProfiles
+
         # Point to location of observations
         files       = FindFiles(mode='images')
         nfiles      = len(files)
@@ -94,7 +97,7 @@ def main():
         
         if bin_ctl == 1:
             # Execute the centre-to-limb binning scheme
-            output = BinCTL(nfiles, spectrum)
+            output = BinCentreToLimb(nfiles, spectrum)
 
             if save == 1:
                 # Store calculated profiles
@@ -107,7 +110,7 @@ def main():
     ############################################################
 
     if source == 2:
-        
+        from Plot.PlotProfiles import PlotMeridProfiles
         if bin_cmerid == 1:
 
             # Read in profiles and coefficients
@@ -119,7 +122,7 @@ def main():
 
             if plotting == 1:
                 # Create plots
-                PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber=False)
+                PlotMeridProfiles(singles, spectrals, ksingles, kspectrals, wavenumber=False)
 
 
     ############################################################
@@ -129,10 +132,10 @@ def main():
 
     if mapping == 1:
     ### Plot cylindrical maps
-        if calc == 0:
+        if bin_cmerid == 0:
             # Create plots
             PlotMaps(files, spectrals, ksingles, wavenumber)
-        if calc == 1:
+        if bin_cmerid == 1:
             # Read in individual calibration coefficients
             _, spectrals, ksingles, _ = ReadNpy(return_singles=False, return_spectrals=True, return_ksingles=True, return_kspectrals=False)
             # Create plots
@@ -144,14 +147,14 @@ def main():
     ############################################################
     if spx == 1:
 
-        if calc == 0:
+        if bin_cmerid == 0:
             # Create spectra
-            WriteMeridSpx(calspectrals)
-        if calc == 1:
+            WriteMeridSpx(spectrals)
+        if bin_cmerid == 1:
             # Read in profiles
             _, spectrals, _, _ = ReadNpy(return_singles=False, return_spectrals=True, return_ksingles=False, return_kspectrals=False)
             # Create spectra
-            WriteSpx(spectrals)
+            WriteMeridSpx(spectrals)
 
 
 if __name__ == '__main__':
