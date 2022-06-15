@@ -6,7 +6,7 @@ from Tools.SetWave import SetWave
 from Tools.VisirFilterInfo import Wavenumbers
 from Tools.ConvertBrightnessTemperature import ConvertBrightnessTemperature
 
-def PolynomialAdjust(directory, files, wavenumber, spectrals, ksingles):
+def PolynomialAdjust(directory, files, spectrals):
     # Define local inputs
     nx, ny = 720, 360                   # Dimensions of an individual cylindrical map (needed for dictionary definition)
     res    = ny / 180                   # Resolution of maps: res = 1 (1 degree), res = 2 (0.5 degree) etc.
@@ -18,6 +18,7 @@ def PolynomialAdjust(directory, files, wavenumber, spectrals, ksingles):
     cmaps      = np.empty((Nfiles, ny, nx))
     mumaps     = np.empty((Nfiles, ny, nx))
     wavelength = np.empty(Nfiles)
+    wavenumber = np.empty(Nfiles)
     viewing_mode   = np.empty(Nfiles)
 
     # Define local arrays to store selected latitude band spectral data
@@ -36,9 +37,9 @@ def PolynomialAdjust(directory, files, wavenumber, spectrals, ksingles):
     selectmu[:, :, :]   = np.nan
 
     # Loop over file to load individual (and original) cylindrical maps
-    for ifile, fname in enumerate(files):
+    for ifile, fpath in enumerate(files):
         ## Step 1: Read img, cmap and mufiles
-        imghead, _, cylhead, cyldata, _, mudata = ReadFits(filename=f"{fname}")
+        imghead, _, cylhead, cyldata, _, mudata = ReadFits(filepath=f"{fpath}")
 
         ## Step 2: Geometric registration of pixel information
         # Save flag depending on Northern (1) or Southern (-1) viewing
@@ -50,18 +51,19 @@ def PolynomialAdjust(directory, files, wavenumber, spectrals, ksingles):
         # Set the central wavelengths for each filter. Must be
         # identical to the central wavelength specified for the
         # production of the k-tables
-        wavelen, _, _, _  = SetWave(wavelength=cylhead['lambda'], wavenumber=False)
+        wavelen, wavenum, _, _  = SetWave(wavelength=cylhead['lambda'], wavenumber=False)
         wavelength[ifile] = wavelen
+        wavenumber[ifile] = wavenum
 
         # Store corrected spectral information in np.array 
         # with ignoring negative beam on each cyldata maps
         if chopang == posang:
             # Northern view
-            cmaps[ifile, int((ny-10)/2):ny, :] = cyldata[int((ny-10)/2):ny, :] * ksingles[ifile, 1]
+            cmaps[ifile, int((ny-10)/2):ny, :] = cyldata[int((ny-10)/2):ny, :]
             cmaps[ifile, 0:int((ny-10)/2), :]  = np.nan
         else:
             # Southern view
-            cmaps[ifile, 0:int((ny+10)/2), :]  = cyldata[0:int((ny+10)/2), :] * ksingles[ifile, 1]
+            cmaps[ifile, 0:int((ny+10)/2), :]  = cyldata[0:int((ny+10)/2), :]
             cmaps[ifile, int((ny+10)/2):ny, :] = np.nan
         mumaps[ifile, :, :] = mudata
 
@@ -114,7 +116,7 @@ def PolynomialAdjust(directory, files, wavenumber, spectrals, ksingles):
         ax3 = plt.subplot2grid((1, 3), (0, 2))
         ax3.scatter(bandmumaps[ifilt, mask],cdata_all)
         # Save figure showing limb correction using polynomial adjustment method 
-        filt = VisirWavenumbers(ifilt)
+        filt = Wavenumbers(ifilt)
         plt.savefig(f"{directory}{filt}_polynomial_adjustment.png", dpi=900)
         plt.savefig(f"{directory}{filt}_polynomial_adjustment.eps", dpi=900)
 
@@ -125,4 +127,4 @@ def PolynomialAdjust(directory, files, wavenumber, spectrals, ksingles):
      # Clear figure to avoid overlapping between plotting subroutines
     plt.clf()
 
-    return cmaps, mumaps 
+    return cmaps, mumaps, wavenumber 
