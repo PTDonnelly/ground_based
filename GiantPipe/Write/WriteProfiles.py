@@ -8,7 +8,7 @@ def WriteProfiles(files, singles, spectrals, ksingles, kspectrals):
     """Save calibrated profiles as numpy arrays and textfiles"""
     
     # If subdirectory does not exist, create it
-    dir = '../outputs/single_merid_profiles/'
+    dir = '../../outputs/single_merid_profiles/'
     if not os.path.exists(dir):
         os.makedirs(dir)
     # Save individual meridional profiles
@@ -35,7 +35,7 @@ def WriteProfiles(files, singles, spectrals, ksingles, kspectrals):
     # Save spectral meridional profiles
     for ifilt in range(Globals.nfilters):
         # Write spectral mean profiles and calibrated coefficient to np.array
-        filt = VisirWavenumbers(ifilt)
+        filt = Wavenumbers(ifilt)
         np.save(f"{dir}{filt}_merid_profile", spectrals[:, ifilt, :])
         np.save(f"{dir}{filt}_calib_coeff", kspectrals[ifilt, :])
         # Write spectral mean profiles and calibrated coefficient to textfiles
