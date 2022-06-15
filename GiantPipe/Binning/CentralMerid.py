@@ -71,7 +71,7 @@ def BinCentralMerid(Nfiles, spectrum, LCMIII):
                 lat1 = Globals.latrange[0] + (Globals.latstep)*ilat
                 lat2 = Globals.latrange[0] + (Globals.latstep)*(ilat+1)
                 # Select a filter to calculate average
-                wave = VisirWavenumbers(ifilt)
+                wave = Wavenumbers(ifilt)
                 filters = single_merids[ilat, :, 5]
                 keep = (filters == wave)
                 spx = single_merids[ilat, keep, :]
