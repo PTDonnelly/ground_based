@@ -32,7 +32,7 @@ These calibrated profiles (and associated calibration coefficients) can then be 
 
 ### UNDER CONSTRUCTION ###
 
-# Funcitons #
+# Functions #
 1. Add special calibration to the 7-um filter (calibrate equatorial values of VISIR and CIRS)
 2. Add in a CTL binning scheme  as a test for whether the removal of the bulk CTL profile from each observation can create pretty global maps. to do this you also need 7-um vdop maps from DRm and the vdop correction. This is a rather time-expensive experiment so perhaps it should be lower prioriy.
 3. Polar plotting of cylmaps
