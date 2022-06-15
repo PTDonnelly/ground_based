@@ -25,7 +25,7 @@ def main():
     files       = FindFiles(mode='images')           # Point to location of all input observations
     nfiles      = len(files)
     # Flags
-    bin_merid   = 1                                   # (0) Calculate meridional profiles, (1) read stored profiles
+    calc        = 1                                   # (0) Calculate meridional profiles, (1) read stored profiles
     save        = 0                                   # (0) Do not save (1) save meridional profiles
     recal       = 1                                   # (0) Do not calibrate (1) calibrate cylindrical maps (with ksingles)
     plot        = 0                                   # (0) Do not plot (1) plot meridional profiles
