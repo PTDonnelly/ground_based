@@ -8,7 +8,7 @@ def WriteProfiles(files, singles, spectrals, ksingles, kspectrals):
     """Save calibrated profiles as numpy arrays and textfiles"""
     
     # If subdirectory does not exist, create it
-    dir = '../../outputs/single_merid_profiles/'
+    dir = '../outputs/single_merid_profiles/'
     if not os.path.exists(dir):
         os.makedirs(dir)
     # Save individual meridional profiles

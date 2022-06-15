@@ -14,7 +14,7 @@ def PlotMaps(files, spectrals, ksingles, wavenumber):
 
     print('Correcting global maps...')
     # If subdirectory does not exist, create it
-    dir = '../../outputs/global_maps_figures/'
+    dir = '../outputs/global_maps_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
     
@@ -30,7 +30,7 @@ def PlotMaps(files, spectrals, ksingles, wavenumber):
     globalmaps = np.empty((Globals.nfilters, ny, nx))
     #mumin      = np.empty((Globals.nfilters,ny, nx))
 
-    cmaps, mumaps = PolynomialAdjust(dir, files, wavenumber, spectrals, ksingles)
+    cmaps, mumaps = PolynomialAdjust(dir, files, wavenumber, spectrals)
 
     print('Mapping global maps...')
 
