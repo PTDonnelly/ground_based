@@ -14,7 +14,7 @@ def PlotMaps(files, spectrals, ksingles, wavenumber):
 
     print('Correcting global maps...')
     # If subdirectory does not exist, create it
-    dir = '../outputs/global_maps_figures/'
+    dir = '../../outputs/global_maps_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
     

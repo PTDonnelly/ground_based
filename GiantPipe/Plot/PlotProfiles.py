@@ -16,12 +16,12 @@ def PlotProfiles(singles, spectrals, ksingles, kspectrals, wavenumber):
     #    print("blablabla, you have to code it!")
 
     # Read in Voyager and Cassini data into arrays
-    calfile = "../inputs/visir.jup.filtered-iris-cirs.10-12-15.data.v3"
+    calfile = "../../inputs/visir.jup.filtered-iris-cirs.10-12-15.data.v3"
     iris, cirs = ReadCal(calfile)
 
     print('Plotting profiles...')
     # If subdirectory does not exist, create it
-    dir = '../outputs/calibration_profiles_figures/'
+    dir = '../../outputs/calibration_profiles_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 
