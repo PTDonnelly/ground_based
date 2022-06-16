@@ -56,7 +56,6 @@ def CalCentralMerid(nfiles, singles, spectrals, wavenumber):
         # Do calibration
         calib_coeff_spectral[iwave, 0] = wave
         calib_coeff_spectral[iwave, 1] = visirmean / calibmean
-        # print(ifilt_sc, visirmean, calibmean, calib_coeff_spectral[iwave, 1])
 
     # Calculate calibration coefficients for the single merid profiles
     print('Calibrating singles...')
@@ -75,8 +74,6 @@ def CalCentralMerid(nfiles, singles, spectrals, wavenumber):
         spectralmean                   = np.nanmean(spectraldata)
         calib_coeff_single[ifile, 0]   = ifile
         calib_coeff_single[ifile, 1]   = singlemean / spectralmean
-
-        # print(ifile, singlemean, spectralmean, calib_coeff_single[ifile, 1])
 
     # Save calibration
     for ifile in range(nfiles):

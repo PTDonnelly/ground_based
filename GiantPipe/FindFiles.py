@@ -1,10 +1,15 @@
 def FindFiles(mode):
     """Put all input data in a single list"""
 
-    if mode == 'images':
+    if 'images' in mode :
         # data_dir = '/Users/db496/Documents/Research/Observations/GBdata/visir/jupiter/global_maps_dataset/'
         data_dir = '/Users/ptdonnelly/Documents/Research/projects/shared/dbardet/data/'
-        source = 'cal_'
+        
+        # If you don't have DRM-calibrated data, use raw
+        source = 'cal_' if (mode == 'images_raw') else ''
+        # If you don't have GiantPipe-calibrated data, use DRM-calibrated data
+        source = 'recal_' if (mode == 'images_calib') else 'cal_'
+        
         files = [f"{data_dir}{source}wvisir_ARIII_2018-05-25T03:45:53.1419_Jupiter_clean_withchop.fits.gz",
                 f"{data_dir}{source}wvisir_ARIII_2018-05-26T00:03:13.9569_Jupiter_clean_withchop.fits.gz",
                 f"{data_dir}{source}wvisir_ARIII_2018-05-26T05:44:15.9897_Jupiter_clean_withchop.fits.gz",
