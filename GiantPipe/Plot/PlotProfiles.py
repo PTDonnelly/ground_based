@@ -96,8 +96,8 @@ def PlotCalMeridProfiles(singles, spectrals, wavenumber):
         ax1 = plt.subplot2grid((2, 1), (0, 0))
         for ifile, iwave in enumerate(wavenumber):
             if iwave == wave:
-                ax1.plot(singles[:, ifile, 0], singles[:, ifile, 3], color='midnightblue', lw=0, marker='.', markersize=3)
-        ax1.plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3], color='skyblue', lw=0, marker='o', markersize=3, label='VLT/VISIR')
+                ax1.plot(singles[:, ifile, 0], singles[:, ifile, 3], color='chocolate', lw=0, marker='.', markersize=3)
+        ax1.plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3], color='orange', lw=0, marker='o', markersize=3, label='VLT/VISIR')
         ax1.set_xlim((-90, 90))
         #ax1.set_ylim((0, 20e-8))
         ax1.set_ylabel('Radiance (W)', size=15)
@@ -110,7 +110,7 @@ def PlotCalMeridProfiles(singles, spectrals, wavenumber):
         else:
             # Use IRIS for Q-Band
             ax2.plot(iris[:, ifilt_sc, 0], iris[:, ifilt_sc, 1], color='k', lw=1, label='Voyager/IRIS')
-        ax2.plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3], color='skyblue', lw=0,  marker='o', markersize=3, label='VLT/VISIR')
+        ax2.plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3], color='orange', lw=0,  marker='o', markersize=3, label='VLT/VISIR')
         ax2.set_xlim((-90, 90))
         ax2.set_xlabel('Latitude', size=15)
         #ax2.set_ylim((0, 20e-8))
@@ -122,8 +122,6 @@ def PlotCalMeridProfiles(singles, spectrals, wavenumber):
         plt.savefig(f"{dir}{filt}_calibrated_merid_profiles.eps", dpi=900)
     # Clear figure to avoid overlapping between plotting subroutines
     plt.clf()
-
-
 
 def ColorNuance(colorm, ncolor, i):
     pal = get_cmap(name=colorm)

@@ -1,8 +1,12 @@
 import os
+from matplotlib import projections
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.path as mpath
+import matplotlib.ticker as mticker
 import cartopy.crs as ccrs
+from cartopy.mpl.ticker import (LongitudeFormatter, LatitudeFormatter,
+                                LatitudeLocator)
 import Globals
 from Tools.VisirFilterInfo import Wavenumbers
 
@@ -14,23 +18,40 @@ def PlotPolesFromGlobal(globalmap):
         os.makedirs(dir)
     
     # Define local inputs
-    to_lon = 180. # East postive
-    to_lat = 20.
+    nx, ny = 720, 360                   # Dimensions of an individual cylindrical map (needed for dictionary definition)
+    res    = ny / 180.
+    lat = np.arange(-89.75,90,step=0.5) # Latitude range from pole-to-pole
+    central_lon = nx / 2.               # Central longitude for polar projection
+    central_lat = 90.                   # Central latitude value for polar projection 
+    lat_lim     = 10.                   # Absolute latitude limit for polar projection 
+    dmeridian   = 30                    # step for lines of meridian
+    dparallel   = int(10 * res)             # step for lines of parallel (in term of pixels, depending of res value)
 
     # Plotting pole map using stored global maps array 
     for ifilt in range(Globals.nfilters):
         # Northern pole subplot
-        ax1 = plt.subplot2grid((1, 2), (0, 0))
-        proj=ccrs.AzimuthalEquidistant(central_longitude=to_lon, central_latitude=to_lat, globe=None)
-        ax1 = plt.axes(projection=proj)
-        ax1.imshow(globalmap[ifilt, :, :], transform=ccrs.PlateCarree(central_longitude=to_lon), origin='lower', regrid_shape=1000)
+        northkeep = (lat > lat_lim)
+        ax1 = plt.subplot2grid((1, 2), (0, 0), \
+                            projection = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
+                                                                    central_latitude=central_lat, globe=None))
+        ax1.imshow(globalmap[ifilt, northkeep, :], \
+                    transform=ccrs.PlateCarree(central_longitude=central_lon), \
+                    origin='lower', regrid_shape=1000, cmap='inferno')
+        ax1.gridlines(draw_labels=True, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
+                        xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
 
         # Southern pole subplot
-        ax2 = plt.subplot2grid((1, 2), (0, 1))
-        proj=ccrs.AzimuthalEquidistant(central_longitude=to_lon, central_latitude=-to_lat, globe=None)
-        ax2 = plt.axes(projection=proj)
-        ax2.imshow(globalmap[ifilt, :, :], transform=ccrs.PlateCarree(central_longitude=to_lon), origin='lower', regrid_shape=1000)
-
+        southkeep = (lat < -lat_lim)
+        ax2 = plt.subplot2grid((1, 2), (0, 1), \
+                            projection = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
+                                                                    central_latitude=-central_lat, globe=None))
+        ax2.imshow(globalmap[ifilt, southkeep, :], \
+                    transform=ccrs.PlateCarree(central_longitude=central_lon), \
+                    origin='lower', regrid_shape=1000, cmap='inferno')
+        ax2.gridlines(draw_labels=True, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
+                        xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
+        ax2.xaxis.set_major_formatter(LongitudeFormatter) 
+        ax2.yaxis.set_major_formatter(LatitudeFormatter)
         # Save pole map figure of the current filter 
         filt = Wavenumbers(ifilt)
         plt.savefig(f"{dir}{filt}_pole_maps.png", dpi=900)

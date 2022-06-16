@@ -1,5 +1,3 @@
-from cmath import nan
-from fileinput import filename
 import os
 import numpy as np
 import numpy.ma as ma
@@ -63,7 +61,7 @@ def PlotMaps(files, spectrals):
         max = np.nanmax(globalmaps[ifilt, :, :]) 
         min = np.nanmin(globalmaps[ifilt, :, :]) 
 
-        im = plt.imshow(globalmaps[ifilt, :, :], origin='lower', vmin=min, vmax=max, cmap='cividis')
+        im = plt.imshow(globalmaps[ifilt, :, :], origin='lower', vmin=min, vmax=max, cmap='inferno')
         plt.xticks(np.arange(0, nx+1,  step = 60), list(np.arange(360,-1,-30)))
         plt.yticks(np.arange(0, ny+1, step = 60), list(np.arange(-90,91,30)))
         plt.xlabel('System III West Longitude')
@@ -79,5 +77,9 @@ def PlotMaps(files, spectrals):
         plt.savefig(f"{dir}{filt}_global_maps.eps", dpi=900)
         # Clear figure to avoid overlapping between plotting subroutines
         plt.clf()
+        # Write global maps to np.array
+        np.save(f"{dir}{filt}_global_maps", globalmaps[ifilt, :, :])
+        # Write global maps to txtfiles
+        np.savetxt(f"{dir}{filt}_global_maps.txt", globalmaps[ifilt, :, :])
 
     return globalmaps
