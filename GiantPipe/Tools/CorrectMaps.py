@@ -12,7 +12,7 @@ def PolynomialAdjust(directory, files, spectrals):
     res    = ny / 180                   # Resolution of maps: res = 1 (1 degree), res = 2 (0.5 degree) etc.
     Nfiles = len(files)
     lat = np.arange(-89.75,90,step=0.5) # Latitude range from pole-to-pole
-    mumin = 0.3
+    mumin = 0.1
     
     # Create np.arrays for all pixels in all cmaps and mumaps
     cmaps      = np.empty((Nfiles, ny, nx))
@@ -26,15 +26,12 @@ def PolynomialAdjust(directory, files, spectrals):
     bandmumaps  = np.empty((Globals.nfilters, ny, nx))
     keepdata  = np.empty((Nfiles, ny, nx))
     keepmu    = np.empty((Nfiles, ny, nx))
-    selectdata  = np.empty((Nfiles, ny, nx))
-    selectmu    = np.empty((Nfiles, ny, nx))
+
     # Initialise to nan values
     bandcmaps[:, :, :]  = np.nan
     bandmumaps[:, :, :] = np.nan
     keepdata[:, :, :] = np.nan
     keepmu[:, :, :]   = np.nan
-    selectdata[:, :, :] = np.nan
-    selectmu[:, :, :]   = np.nan
 
     # Loop over file to load individual (and original) cylindrical maps
     for ifile, fpath in enumerate(files):
@@ -82,39 +79,62 @@ def PolynomialAdjust(directory, files, spectrals):
         waves = spectrals[:, ifilt, 5]
         wave  = waves[(waves > 0)][0]
         _, _, _, ifilt = SetWave(wavelength=False, wavenumber=wave)
-        # Fing all files for the current filter
+        # Find all files for the current filter
+        currentdata  = np.empty((ny, nx)) # empty arrays to append temperature maps of the current filter 
+        currentmu    = np.empty((ny, nx)) # empty arrays to append emission angle maps of the current filter
+        currentnfiles = 1 # Number of files for the current filter, initialised at 1 to take into account the initialised empty currentdata and currentmu arrays
         for ifile, iwave in enumerate(wavenumber):
             if iwave == wave:
-                selectdata[ifile, :, :] = keepdata[ifile, :, :]
-                selectmu[ifile, :, :]   = keepmu[ifile, :, :]
-                for x in range(nx):
-                    for y in range(ny):
-                        bandcmaps[ifilt, y, x] = np.nanmean(selectdata[:, y, x])
-                        bandmumaps[ifilt, y, x] = np.nanmean(selectmu[:, y, x])
-            selectdata[ifile, :, :] = np.nan
-            selectmu[ifile, :, :]   = np.nan
-        # Define a mask depending on minimum emission angle
-        mask = ((bandmumaps[ifilt, :, :] > mumin) & (bandcmaps[ifilt, :, :] > 90.))
-        # Calculate polynomial adjustement
-        p = np.poly1d(np.polyfit(bandmumaps[ifilt, mask], bandcmaps[ifilt, mask],4))
-        # Define a linear space to show the polynomial adjustment variation over all 
-        # emission angle range 
+                currentdata = np.append(currentdata, keepdata[ifile, :, :], axis = 1)
+                currentmu   = np.append(currentmu, keepmu[ifile, :, :], axis = 1)
+                currentnfiles += 1
+        # Reshape the appended arrays to recover map dimensions
+        selectdata = np.reshape(currentdata, (currentnfiles, ny, nx))
+        selectmu   = np.reshape(currentmu, (currentnfiles, ny, nx))
+        # Average selected data and mu over current number files (for this filter) to obtain averaged latitude band 
+        for x in range(nx):
+            for y in range(ny):
+                bandcmaps[ifilt, y, x] = np.nanmean(selectdata[:, y, x])
+                bandmumaps[ifilt, y, x] = np.nanmean(selectmu[:, y, x])
+        # Define a mask depending on minimum emission angle for each hemisphere
+        keep_north  = (lat < 30) & (lat > 5)
+        bandcnorth  = bandcmaps[ifilt, keep_north, :]
+        bandmunorth = bandmumaps[ifilt, keep_north, :]
+        mask_north  = (( bandmunorth > mumin) & (bandcnorth > 90.))
+        keep_south  = (lat < -5) & (lat > -30)
+        bandcsouth  = bandcmaps[ifilt, keep_south, :]
+        bandmusouth = bandmumaps[ifilt, keep_south, :]           
+        mask_south  = ((bandmusouth > mumin) & (bandcsouth > 90.))
+        # Calculate polynomial adjustement for each hemisphere (using mask selections)
+        p_north = np.poly1d(np.polyfit(bandmunorth[mask_north], bandcnorth[mask_north],4))
+        p_south = np.poly1d(np.polyfit(bandmusouth[mask_south], bandcsouth[mask_south],4))
+        # Define a linear space to show the polynomial adjustment variation over all emission angle range 
         t = np.linspace(mumin, 0.9, 100)
         # Some control printing 
-        print(p)
-        print(bandcmaps[ifilt, mask])
-
+        print('Northern polynome')
+        print(p_north)
+        print(bandcnorth[mask_north])
+        print('Southern polynome')
+        print(p_south)
+        print(bandcsouth[mask_south])            
         # Correct data on the slected latitude band
-        cdata_all=bandcmaps[ifilt, mask]*p(1)/p(bandmumaps[ifilt, mask])    
-        
+        cdata_north=bandcnorth[mask_north]*p_north(1)/p_north(bandmunorth[mask_north])    
+        cdata_south=bandcsouth[mask_south]*p_north(1)/p_south(bandmusouth[mask_south])    
         # Plot figure showing limb correction using polynomial adjustment method
-        ax1 = plt.subplot2grid((1, 3), (0, 0))
-        ax1.scatter(bandmumaps[ifilt, mask],bandcmaps[ifilt, mask])
-        ax1.plot(t, p(t), '-',color='red')
-        ax2 = plt.subplot2grid((1, 3), (0, 1))
-        ax2.plot(t, (p(1))/p(t), '-',color='red')
-        ax3 = plt.subplot2grid((1, 3), (0, 2))
-        ax3.scatter(bandmumaps[ifilt, mask],cdata_all)
+        ax1 = plt.subplot2grid((2, 3), (0, 0))
+        ax1.scatter(bandmunorth[mask_north], bandcnorth[mask_north])
+        ax1.plot(t, p_north(t), '-',color='red')
+        ax2 = plt.subplot2grid((2, 3), (0, 1))
+        ax2.plot(t, (p_north(1))/p_north(t), '-',color='red')
+        ax3 = plt.subplot2grid((2, 3), (0, 2))
+        ax3.scatter(bandmunorth[mask_north], cdata_north)
+        ax4 = plt.subplot2grid((2, 3), (1, 0))
+        ax4.scatter(bandmusouth[mask_south], bandcnorth[mask_south])
+        ax4.plot(t, p_south(t), '-',color='red')
+        ax5 = plt.subplot2grid((2, 3), (1, 1))
+        ax5.plot(t, (p_south(1))/p_south(t), '-',color='red')
+        ax6 = plt.subplot2grid((2, 3), (1, 2))
+        ax6.scatter(bandmusouth[mask_south], cdata_south)
         # Save figure showing limb correction using polynomial adjustment method 
         filt = Wavenumbers(ifilt)
         plt.savefig(f"{directory}{filt}_polynomial_adjustment.png", dpi=900)
@@ -123,7 +143,11 @@ def PolynomialAdjust(directory, files, spectrals):
         # Apply polynomial adjustment over individual cmaps depending of wave value
         for ifile, iwave in enumerate(wavenumber):
             if iwave == wave:
-                    cmaps[ifile, :, :] = cmaps[ifile, :, :] * p(1) / p(mumaps[ifile, :, :])
+                if viewing_mode[ifile] == 1:
+                    cmaps[ifile, :, :] = cmaps[ifile, :, :] * p_north(1) / p_north(mumaps[ifile, :, :])
+                if viewing_mode[ifile] == -1:
+                    cmaps[ifile, :, :] = cmaps[ifile, :, :] * p_south(1) / p_south(mumaps[ifile, :, :])
+
      # Clear figure to avoid overlapping between plotting subroutines
     plt.clf()
 
