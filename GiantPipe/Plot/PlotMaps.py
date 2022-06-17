@@ -2,6 +2,7 @@ import os
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import Globals
 from Tools.CorrectMaps import PolynomialAdjust
 from Tools.SetWave import SetWave
@@ -67,7 +68,11 @@ def PlotMaps(files, spectrals):
         plt.xlabel('System III West Longitude')
         plt.ylabel('Planetocentric Latitude')
         #plt.tick_params(labelsize=15)
-        cbar = plt.colorbar(im, extend='both')
+        # create an axes on the right side of im. The width of cax will be 5%
+        # of im and the padding between cax and im will be fixed at 0.05 inch.
+        #divider = make_axes_locatable(im)
+        #cbar_ax = divider.append_axes("right", size="5%", pad=0.05)
+        cbar = plt.colorbar(im, extend='both', fraction=0.046, pad=0.04)
         #cbar.ax.tick_params(labelsize=15)
         cbar.set_label("Brightness Temperature [K]")
 
