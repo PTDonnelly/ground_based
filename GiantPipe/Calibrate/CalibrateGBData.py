@@ -4,7 +4,7 @@ from Binning.CentralMerid import BinCentralMerid
 from Calibrate.CentralMerid import CalCentralMerid
 from Calibrate.CylindricalMaps import CalCylindricalMaps
 
-def CalibrateGBData(mode=mode):
+def CalibrateGBData(mode):
 
     # Point to location of observations
     files = FindFiles(mode=mode)
