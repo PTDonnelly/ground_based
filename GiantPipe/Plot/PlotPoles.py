@@ -20,9 +20,6 @@ def PlotPolesFromGlobal(globalmap):
         os.makedirs(dir)
     
     # Define local inputs
-    nx, ny = 720, 360                                           # Dimensions of an individual global map
-    res    = ny / 180.                                          # Resolution of cmaps (i.e. pixels number per degree of longitude/latitude)
-    lat = np.arange(-89.75,90,step=0.5)                         # Latitude range from pole-to-pole
     central_lon   = 0.                                          # Central longitude for polar projection
     central_lat   = 90.                                         # Absolute central latitude value for polar projection 
     lat_lim       = 10.                                         # Absolute latitude limit for polar projection 
@@ -33,9 +30,6 @@ def PlotPolesFromGlobal(globalmap):
     degree_symbol = u'\u00B0'
     lond = np.linspace(0, 360, num_merid)
     lon_to_write = 45*np.ones(len(lond))                        # Array to set on which longitude will be written latitude labels
-    lat_north_labels = np.linspace(lat_lim, central_lat, 10)
-    lat_south_labels = np.linspace(-central_lat, -lat_lim, 10)
-
 
     #  Subplot figure with both hemisphere
     for ifilt in range(Globals.nfilters):
