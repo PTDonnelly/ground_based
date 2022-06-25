@@ -1,12 +1,8 @@
 import os
-from matplotlib import projections
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.path as mpath
-import matplotlib.ticker as mticker
 import cartopy.crs as ccrs
-from cartopy.mpl.ticker import (LongitudeFormatter, LatitudeFormatter,
-                                LatitudeLocator)
 import Globals
 from Tools.VisirFilterInfo import Wavenumbers
 
