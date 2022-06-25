@@ -20,21 +20,21 @@ def PlotPolesFromGlobal(globalmap):
         os.makedirs(dir)
     
     # Define local inputs
-    nx, ny = 720, 360                   # Dimensions of an individual cylindrical map (needed for dictionary definition)
-    res    = ny / 180.                  # Latitude resolution of cmaps (i.e. pixels number per degree of latitude)
-    lat = np.arange(-89.75,90,step=0.5) # Latitude range from pole-to-pole
-    central_lon   = nx / 2.               # Central longitude for polar projection
-    central_lat   = 90.                   # Absolute central latitude value for polar projection 
-    lat_lim       = 10.                   # Absolute latitude limit for polar projection 
-    dmeridian     = 30                    # step for lines of meridian, interger to please xlocs parameter in gridlines
-    dparallel     = int(10 * res)         # step for lines of parallel (in term of pixels, depending of res value), interger to please ylocs in gridlines
-    num_merid     = int(360/dmeridian + 1)
-    num_parra     = int((90-np.abs(lat_lim)) / (dparallel) + 1)
+    nx, ny = 720, 360                                           # Dimensions of an individual global map
+    res    = ny / 180.                                          # Resolution of cmaps (i.e. pixels number per degree of longitude/latitude)
+    lat = np.arange(-89.75,90,step=0.5)                         # Latitude range from pole-to-pole
+    central_lon   = 0.                                          # Central longitude for polar projection
+    central_lat   = 90.                                         # Absolute central latitude value for polar projection 
+    lat_lim       = 10.                                         # Absolute latitude limit for polar projection 
+    dmeridian     = 30                                          # Meridian lines step, interger to please xlocs parameter in gridlines
+    dparallel     = 10                                          # Parallel lines step, interger to please ylocs in gridlines
+    num_merid     = int(360/dmeridian + 1)                      # Number of meridian lines
+    num_parra     = int((90-np.abs(lat_lim)) / dparallel + 1)   # Number of parallel lines per hemisphere
     degree_symbol = u'\u00B0'
     lond = np.linspace(0, 360, num_merid)
-    lon_to_write = 45*np.ones(len(lond))    # Array to set on which longitude will be wrttien latitude labels
-    lat_north_labels = np.linspace(lat_lim, central_lat, 180)
-    lat_south_labels = np.linspace(-central_lat, -lat_lim, 180)
+    lon_to_write = 45*np.ones(len(lond))                        # Array to set on which longitude will be written latitude labels
+    lat_north_labels = np.linspace(lat_lim, central_lat, 10)
+    lat_south_labels = np.linspace(-central_lat, -lat_lim, 10)
 
 
     #  Subplot figure with both hemisphere
@@ -43,35 +43,39 @@ def PlotPolesFromGlobal(globalmap):
         max = np.nanmax(globalmap[ifilt, :, :]) 
         min = np.nanmin(globalmap[ifilt, :, :])
         # Northern pole subplot
-        northkeep = (lat > lat_lim)
-        ax1 = plt.subplot2grid((1, 2), (0, 0), \
-                            projection = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
-                                                                    central_latitude=central_lat, globe=None))
-        ax1.imshow(globalmap[ifilt, northkeep, :], \
-                    transform=ccrs.PlateCarree(central_longitude=central_lon), \
-                    origin='lower', vmin=min, vmax=max, regrid_shape=1000, cmap='inferno')
-        ax1.gridlines(draw_labels=True, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
-                        xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
-        # locations of parallel labels and write them
-        for ilon, ilat in zip(lon_to_write, lat):
-            projx1, projy1 = ax1.projection.transform_point(ilon, ilat, ccrs.Geodetic())
-            txt =  '{0}'.format(str(int(ilat)))+degree_symbol
-            ax1.text(projx1, projy1, txt, va='center', ha='center', color='white',fontsize = 10)
+        proj = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
+                                        central_latitude=central_lat, globe=None)
+        ax1 = plt.subplot2grid((1, 2), (0, 0), projection = proj)
+        ax1.imshow(globalmap[ifilt, :, :], \
+                        transform=ccrs.PlateCarree(central_longitude=central_lon), \
+                        origin='lower', extent=[0, 360, -90, 90], vmin=min, vmax=max, \
+                        regrid_shape=1000, cmap='inferno')
+        # Define locations of longitude labels and write them
+        CustomLongitudeLabels(ax1, central_lat, lat_lim, num_merid, degree_symbol)
+        # Define locations of latitude labels and write them along lon_to_write array
+        CustomLatitudeLabels(ax1, central_lat, lat_lim, num_parra, lon_to_write, degree_symbol)
+        # Set the boundary of the polar projection
+        CustomBoundaryLatitude(ax1, proj, lat_lim)
+        # Draw the gridlines without the default labels        
+        ax1.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
+                        xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel), linestyle='--')
         # Southern pole subplot
-        southkeep = (lat < -lat_lim)
-        ax2 = plt.subplot2grid((1, 2), (0, 1), \
-                            projection = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
-                                                                    central_latitude=-central_lat, globe=None))
-        ax2.imshow(globalmap[ifilt, southkeep, :], \
-                    transform=ccrs.PlateCarree(central_longitude=central_lon), \
-                    origin='lower', vmin=min, vmax=max, regrid_shape=1000, cmap='inferno')
-        ax2.gridlines(draw_labels=True, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
+        proj = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
+                                        central_latitude=-central_lat, globe=None)
+        ax2 = plt.subplot2grid((1, 2), (0, 1), projection = proj)
+        ax2.imshow(globalmap[ifilt, :, :], \
+                        transform=ccrs.PlateCarree(central_longitude=central_lon), \
+                        origin='lower', extent=[0, 360, -90, 90], vmin=min, vmax=max, \
+                        regrid_shape=1000, cmap='inferno')
+        # Define locations of longitude labels and write them
+        CustomLongitudeLabels(ax2, -central_lat, -lat_lim, num_merid, degree_symbol)
+        # Define locations of latitude labels and write them along lon_to_write array
+        CustomLatitudeLabels(ax2, -central_lat, -lat_lim, num_parra, lon_to_write, degree_symbol)
+        # Set the boundary of the polar projection
+        CustomBoundaryLatitude(ax2, proj, -lat_lim)
+        # Draw the gridlines without the default labels        
+        ax2.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
                         xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
-        # Define locations of parallel labels and write them
-        for ilon, ilat in zip(lon_to_write, lat):
-            projx2, projy2 = ax2.projection.transform_point(ilon, ilat, ccrs.Geodetic())
-            txt =  '{0}'.format(str(int(ilat)))+degree_symbol
-            ax2.text(projx2, projy2, txt, va='center', ha='center', color='white',fontsize = 10)
         # Save pole map figure of the current filter 
         filt = Wavenumbers(ifilt)
         plt.savefig(f"{dir}{filt}_pole_maps.png", dpi=900)
@@ -83,19 +87,23 @@ def PlotPolesFromGlobal(globalmap):
         projection = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
                                                 central_latitude=central_lat, globe=None)
         ax = plt.axes(projection=projection)
-        ax.imshow(globalmap[ifilt, northkeep, :], \
-                    transform=ccrs.PlateCarree(central_longitude=central_lon), \
-                    origin='lower', vmin=min, vmax=max, regrid_shape=1000, cmap='inferno')
-        ax.gridlines(draw_labels=True, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
-                        xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
-        # locations of parallel labels and write them
-        for ilon, ilat in zip(lon_to_write, lat_north_labels):
-            projx1, projy1 = ax.projection.transform_point(ilon, ilat, ccrs.Geodetic())
-            txt =  '{0}'.format(str(int(ilat)))+degree_symbol
-            ax.text(projx1, projy1, txt, va='center', ha='center', color='white',fontsize = 10)
-        #cbar = plt.colorbar(ax, extend='both')
+        im = ax.imshow(globalmap[ifilt, :, :], \
+                        transform=ccrs.PlateCarree(central_longitude=central_lon), \
+                        origin='lower', extent=[0, 360, -90, 90], vmin=min, vmax=max, \
+                        regrid_shape=1000, cmap='inferno')
+        # Define locations of longitude labels and write them
+        CustomLongitudeLabels(ax, central_lat, lat_lim, num_merid, degree_symbol)
+        # Define locations of latitude labels and write them along lon_to_write array
+        CustomLatitudeLabels(ax, central_lat, lat_lim, num_parra, lon_to_write, degree_symbol)
+        # Set the boundary of the polar projection
+        CustomBoundaryLatitude(ax, projection, lat_lim)
+        # Draw the gridlines without the default labels        
+        ax.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
+                        xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel), linestyle='--')
+        # Define a colorbar
+        cbar = plt.colorbar(im, ax=ax, extend='both', fraction=0.046, pad=0.04)
         #cbar.ax.tick_params(labelsize=15)
-        #cbar.set_label("Brightness Temperature [K]")
+        cbar.set_label("Brightness Temperature [K]")
         # Save north pole map figure of the current filter 
         filt = Wavenumbers(ifilt)
         plt.savefig(f"{dir}{filt}_north_pole_maps.png", dpi=900)
@@ -107,19 +115,23 @@ def PlotPolesFromGlobal(globalmap):
         projection = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
                                                 central_latitude=-central_lat, globe=None)
         ax = plt.axes(projection = projection)
-        ax.imshow(globalmap[ifilt, southkeep, :], \
-                    transform=ccrs.PlateCarree(central_longitude=central_lon), \
-                    origin='lower', vmin=min, vmax=max, regrid_shape=1000, cmap='inferno')
-        ax.gridlines(draw_labels=True, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
+        im = ax.imshow(globalmap[ifilt, :, :], \
+                        transform=ccrs.PlateCarree(central_longitude=central_lon), \
+                        origin='lower', extent=[0, 360, -90, 90], vmin=min, vmax=max, \
+                        regrid_shape=1000, cmap='inferno')
+        # Define locations of longitude labels and write them
+        CustomLongitudeLabels(ax, -central_lat, -lat_lim, num_merid, degree_symbol)
+        # Define locations of latitude labels and write them along lon_to_write array
+        CustomLatitudeLabels(ax, -central_lat, -lat_lim, num_parra, lon_to_write, degree_symbol)
+        # Set the boundary of the polar projection
+        CustomBoundaryLatitude(ax, projection, -lat_lim)
+        # Draw the gridlines without the default labels        
+        ax.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
                         xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
-        # Define locations of parallel labels and write them
-        for ilon, ilat in zip(lon_to_write, lat_south_labels):
-            projx2, projy2 = ax.projection.transform_point(ilon, ilat, ccrs.Geodetic())
-            txt =  '{0}'.format(str(int(ilat)))+degree_symbol
-            ax.text(projx2, projy2, txt, va='center', ha='center', color='white',fontsize = 10)
-        #cbar = plt.colorbar(ax, extend='both')
+        # Define a colorbar
+        cbar = plt.colorbar(im, ax=ax, extend='both', fraction=0.046, pad=0.04)
         #cbar.ax.tick_params(labelsize=15)
-        #cbar.set_label("Brightness Temperature [K]")
+        cbar.set_label("Brightness Temperature [K]")
         # Save south pole map figure of the current filter 
         filt = Wavenumbers(ifilt)
         plt.savefig(f"{dir}{filt}_south_pole_maps.png", dpi=900)
@@ -127,102 +139,73 @@ def PlotPolesFromGlobal(globalmap):
         # Clear figure to avoid overlapping between plotting subroutines
         plt.clf()
 
+def CustomLongitudeLabels(ax, clat, lat_lim, num_merid, degree_symbol):
+    # for locations of (meridional/longitude) labels
+    lond = np.linspace(0,360, num_merid)
+    latd = np.zeros(len(lond))
+    for (alon, alat) in zip(lond, latd):
+        if clat>0:
+            projx1, projy1 = ax.projection.transform_point(alon, lat_lim-2., ccrs.Geodetic())
+        if clat<0:
+            projx1, projy1 = ax.projection.transform_point(alon, lat_lim+2., ccrs.Geodetic())
+        if alon>0 and alon<180:
+            ha = 'left'
+            va = 'center'
+        if alon>180 and alon<360:
+            ha = 'right'
+            va = 'center'
+        if np.abs(alon-180)<0.01:
+            ha = 'center'
+            if clat==90:
+                va = 'bottom'
+            if clat==-90:
+                va = 'top'
+        if alon==0.:
+            ha = 'center'
+            if clat==-90:
+                va = 'bottom'
+            if clat==90:
+                va = 'top'
+        if (alon<360. and alon>0):
+            txt = f"{int(360-alon)}"+degree_symbol+'W'
+            ax.text(projx1, projy1, txt, \
+                    va=va, ha=ha, color='black',fontsize = 10)
+        if (alon==0):
+            txt = f"{int(alon)}"+degree_symbol+'W'
+            ax.text(projx1, projy1, txt, \
+                    va=va, ha=ha, color='black',fontsize = 10)
 
-# #def polarlongitudes(clat,clon,limit,dmeridian,dparallel):
-#     if clat>0:
-#             latlim=limit
-#     if clat<0:
-#             latlim=-limit
-    
-#     num_merid = int(360/dmeridian + 1)
-#     num_parra = int((90-np.abs(latlim))/dparallel + 1)
-#     print(num_merid,num_parra)
-    
-#     theta = np.linspace(0, 2*np.pi, 120)
-#     verts = np.vstack([np.sin(theta), np.cos(theta)]).T
-#     center, radius = [0.5, 0.5], 0.5
-#     circle = mpath.Path(verts * radius + center)
+def CustomLatitudeLabels(ax, clat, lat_lim, num_parra, lon_to_write, degree_symbol):    
+    lat = np.linspace(-90, lat_lim, num_parra) if clat<0 else np.linspace(lat_lim, 90, num_parra)
+    for (alon, alat) in zip(lon_to_write, lat):
+        if(clat<0 and alat<=-20 and alat>-90):
+            projx1, projy1 = ax.projection.transform_point(alon, alat, ccrs.Geodetic())
+            txt = f"{int(alat)}"+ degree_symbol
+            ax.text(projx1, projy1, \
+                       txt, va='center', ha='center', \
+                        color='white',fontsize = 10) 
+        if(clat>0 and alat>=20 and alat<90):
+            projx1, projy1 = ax.projection.transform_point(alon, alat, ccrs.Geodetic())
+            txt = f"{int(alat)}"+degree_symbol
+            ax.text(projx1, projy1, \
+                        txt, va='center', ha='center', \
+                        color='white',fontsize = 10)
 
-#     # for label alignment
-#     va = 'center' # also bottom, top
-#     ha = 'center' # right, left
-#     degree_symbol=u'\u00B0'
+def CustomBoundaryLatitude(ax, proj, lat_lim):
+    # add extra padding to the plot extents
+    # These 2 lines of code grab extents in projection coordinates
+    lonlatproj = ccrs.PlateCarree()
+    _, y_min = proj.transform_point(0, lat_lim, lonlatproj)  #(0.0, -3189068.5)
+    r_limit=np.abs(y_min)
+    r_extent = r_limit*1.0001
+    ax.set_xlim(-r_extent, r_extent)
+    ax.set_ylim(-r_extent, r_extent)
 
-#     # for locations of (meridional/longitude) labels
-#     lond = np.linspace(0,360, num_merid)
-#     latd = np.zeros(len(lond))
-
-#     for (alon, alat) in zip(lond, latd):
-#         if clat>0:
-#             projx1, projy1 = ax.projection.transform_point(alon, latlim-2., ccrs.Geodetic())
-#         if clat<0:
-#             projx1, projy1 = ax.projection.transform_point(alon, latlim+2., ccrs.Geodetic())
-#         if alon>0 and alon<180:
-#             ha = 'left'
-#             va = 'center'
-#         if alon>180 and alon<360:
-#             ha = 'right'
-#             va = 'center'
-#         if np.abs(alon-180)<0.01:
-#             ha = 'center'
-#             if clat==90:
-#                 va = 'bottom'
-#             if clat==-90:
-#                 va = 'top'
-#         if alon==0.:
-#             ha = 'center'
-#             if clat==-90:
-#                 va = 'bottom'
-#             if clat==90:
-#                 va = 'top'
-#         if (alon<360. and alon>0):
-#             txt =  '{0}'.format(str(int(360-alon)))+degree_symbol+'W'
-#             ax.text(projx1, projy1, txt, \
-#                     va=va, ha=ha, color='black',fontsize = 10)
-#         if (alon==0):
-#             txt =  '{0}'.format(str(int(alon)))+degree_symbol+'W'
-#             ax.text(projx1, projy1, txt, \
-#                     va=va, ha=ha, color='black',fontsize = 10)
-
-
-#     # for locations of (meridional/longitude) labels
-#     # select longitude: 315 for label positioning
-#     lond2 = 45*np.ones(len(lond))
-#     if clat<0:
-#         latd2 = np.linspace(-90, latlim, num_parra)
-#     if clat>0:
-#         latd2 = np.linspace(latlim, 90, num_parra)
-#     va, ha = 'center', 'center'
-#     for (alon, alat) in zip(lond2, latd2):
-#         if(clat<0 and alat<=-20 and alat>-90):
-#             projx1, projy1 = ax.projection.transform_point(alon, alat, ccrs.Geodetic())
-#             txt =  '{0}'.format(str(int(alat)))+degree_symbol
-#             ax.text(projx1, projy1, \
-#                        txt, va=va, ha=ha, \
-#                         color='black',fontsize = 10) 
-#         if(clat>0 and alat>=20 and alat<90):
-#             projx1, projy1 = ax.projection.transform_point(alon, alat, ccrs.Geodetic())
-#             txt =  '{0}'.format(str(int(alat)))+degree_symbol
-#             ax.text(projx1, projy1, \
-#                         txt, va=va, ha=ha, \
-#                         color='black',fontsize = 10)
-
-#     # add extra padding to the plot extents
-#     # These 2 lines of code grab extents in projection coordinates
-#     lonlatproj = ccrs.PlateCarree()
-#     _, y_min = proj.transform_point(0, latlim, lonlatproj)  #(0.0, -3189068.5)
-#     x_max, _ = proj.transform_point(90, latlim, lonlatproj) #(3189068.5, 0)
-#     r_limit=np.abs(y_min)
-#     r_extent = r_limit*1.0001
-#     ax.set_xlim(-r_extent, r_extent)
-#     ax.set_ylim(-r_extent, r_extent)
-
-#     # Prep circular boundary
-#     circle_path = mpath.Path.unit_circle()
-#     circle_path = mpath.Path(circle_path.vertices.copy() * r_limit,
-#                                circle_path.codes.copy())
-
-#     #set circle boundary
-#     ax.set_boundary(circle_path)
-#     #hide frame
-#     ax.set_frame_on(True)  #hide the rectangle frame
+    # Calculation of the circular boundary path in function to lat_lim
+    circle_path = mpath.Path.unit_circle()
+    circle_path = mpath.Path(circle_path.vertices.copy() * r_limit,
+                               circle_path.codes.copy())
+    # set circle boundary
+    ax.set_boundary(circle_path)
+    # Remove black line contour of the polar projection (cosmetic, could be set to True)
+    ax.set_frame_on(False)
