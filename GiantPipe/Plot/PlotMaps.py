@@ -9,7 +9,7 @@ from Tools.SetWave import SetWave
 from Tools.VisirFilterInfo import Wavenumbers
 
 def PlotMaps(files, spectrals):
-    """ DB: Mapping global maps for each VISIR filter """
+    """ Mapping global maps for each VISIR filter """
 
     print('Correcting global maps...')
     # If subdirectory does not exist, create it
@@ -56,22 +56,16 @@ def PlotMaps(files, spectrals):
             for x in range(nx):
                 globalmaps[ifilt, y, x] = np.nanmax(TBmaps[:, y, x])
 
-
-
-        # Plotting global map
+        # Setting brightness temperature extremes to plot global map
         max = np.nanmax(globalmaps[ifilt, :, :]) 
         min = np.nanmin(globalmaps[ifilt, :, :]) 
-
+        # Plotting global map
         im = plt.imshow(globalmaps[ifilt, :, :], origin='lower', vmin=min, vmax=max, cmap='inferno')
         plt.xticks(np.arange(0, nx+1,  step = 60), list(np.arange(360,-1,-30)))
         plt.yticks(np.arange(0, ny+1, step = 60), list(np.arange(-90,91,30)))
         plt.xlabel('System III West Longitude')
         plt.ylabel('Planetocentric Latitude')
         #plt.tick_params(labelsize=15)
-        # create an axes on the right side of im. The width of cax will be 5%
-        # of im and the padding between cax and im will be fixed at 0.05 inch.
-        #divider = make_axes_locatable(im)
-        #cbar_ax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(im, extend='both', fraction=0.046, pad=0.04)
         #cbar.ax.tick_params(labelsize=15)
         cbar.set_label("Brightness Temperature [K]")
@@ -86,5 +80,37 @@ def PlotMaps(files, spectrals):
         np.save(f"{dir}{filt}_global_maps", globalmaps[ifilt, :, :])
         # Write global maps to txtfiles
         np.savetxt(f"{dir}{filt}_global_maps.txt", globalmaps[ifilt, :, :])
+        # Write global maps to NetCDF files
+        #GlobalMapsNetCDF(dir, filt, globalmaps=globalmaps[ifilt, :, :])
 
     return globalmaps
+
+def GlobalMapsNetCDF(dir, filt, globalmaps):
+    import netCDF4 as nc
+    import numpy as np
+
+
+    fn = f"{dir}{filt}_global_maps.nc"
+    data = nc.Dataset(fn, 'w', format='NETCDF4')
+
+    time = data.createDimension('time', None)
+    lat = data.createDimension('lat', 360)
+    lon = data.createDimension('lon', 720)
+
+    times = data.createVariable('time', 'f4', ('time',))
+    lats = data.createVariable('lat', 'f4', ('lat',))
+    lons = data.createVariable('lon', 'f4', ('lon',))
+    value = data.createVariable('value', 'f4', ('time', 'lat', 'lon',))
+    value.units = 'Unknown'
+
+    lats[:] = np.arange(-89.75,90,step=0.5)
+    lons[:] = np.arange(0, 360, step=0.5)
+
+
+    value[0, :, :] = globalmaps[:, :]
+
+
+
+    data.close()
+
+
