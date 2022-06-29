@@ -31,7 +31,7 @@ def RegisterMaps(files):
 
     # Loop over files
     for ifile, fpath in enumerate(files):
-        print(ifile, fpath)
+        # print(ifile, fpath)
         ## Step 1: Read img, cmap and mufiles
         imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filepath=f"{fpath}")
 
@@ -54,7 +54,7 @@ def RegisterMaps(files):
         # Set the central wavelengths for each filter. Must be
         # identical to the central wavelength specified for the
         # production of the k-tables
-        wavelen, wavenum, _, _  = SetWave(wavelength=cylhead['lambda'], wavenumber=False)
+        _, wavelen, wavenum, _, _  = SetWave(filename=fpath, wavelength=cylhead['lambda'], wavenumber=None, ifilt=None)
         wavelength[ifile] = wavelen
         wavenumber[ifile] = wavenum
 
@@ -83,6 +83,7 @@ def RegisterMaps(files):
                     mu  = 180/pi * acos(mu_ang)
                     # Calculate pxel radiance and error
                     rad = cyldata[y, x] * 1e-7
+                    
                     ## Step 3: Gather pxel information for all files
                     # Store spectral information in spectrum array
                     spectrum[y, x, ifile, 0] = lat

@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import Globals
 from Read.ReadFits import ReadFits
 from Tools.SetWave import SetWave
-from Tools.VisirFilterInfo import Wavenumbers
 from Tools.ConvertBrightnessTemperature import ConvertBrightnessTemperature
 
 def PolynomialAdjust(directory, files, spectrals):
@@ -81,9 +80,9 @@ def PolynomialAdjust(directory, files, spectrals):
         # Get filter index for spectral profiles
         waves = spectrals[:, ifilt, 5]
         wave  = waves[(waves > 0)][0]
-        _, _, _, ifilt = SetWave(wavelength=False, wavenumber=wave)
         # Fing all files for the current filter
-        for ifile, iwave in enumerate(wavenumber):
+        for ifile, fname in enumerate(files):
+            _, _, iwave, _, _ = SetWave(filename=fname, wavelength=False, wavenumber=False)
             if iwave == wave:
                 selectdata[ifile, :, :] = keepdata[ifile, :, :]
                 selectmu[ifile, :, :]   = keepmu[ifile, :, :]
@@ -117,11 +116,13 @@ def PolynomialAdjust(directory, files, spectrals):
         ax3.scatter(bandmumaps[ifilt, mask],cdata_all)
         # Save figure showing limb correction using polynomial adjustment method 
         filt = Wavenumbers(ifilt)
+        print(wave, filt)
         plt.savefig(f"{directory}{filt}_polynomial_adjustment.png", dpi=900)
         plt.savefig(f"{directory}{filt}_polynomial_adjustment.eps", dpi=900)
 
         # Apply polynomial adjustment over individual cmaps depending of wave value
-        for ifile, iwave in enumerate(wavenumber):
+        for ifile, fname in enumerate(files):
+            _, _, iwave, _, _ = SetWave(filename=fname, wavelength=False, wavenumber=False)
             if iwave == wave:
                     cmaps[ifile, :, :] = cmaps[ifile, :, :] * p(1) / p(mumaps[ifile, :, :])
      # Clear figure to avoid overlapping between plotting subroutines

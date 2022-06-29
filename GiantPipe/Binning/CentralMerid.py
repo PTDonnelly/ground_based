@@ -2,7 +2,7 @@ import numpy as np
 import bottleneck as bn
 import warnings
 import Globals
-from Tools.VisirFilterInfo import Wavenumbers
+from Tools.SetWave import SetWave
 
 def BinCentralMerid(nfiles, spectrum, LCMIII):
     """ Step 4: Create central meridian average for each observation
@@ -19,7 +19,7 @@ def BinCentralMerid(nfiles, spectrum, LCMIII):
         # Loop over latitudes and create individual mean profiles
         print('Binning singles...')
         for ilat, _ in enumerate(Globals.latgrid):
-            print(ilat)
+            # print(ilat)
             # Define centre and edges of latitude bin
             clat = Globals.latrange[0] + (Globals.latstep)*ilat + (Globals.latstep/2)
             lat1 = Globals.latrange[0] + (Globals.latstep)*ilat
@@ -55,6 +55,7 @@ def BinCentralMerid(nfiles, spectrum, LCMIII):
                             single_merids[ilat, ifile, 3] = rad
                             single_merids[ilat, ifile, 4] = rad_err
                             single_merids[ilat, ifile, 5] = wavenum
+                            # print(ilat, ifile, wavenum)
                             single_merids[ilat, ifile, 6] = view
         # Throw away zeros
         single_merids[single_merids == 0] = np.nan
@@ -70,6 +71,7 @@ def BinCentralMerid(nfiles, spectrum, LCMIII):
         print('Binning spectrals...')
         # Loop over filters and create mean spectral profiles
         for ifilt in range(Globals.nfilters):
+            _, _, wave, _, _ = SetWave(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)
             # Loop over latitudes and create individual mean profiles
             for ilat, _ in enumerate(Globals.latgrid):
                 # Define centre and edges of latitude bin
@@ -77,7 +79,6 @@ def BinCentralMerid(nfiles, spectrum, LCMIII):
                 lat1 = Globals.latrange[0] + (Globals.latstep)*ilat
                 lat2 = Globals.latrange[0] + (Globals.latstep)*(ilat+1)
                 # Select a filter to calculate average
-                wave = Wavenumbers(ifilt)
                 filters = single_merids[ilat, :, 5]
                 keep = (filters == wave)
                 spx = single_merids[ilat, keep, :]
@@ -102,8 +103,5 @@ def BinCentralMerid(nfiles, spectrum, LCMIII):
 
     singles = singles(nfiles, spectrum, LCMIII)
     spectrals = spectrals(nfiles, spectrum, LCMIII, singles)
-
-    # # Clear spectrum array from local variables
-    # del locals()['spectrum']
 
     return singles, spectrals

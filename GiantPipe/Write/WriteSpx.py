@@ -2,9 +2,11 @@ import os
 import numpy as np
 import Globals
 
-def WriteMeridSpx(spectrals):
+def WriteMeridSpx(mode, spectrals):
     """Create spectral input for NEMESIS using central meridian profiles.
        Populate .spxfile with radiances, measurement errors, and geometries."""
+
+    print('Creating spectra...')
 
     def create_merid_spx(f, lats, LCMs, mus, rads, rad_errs, waves):
         """Write spxfile for meridional binning method """
@@ -44,7 +46,6 @@ def WriteMeridSpx(spectrals):
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-    print('Creating spectra...')
     # Loop over latitudes to create one .spxfile per latitude
     for ilat in range(Globals.nlatbins):
         # Extract variables and throw NaNs
@@ -53,7 +54,7 @@ def WriteMeridSpx(spectrals):
         mus      = [spectrals[ilat, ifilt, 2] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ifilt, 2]) == False]
         rads     = [spectrals[ilat, ifilt, 3] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ifilt, 3]) == False]
         rad_errs = [spectrals[ilat, ifilt, 4] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ifilt, 4]) == False]
-        waves = [spectrals[ilat, ifilt, 5] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ifilt, 5]) == False]
+        waves    = [spectrals[ilat, ifilt, 5] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ifilt, 5]) == False]
         # Only write spxfile for latitudes with spectral information
         if lats:
             # Open textfile
@@ -63,8 +64,10 @@ def WriteMeridSpx(spectrals):
             with open(f"../outputs/spxfiles/lat_{lats[0]}.spx", 'w') as f:
                 create_merid_spx(f, lats, LCMs, mus, rads, rad_errs, waves)
 
-def WriteCTLSpx():
+def WriteCentreToLimbSpx(mode, spectrals):
     """Create spectral input for NEMESIS using centre-to-limb profiles.
        Populate .spxfile with radiances, measurement errors, and geometries."""
+    
+    print('Creating spectra...')
     
     a = 1
