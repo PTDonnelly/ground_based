@@ -35,6 +35,13 @@ def PlotPolesFromGlobal(globalmap):
         # Set extreme values for mapping
         max = np.nanmax(globalmap[ifilt, :, :]) 
         min = np.nanmin(globalmap[ifilt, :, :])
+        northkeep = ((lat > 15) & (lat < 75))
+        max_north = np.nanmax(globalmap[ifilt, northkeep, :])
+        min_north = np.nanmin(globalmap[ifilt, northkeep, :]) 
+        southkeep = ((lat < -15) & (lat > -75))
+        max_south = np.nanmax(globalmap[ifilt, southkeep, :])
+        min_south = np.nanmin(globalmap[ifilt, southkeep, :])
+
 
         plt.figure(figsize=(15, 8), dpi=300)
         # Northern pole subplot
@@ -85,7 +92,7 @@ def PlotPolesFromGlobal(globalmap):
 
         plt.figure(figsize=(7, 5), dpi=300)
         # Northern pole figure
-        PlotOnePole(img=globalmap[ifilt,:,:], vmin=min, vmax=max, \
+        PlotOnePole(img=globalmap[ifilt,:,:], vmin=min_north, vmax=max_north, \
             central_longitude=central_lon, central_latitude=central_lat, \
             latitude_limit=lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
             longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
@@ -96,7 +103,7 @@ def PlotPolesFromGlobal(globalmap):
         plt.clf()
     
         # Southern pole figure
-        PlotOnePole(img=globalmap[ifilt,:,:], vmin=min, vmax=max, \
+        PlotOnePole(img=globalmap[ifilt,:,:], vmin=min_south, vmax=max_south, \
             central_longitude=central_lon, central_latitude=-central_lat, \
             latitude_limit=-lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
             longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
