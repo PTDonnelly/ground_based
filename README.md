@@ -33,17 +33,15 @@ These calibrated profiles (and associated calibration coefficients) can then be 
 ### UNDER CONSTRUCTION ###
 
 # Functions #
-1. Add special calibration to the 7-um filter (calibrate equatorial values of VISIR and CIRS)
-2. Add in a CTL binning scheme  as a test for whether the removal of the bulk CTL profile from each observation can create pretty global maps. To do this you also need 7-um vdop maps from DRM and the vdop correction. This is a rather time-expensive experiment so perhaps it should be lower prioriy.
-3. Polar plotting of cylmaps
-4. Optimise plotting codes?
+1. Add in a CTL binning scheme  as a test for whether the removal of the bulk CTL profile from each observation can create pretty global maps. To do this you also need 7-um vdop maps from DRM and the vdop correction. This is a rather time-expensive experiment so perhaps it should be lower prioriy.
+2. Polar plotting of cylmaps
+3. Optimise plotting codes?
 
 # Filestructure #
 Implemented the above approach with subdirectories first rather than submodules first. Submodules can come later as and when we need more diverse applications to the code.
 Thoughts for next version: consolidate codes into groups of functions and subfunctions for expansion in future
 1. For Mapping: define a module with both mapping options inside so that we can simply import Mapping and call Mapping.Cylindrical or Mapping.Polar.
 2. For Profiles: define the module MeridProfiles, such that MeridProfiles.Create and MeridProfiles.Calibrate. Eventually this could even become Binning.MeridProfile.Create, Binning.CTLProfile.Create, etc. (depending on what is needed).
-3. For filter information, define the module VisirFilters, such that VisirFilters.Wavelengths and VisirFilters.Wavenumbers. Although this is a non-ideal and dirty fix anyway, so maybe that is a chance to generalise those functions. Possibly combine with SetWave?
 4. For Winds: define the module PlotWinds, such that PlotWinds.Pseudo, PlotWinds.Retrieved, PlotWinds.DYNAMICO etc.
 5. For reading input files: define the module ReadInput, such that ReadInput.Gravity, ReadInput.Calib, ReadInput.ZonalWind, ReadInput.Fits.
 6. For writing output files: define the module WriteOutput, such that WriteOutput.MeridProfiles, WriteOutput.Calibration, WriteOutput.Spx.

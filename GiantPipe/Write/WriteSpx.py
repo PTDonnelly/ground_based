@@ -38,7 +38,7 @@ def WriteMeridSpx(mode, spectrals):
             # Write output to texfile with relevant formatting
             f.write("{0:d}\n".format(nconv))
             f.write("{0:d}\n".format(nav))
-            f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:12.5f}  {4:12.5f}  {4:12.5f}\n".format(clat, clon, solar_ang, emission_angle, azimuth_angle, wgeom))
+            f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:12.5f}  {4:12.5f}  {5:12.5f}\n".format(clat, clon, solar_ang, emission_angle, azimuth_angle, wgeom))
             f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(wave, rad, rad_err))
 
     # If subdirectory does not exist, create it
