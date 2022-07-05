@@ -2,6 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
+from copy import copy
 import Globals
 from Read.ReadCal import ReadCal
 from Tools.SetWave import SetWave
@@ -117,6 +118,55 @@ def PlotCalMeridProfiles(singles, spectrals):
         plt.savefig(f"{dir}{filt}_calibrated_merid_profiles.eps", dpi=900)
     # Clear figure to avoid overlapping between plotting subroutines
     plt.clf()
+
+def PlotGlobalSpectrals(spectrals):
+    """Basic code to plot the central meridian profiles with wavenumber
+    (or spectral profiles with latitude, depending on the persepctive).
+    Displays the global pseudo-spectrum in a way resembling a normal spectrum."""
+    
+    # If subdirectory does not exist, create it
+    dir = '../outputs/calibration_profiles_figures/'
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+
+    lat = copy(spectrals[:, :, 0])
+    wave = copy(spectrals[:, :, 5])
+    rad =  copy(spectrals[:, :, 3])
+    rad_res1 = copy(spectrals[:, :, 3])
+    rad_res2 = copy(spectrals[:, :, 3])
+    for i in range(Globals.nfilters):
+        rad_res1[:, i] = rad[:, i] - np.nanmean(rad[:, i])
+        rad_res2[:, i] = (rad_res1[:, i]/np.nanmean(rad[:, i]))*100
+
+    plt.figure
+    ax1 = plt.contourf(wave, lat, rad, levels=200, cmap='nipy_spectral')
+    for i in range(Globals.nfilters):
+        plt.plot((wave[i], wave[i]), (-90, 90), ls=':', lw=0.7, color='white')
+    plt.colorbar(ax1)
+    plt.xlim((xmin, xmax))
+    plt.ylim((-90, 90))
+    plt.savefig(f"{dir}global_spectrals.png", dpi=900)
+    plt.close()
+ 
+    plt.figure
+    ax2 = plt.contourf(wave, lat, rad_res1, vmin=-1*np.nanmax(rad_res1),vmax=np.nanmax(rad_res1), levels=200, cmap='seismic')
+    for i in range(Globals.nfilters):
+        plt.plot((wave[i], wave[i]), (-90, 90), ls=':', lw=0.7, color='black')
+    plt.colorbar(ax2)
+    plt.xlim((xmin, xmax))
+    plt.ylim((-90, 90))
+    plt.savefig(f"{dir}global_spectrals_res1.png", dpi=900)
+    plt.close()
+
+    plt.figure
+    ax3 = plt.contourf(wave, lat, rad_res2, vmin=-1*np.nanmax(rad_res2),vmax=np.nanmax(rad_res2), levels=200, cmap='seismic')
+    for i in range(Globals.nfilters):
+        plt.plot((wave[i], wave[i]), (-90, 90), ls=':', lw=0.7, color='black')
+    plt.colorbar(ax3)
+    plt.xlim((xmin, xmax))
+    plt.ylim((-90, 90))
+    plt.savefig(f"{dir}global_spectrals_res2.png", dpi=900)
+    plt.close()
 
 def PlotCentreTotLimbProfiles(mode, singles, spectrals):
     print('Plotting profiles...')

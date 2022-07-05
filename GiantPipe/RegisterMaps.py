@@ -31,7 +31,7 @@ def RegisterMaps(files):
 
     # Loop over files
     for ifile, fpath in enumerate(files):
-        # print(ifile, fpath)
+        print(ifile, fpath)
         ## Step 1: Read img, cmap and mufiles
         imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filepath=f"{fpath}")
 

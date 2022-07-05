@@ -12,9 +12,11 @@ def main():
     from Calibrate.CentralMerid import CalCentralMerid
     # from Calibrate.CylindricalMaps import CalCylindricalMaps
     from Plot.PlotProfiles import PlotMeridProfiles
+    from Plot.PlotProfiles import PlotGlobalSpectrals
     from Plot.PlotMaps import PlotMaps
     from Read.ReadNpy import ReadCentralMeridNpy
     from Read.ReadNpy import ReadCentreToLimbNpy
+    from Read.ReadSpx import ReadSpx
     from Write.WriteProfiles import WriteMeridProfiles
     from Write.WriteProfiles import WriteCentreToLimbProfiles
     from Write.WriteSpx import WriteMeridSpx
@@ -27,10 +29,10 @@ def main():
     bin_cmerid  = True     # Use central meridian binning scheme
     bin_ctl     = False     # Use centre-to-limb binning scheme
     # Output
-    save        = True      # Store calculated profiles to local files
+    save        = False      # Store calculated profiles to local files
     plotting    = True      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
-    spx         = True      # Write spxfiles as spectral input for NEMESIS
+    spx         = False      # Write spxfiles as spectral input for NEMESIS
 
     ############################################################
     # Perform geometric registration and radiometric calibration
@@ -77,7 +79,8 @@ def main():
 
         if plotting:
             # Plot mean central meridian profiles
-            PlotMeridProfiles(mode=mode, files=files, singles=singles, spectrals=spectrals)
+            # PlotMeridProfiles(mode=mode, files=files, singles=singles, spectrals=spectrals)
+            PlotGlobalSpectrals(spectrals=spectrals)
 
         if spx:
             # Write mean central meridian profiles to spxfile
@@ -120,11 +123,15 @@ def main():
     #         PlotMaps(files, spectrals)
     
     ############################################################
-    # Read in relevant calculated profiles (bin_cmerid or bin_ctl)
-    # and generate spectral inputs for NEMESIS
+    # Read in spectral inputs for NEMESIS and plot
     ############################################################
 
+    if 'spx' in source:
+        files  = FindFiles(mode=mode+'_spx')
+        nfiles = len(files)
 
+        if plotting:
+            PlotSpx(files=files)
 
 if __name__ == '__main__':
     import numpy as np
