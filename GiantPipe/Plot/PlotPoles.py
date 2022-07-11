@@ -8,7 +8,7 @@ from Tools.VisirFilterInfo import Wavenumbers
 
 plt.rcParams['figure.max_open_warning'] = 50
 
-def PlotPolesFromGlobal(globalmap):
+def PlotPolesFromGlobal(globalmap, adj_location):
     """ Plotting pole maps using stored global maps array """
 
     print('Mapping pole maps...')
@@ -35,9 +35,10 @@ def PlotPolesFromGlobal(globalmap):
         # Set extreme values for mapping
         max = np.nanmax(globalmap[ifilt, :, :]) 
         min = np.nanmin(globalmap[ifilt, :, :])
-        northkeep = ((lat > 15) & (lat < 75))
-        max_north = np.nanmax(globalmap[ifilt, northkeep, :])
-        min_north = np.nanmin(globalmap[ifilt, northkeep, :]) 
+        if ifilt < 6 or ifilt > 7:
+            northkeep = ((lat > 15) & (lat < 75))
+            max_north = np.nanmax(globalmap[ifilt, northkeep, :])
+            min_north = np.nanmin(globalmap[ifilt, northkeep, :]) 
         southkeep = ((lat < -15) & (lat > -75))
         max_south = np.nanmax(globalmap[ifilt, southkeep, :])
         min_south = np.nanmin(globalmap[ifilt, southkeep, :])
@@ -84,23 +85,24 @@ def PlotPolesFromGlobal(globalmap):
         #cbar.ax.tick_params(labelsize=15)
         cbar.set_label("Brightness Temperature [K]")
         # Save pole map figure of the current filter 
-        plt.savefig(f"{dir}{filt}_pole_maps.png", dpi=300)
-        plt.savefig(f"{dir}{filt}_pole_maps.eps", dpi=300)
+        plt.savefig(f"{dir}{filt}_pole_maps_{adj_location}_adj.png", dpi=300)
+        plt.savefig(f"{dir}{filt}_pole_maps_{adj_location}_adj.eps", dpi=300)
         # Clear figure to avoid overlapping between plotting subroutines
         plt.clf()
     
 
         plt.figure(figsize=(7, 5), dpi=300)
-        # Northern pole figure
-        PlotOnePole(img=globalmap[ifilt,:,:], vmin=min_north, vmax=max_north, \
-            central_longitude=central_lon, central_latitude=central_lat, \
-            latitude_limit=lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
-            longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
-        # Save north pole map figure of the current filter 
-        plt.savefig(f"{dir}{filt}_north_pole_maps.png", dpi=300)
-        plt.savefig(f"{dir}{filt}_north_pole_maps.eps", dpi=300)
-        # Clear figure to avoid overlapping between plotting subroutines
-        plt.clf()
+        if ifilt < 6 or ifilt > 7:
+            # Northern pole figure
+            PlotOnePole(img=globalmap[ifilt,:,:], vmin=min_north, vmax=max_north, \
+                central_longitude=central_lon, central_latitude=central_lat, \
+                latitude_limit=lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
+                longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
+            # Save north pole map figure of the current filter 
+            plt.savefig(f"{dir}{filt}_north_pole_maps_{adj_location}_adj.png", dpi=300)
+            plt.savefig(f"{dir}{filt}_north_pole_maps_{adj_location}_adj.eps", dpi=300)
+            # Clear figure to avoid overlapping between plotting subroutines
+            plt.clf()
     
         # Southern pole figure
         PlotOnePole(img=globalmap[ifilt,:,:], vmin=min_south, vmax=max_south, \
@@ -108,8 +110,8 @@ def PlotPolesFromGlobal(globalmap):
             latitude_limit=-lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
             longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
         # Save south pole map figure of the current filter 
-        plt.savefig(f"{dir}{filt}_south_pole_maps.png", dpi=300)
-        plt.savefig(f"{dir}{filt}_south_pole_maps.eps", dpi=300)
+        plt.savefig(f"{dir}{filt}_south_pole_maps_{adj_location}_adj.png", dpi=300)
+        plt.savefig(f"{dir}{filt}_south_pole_maps_{adj_location}_adj.eps", dpi=300)
         # Clear figure to avoid overlapping between plotting subroutines
         plt.clf()
 

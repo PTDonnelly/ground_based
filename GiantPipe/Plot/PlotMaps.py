@@ -2,7 +2,6 @@ import os
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 import Globals
 from Tools.CorrectMaps import PolynomialAdjust
 from Tools.SetWave import SetWave
@@ -29,8 +28,9 @@ def PlotMaps(files, spectrals):
     TBmaps     = np.empty((Nfiles, ny, nx))
     globalmaps = np.empty((Globals.nfilters, ny, nx))
     #mumin      = np.empty((Globals.nfilters,ny, nx))
+    mumin = [0.02, 0.02, 0.08, 0.09, 0.1, 0.05, 0.02, 0.02, 0.02, 0.02, 0.01, 0.01, 0.01]
 
-    cmaps, mumaps, wavenumber = PolynomialAdjust(dir, files, spectrals)
+    cmaps, mumaps, wavenumber, adj_location = PolynomialAdjust(dir, files, spectrals)
 
     print('Mapping global maps...')
 
@@ -46,9 +46,9 @@ def PlotMaps(files, spectrals):
                 # Store only the cmaps for the current ifilt 
                 TBmaps[ifile, :, :] = cmaps[ifile, :, :]                
                
-                res = ma.masked_where(mumaps[ifile, :, :] < 0.02, TBmaps[ifile, :, :])
-                #res = ma.masked_where(((res > 161)), res)
-                #res = ma.masked_where(((res < 135)), res)
+                res = ma.masked_where(mumaps[ifile, :, :] < mumin[ifilt], TBmaps[ifile, :, :])
+                res = ma.masked_where(((res > 201)), res)
+                res = ma.masked_where(((res < 0)), res)
                 TBmaps[ifile,:,:] = res.filled(np.nan)
 
         # Combinig single cylmaps to store in globalmaps array
@@ -72,18 +72,18 @@ def PlotMaps(files, spectrals):
 
         # Save global map figure of the current filter 
         filt = Wavenumbers(ifilt)
-        plt.savefig(f"{dir}{filt}_global_maps.png", dpi=900)
-        plt.savefig(f"{dir}{filt}_global_maps.eps", dpi=900)
+        plt.savefig(f"{dir}{filt}_global_maps_{adj_location}_adj.png", dpi=900)
+        plt.savefig(f"{dir}{filt}_global_maps_{adj_location}_adj.eps", dpi=900)
         # Clear figure to avoid overlapping between plotting subroutines
         plt.clf()
         # Write global maps to np.array
-        np.save(f"{dir}{filt}_global_maps", globalmaps[ifilt, :, :])
+        np.save(f"{dir}{filt}_global_maps_{adj_location}_adj", globalmaps[ifilt, :, :])
         # Write global maps to txtfiles
-        np.savetxt(f"{dir}{filt}_global_maps.txt", globalmaps[ifilt, :, :])
+        np.savetxt(f"{dir}{filt}_global_maps_{adj_location}_adj.txt", globalmaps[ifilt, :, :])
         # Write global maps to NetCDF files
         #GlobalMapsNetCDF(dir, filt, globalmaps=globalmaps[ifilt, :, :])
 
-    return globalmaps
+    return globalmaps, adj_location
 
 def GlobalMapsNetCDF(dir, filt, globalmaps):
     import netCDF4 as nc
