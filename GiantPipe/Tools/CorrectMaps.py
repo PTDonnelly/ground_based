@@ -35,10 +35,10 @@ def PolynomialAdjust(directory, files, spectrals):
     keepdata[:, :, :] = np.nan
     keepmu[:, :, :]   = np.nan
 
-    adj_location = 'northern'    
+    #adj_location = 'northern'    
     #adj_location = 'southern'
     #adj_location = 'hemispheric'
-    #adj_location = 'average'
+    adj_location = 'average'
 
     # Loop over file to load individual (and original) cylindrical maps
     for ifile, fpath in enumerate(files):
@@ -166,24 +166,25 @@ def PolynomialAdjust(directory, files, spectrals):
                 bandc  = bandcmaps[ifilt, keep, :]
                 bandmu = bandmumaps[ifilt, keep, :]
                 if adj_location == 'average':
-                    keep_north  = ((lat < 30) & (lat > 5)) 
+                    keep_north  = ((lat < 30) & (lat > 5))  if (ifilt != 4) else ((lat < 15) & (lat > 10))
                     bandcnorth  = bandcmaps[ifilt, keep_north, :]
                     bandmunorth = bandmumaps[ifilt, keep_north, :]
                     mask_north  = (( bandmunorth > mumin_north[ifilt]) & (bandcnorth > 90.))
-                    keep_south  = ((lat < -5) & (lat > -30)) 
+                    keep_south  = ((lat < -5) & (lat > -30))  if (ifilt != 4) else ((lat < -10) & (lat > -15))
                     bandcsouth  = bandcmaps[ifilt, keep_south, :]
                     bandmusouth = bandmumaps[ifilt, keep_south, :]           
                     mask_south  = ((bandmusouth > mumin_south[ifilt]) & (bandcsouth > 90.))
                     # Average the two hemispheric bands
-                    bandc_combined = np.append(bandcnorth, bandcsouth, axis = 0)
-                    bandmu_combined = np.append(bandmunorth, bandmusouth, axis = 0)
-                    bandc_tmp = np.reshape(bandc_combined, (2, 50, nx))
-                    bandmu_tmp = np.reshape(bandmu_combined, (2, 50, nx))
+                    bandc_combined = np.append(bandcnorth, bandcsouth, axis = 1)
+                    bandmu_combined = np.append(bandmunorth, bandmusouth, axis = 1)
+                    iy = len(bandcnorth[:,0])
+                    bandc_tmp = np.reshape(bandc_combined, (2, iy, nx))  
+                    bandmu_tmp = np.reshape(bandmu_combined, (2, iy, nx))
                     for x in range(nx):
-                        for y in range(50):
+                        for y in range(iy):
                             bandc[y, x] = np.nanmean(bandc_tmp[:, y, x])
-                            bandmu[y, x] = np.nanmean(bandmu_tmp[:, y, x])
-                    mumin = min(mumin_north[ifilt], mumin_south[ifilt])
+                            bandmu[y, x] = np.nanmax(bandmu_tmp[:, y, x])
+                    mumin = max(mumin_north[ifilt], mumin_south[ifilt])
                 mask  = (( bandmu > mumin) & (bandc > 90.))
                 if adj_location == 'northern':
                     if (ifilt != 6): # ifilt = 6 is only a southern view
