@@ -32,39 +32,43 @@ def PlotPseudoWindShear(globalmaps, adj_location):
             zonalmean[ifilt, iy] = np.nanmean(globalmaps[ifilt, iy, :])
         # Calculated the associated thermal/pseudo-windshear
         windshear[ifilt,:]=-(grav/(Coriolis*zonalmean[ifilt,:]))*np.gradient(zonalmean[ifilt, :],y)
-        # Subplot for the southern hemisphere
-        ax1 = plt.subplot2grid((1, 2), (0, 0))
+        # Create a figure per filter
+        fig, axes = plt.subplots(1, 2, sharey=True)
         latkeep = (lat <-5)
-        ax1.plot(lat[latkeep],windshear[ifilt,latkeep],linewidth=3.0,color="black")
+        axes[0].plot(lat[latkeep],windshear[ifilt,latkeep],linewidth=3.0,color="black")
         negkeep = (lat <-5) & (windshear[ifilt,:] < 0)
-        ax1.plot(lat[negkeep],windshear[ifilt,negkeep],"bo")
+        axes[0].plot(lat[negkeep],windshear[ifilt,negkeep],"bo")
         poskeep = (lat <-5) & (windshear[ifilt,:] > 0)
-        ax1.plot(lat[poskeep],windshear[ifilt,poskeep],"ro")
+        axes[0].plot(lat[poskeep],windshear[ifilt,poskeep],"ro")
         for iejet in range(0,nejet):
-            ax1.plot([ejets_c[iejet],ejets_c[iejet]],[-15,15],color='black',linestyle="dashed")
+            axes[0].plot([ejets_c[iejet],ejets_c[iejet]],[-15,15],color='black',linestyle="dashed")
         for iwjet in range(0,nwjet):
-            ax1.plot([wjets_c[iwjet],wjets_c[iwjet]],[-15,15],color='black',linestyle="dotted")
-        ax1.plot([-90,-10],[0,0],linewidth=1.0,color="grey")
-        ax1.set_ylim([-0.7,0.7])
-        ax1.set_xlim(-90,-10)
-        
+            axes[0].plot([wjets_c[iwjet],wjets_c[iwjet]],[-15,15],color='black',linestyle="dotted")
+        axes[0].plot([-90,-10],[0,0],linewidth=1.0,color="grey")
+        axes[0].set_xlim(-90,-10)
+        axes[0].set_ylim(-0.7,0.7)
+
 
         # Subplot for the northern hemisphere
-        ax2 = plt.subplot2grid((1, 2), (0, 1))
         latkeep = (lat > 5)       
-        ax2.plot(lat[latkeep],windshear[ifilt,latkeep],linewidth=3.0,color="black")
+        axes[1].plot(lat[latkeep],windshear[ifilt,latkeep],linewidth=3.0,color="black")
         negkeep = (lat > 5) & (windshear[ifilt,:] < 0)
-        ax2.plot(lat[negkeep],windshear[ifilt,negkeep],"bo")
+        axes[1].plot(lat[negkeep],windshear[ifilt,negkeep],"bo")
         poskeep = (lat > 5) & (windshear[ifilt,:] > 0)
-        ax2.plot(lat[poskeep],windshear[ifilt,poskeep],"ro")
-        ax2.set_ylim([-0.7,0.7])        
-        ax2.set_xlim(10,90)
+        axes[1].plot(lat[poskeep],windshear[ifilt,poskeep],"ro")
+        axes[1].set_xlim(10,90)
+        axes[1].set_ylim(-0.7,0.7)
         for iejet in range(0,nejet):
-            ax1.plot([ejets_c[iejet],ejets_c[iejet]],[-15,15],color='black',linestyle="dashed")
+            axes[1].plot([ejets_c[iejet],ejets_c[iejet]],[-15,15],color='black',linestyle="dashed")
         for iwjet in range(0,nwjet):
-            ax1.plot([wjets_c[iwjet],wjets_c[iwjet]],[-15,15],color='black',linestyle="dotted")
-        ax2.plot([10,90],[0,0],linewidth=1.0,color="grey")
-        
+            axes[1].plot([wjets_c[iwjet],wjets_c[iwjet]],[-15,15],color='black',linestyle="dotted")
+        axes[1].plot([10,90],[0,0],linewidth=1.0,color="grey")
+        # add a big axis, hide frame
+        fig.add_subplot(111, frameon=False)
+        # hide tick and tick label of the big axis
+        plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
+        plt.xlabel("Latitude", size=15)
+        plt.ylabel("Pseudo-shear m s$^{-1}$ km$^{-1}$", size=15)
 
         # Save figure showing calibation method 
         filt = Wavenumbers(ifilt)
