@@ -13,8 +13,8 @@ def PolynomialAdjust(directory, files, spectrals):
     res    = ny / 180                   # Resolution of maps: res = 1 (1 degree), res = 2 (0.5 degree) etc.
     Nfiles = len(files)
     lat = np.arange(-89.75,90,step=0.5) # Latitude range from pole-to-pole
-    mumin_north = [0.15, 0.15, 0.00, 0.5, 0.15, 0.2, 0.5, 0.5, 0.15, 0.3, 0.4, 0.2, 0.05]
-    mumin_south = [0.15, 0.15, 0.00, 0.1, 0.1, 0.2, 0.5, 0.5, 0.15, 0.3, 0.6, 0.5, 0.05]
+    mumin_north = [0.15, 0.15, 0.02, 0.37, 0.3, 0.2, 0.5, 0.5, 0.15, 0.3, 0.6, 0.5, 0.05]
+    mumin_south = [0.15, 0.15, 0.02, 0.37, 0.3, 0.2, 0.5, 0.5, 0.15, 0.3, 0.6, 0.5, 0.05]
 
     # Create np.arrays for all pixels in all cmaps and mumaps
     cmaps      = np.empty((Nfiles, ny, nx))
@@ -110,11 +110,18 @@ def PolynomialAdjust(directory, files, spectrals):
             # Hemispheric, Northern, Southern, Average:
             if adj_location == 'hemispheric':
                 # Define a mask depending on minimum emission angle for each hemisphere
-                keep_north  = ((lat < 30) & (lat > 5)) 
+                if (ifilt == 3):
+                    keep_north = ((lat < 15) & (lat > 10))
+                    keep_south = ((lat < -10 ) & (lat > -15))
+                elif (ifilt == 4):
+                    keep_north = ((lat < 25) & (lat > 10))
+                    keep_south = ((lat < -10) & (lat > -25))
+                else:
+                    keep_north  = ((lat < 30) & (lat > 5))
+                    keep_south  = ((lat < -5) & (lat > -30))
                 bandcnorth  = bandcmaps[ifilt, keep_north, :]
                 bandmunorth = bandmumaps[ifilt, keep_north, :]
                 mask_north  = (( bandmunorth > mumin_north[ifilt]) & (bandcnorth > 90.))
-                keep_south  = ((lat < -5) & (lat > -30)) 
                 bandcsouth  = bandcmaps[ifilt, keep_south, :]
                 bandmusouth = bandmumaps[ifilt, keep_south, :]           
                 mask_south  = ((bandmusouth > mumin_south[ifilt]) & (bandcsouth > 90.))
@@ -158,25 +165,42 @@ def PolynomialAdjust(directory, files, spectrals):
                 # Define a mask depending on minimum emission angle and the adjustement location chosen
                 if adj_location == 'northern':
                     if (ifilt != 6): # ifilt = 6 is only a southern view
-                        keep  = ((lat < 30) & (lat > 5))
+                        if (ifilt == 3):
+                            keep = ((lat < 15) & (lat > 10))
+                        elif (ifilt == 4):
+                            keep = ((lat < 25) & (lat > 10))
+                        else:
+                            keep = ((lat < 30) & (lat > 5))
                     mumin = mumin_north[ifilt]
                 if adj_location == 'southern':
-                    keep  = ((lat < -5) & (lat > -30)) if (ifilt != 4) else ((lat < -10) & (lat > -15))
+                    if (ifilt == 3):
+                        keep = ((lat < -10 ) & (lat > -15))
+                    elif (ifilt == 4):
+                        keep = ((lat < -10) & (lat > -25))
+                    else:
+                        keep  = ((lat < -5) & (lat > -30))
                     mumin = mumin_south[ifilt]
                 bandc  = bandcmaps[ifilt, keep, :]
                 bandmu = bandmumaps[ifilt, keep, :]
                 if adj_location == 'average':
-                    keep_north  = ((lat < 30) & (lat > 5))  if (ifilt != 4) else ((lat < 15) & (lat > 10))
+                    if (ifilt == 3):
+                        keep_north = ((lat < 15) & (lat > 10))
+                        keep_south = ((lat < -10 ) & (lat > -15))
+                    elif (ifilt == 4):
+                        keep_north = ((lat < 25) & (lat > 10))
+                        keep_south = ((lat < -10) & (lat > -25))
+                    else:
+                        keep_north  = ((lat < 30) & (lat > 5))
+                        keep_south  = ((lat < -5) & (lat > -30))
                     bandcnorth  = bandcmaps[ifilt, keep_north, :]
                     bandmunorth = bandmumaps[ifilt, keep_north, :]
                     mask_north  = (( bandmunorth > mumin_north[ifilt]) & (bandcnorth > 90.))
-                    keep_south  = ((lat < -5) & (lat > -30))  if (ifilt != 4) else ((lat < -10) & (lat > -15))
                     bandcsouth  = bandcmaps[ifilt, keep_south, :]
                     bandmusouth = bandmumaps[ifilt, keep_south, :]           
                     mask_south  = ((bandmusouth > mumin_south[ifilt]) & (bandcsouth > 90.))
                     # Average the two hemispheric bands
-                    bandc_combined = np.append(bandcnorth, bandcsouth, axis = 1)
-                    bandmu_combined = np.append(bandmunorth, bandmusouth, axis = 1)
+                    bandc_combined = np.append(bandcnorth, bandcsouth[::-1,:], axis = 1)
+                    bandmu_combined = np.append(bandmunorth, bandmusouth[::-1,:], axis = 1)
                     iy = len(bandcnorth[:,0])
                     bandc_tmp = np.reshape(bandc_combined, (2, iy, nx))  
                     bandmu_tmp = np.reshape(bandmu_combined, (2, iy, nx))
@@ -227,8 +251,8 @@ def PolynomialAdjust(directory, files, spectrals):
                     ax3.scatter(bandmu[mask], cdata)
             # Save figure showing limb correction using polynomial adjustment method 
             filt = Wavenumbers(ifilt)
-            plt.savefig(f"{directory}{filt}_polynomial_adjustment_{adj_location}.png", dpi=900)
-            plt.savefig(f"{directory}{filt}_polynomial_adjustment_{adj_location}.eps", dpi=900)
+            plt.savefig(f"{directory}calib_{filt}_polynomial_adjustment_{adj_location}.png", dpi=300)
+            plt.savefig(f"{directory}calib_{filt}_polynomial_adjustment_{adj_location}.eps", dpi=300)
 
             # Apply polynomial adjustment over individual cmaps depending of wave value
             for ifile, iwave in enumerate(wavenumber):
