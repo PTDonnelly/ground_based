@@ -108,11 +108,12 @@ def PlotCompositePseudoWindShear():
         windshear[ifilt,:]=-(grav/(Coriolis*zonalmean[ifilt,:]))*np.gradient(zonalmean[ifilt, :],y)
     
     # Create a composite figure with all filters
-    fig, axes = plt.subplots(Globals.nfilters, 2, figsize=(12,20), sharey=True)
+    fig, axes = plt.subplots(Globals.nfilters, 2, figsize=(12,16), sharey=True)
     iaxes = 0
     for ifilt in [0,10,11,12,5,4,6,7,8,9,3,2,1]:
         filt = Wavenumbers(ifilt)
         wavelength, _, _, _ = SetWave(_, filt)
+        # Subplot for the southern hemisphere
         latkeep = (lat <-5)
         axes[iaxes,0].plot(lat[latkeep],windshear[iaxes,latkeep],linewidth=3.0,color="black")
         negkeep = (lat <-5) & (windshear[iaxes,:] < 0)
@@ -125,7 +126,9 @@ def PlotCompositePseudoWindShear():
             axes[iaxes,0].plot([wjets_c[iwjet],wjets_c[iwjet]],[-15,15],color='black',linestyle="dotted")
         axes[iaxes,0].plot([-90,-10],[0,0],linewidth=1.0,color="grey")
         axes[iaxes,0].set_xlim(-60,-20)
+        axes[iaxes,0].xaxis.set_ticklabels([]) if (iaxes < 12) else axes[iaxes,0].tick_params(labelsize=20)
         axes[iaxes,0].set_ylim(-0.7,0.7)
+        axes[iaxes,0].tick_params(labelsize=20)
         # Subplot for the northern hemisphere
         latkeep = (lat > 5)       
         axes[iaxes,1].plot(lat[latkeep],windshear[iaxes,latkeep],linewidth=3.0,color="black",label=f"{wavelength}"+"$\mu$m")
@@ -134,20 +137,22 @@ def PlotCompositePseudoWindShear():
         poskeep = (lat > 5) & (windshear[iaxes,:] > 0)
         axes[iaxes,1].plot(lat[poskeep],windshear[iaxes,poskeep],"ro")
         axes[iaxes,1].set_xlim(20,60)
+        axes[iaxes,1].xaxis.set_ticklabels([]) if (iaxes < 12) else axes[iaxes,1].tick_params(labelsize=20)
         axes[iaxes,1].set_ylim(-0.7,0.7)
+        axes[iaxes,1].tick_params(labelsize=20)
         axes[iaxes,1].legend(loc="upper right", fontsize=12)
         for iejet in range(0,nejet):
             axes[iaxes,1].plot([ejets_c[iejet],ejets_c[iejet]],[-15,15],color='black',linestyle="dashed")
         for iwjet in range(0,nwjet):
             axes[iaxes,1].plot([wjets_c[iwjet],wjets_c[iwjet]],[-15,15],color='black',linestyle="dotted")
         axes[iaxes,1].plot([10,90],[0,0],linewidth=1.0,color="grey")
-        # add a big axis, hide frame
-        fig.add_subplot(111, frameon=False)
         # hide tick and tick label of the big axis
-        plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
-        plt.xlabel("Latitude", size=25)
+        plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
+        plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+        plt.xlabel("Planetocentric Latitude", size=25)
         plt.ylabel("Pseudo-shear (m s$^{-1}$ km$^{-1}$)", size=25)
         iaxes += 1
     # Save figure 
     plt.savefig(f"{dir}calib_pseudo_wind_shear.png", dpi=300)
     plt.savefig(f"{dir}calib_pseudo_wind_shear.eps", dpi=300)
+    plt.clf()
