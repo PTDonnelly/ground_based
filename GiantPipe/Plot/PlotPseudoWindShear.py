@@ -140,7 +140,7 @@ def PlotCompositePseudoWindShear():
         axes[iaxes,1].xaxis.set_ticklabels([]) if (iaxes < 12) else axes[iaxes,1].tick_params(labelsize=20)
         axes[iaxes,1].set_ylim(-0.7,0.7)
         axes[iaxes,1].tick_params(labelsize=20)
-        axes[iaxes,1].legend(loc="upper right", fontsize=12)
+        axes[iaxes,1].legend(loc="upper right", fontsize=12, handletextpad=0, handlelength=0, markerscale=0)
         for iejet in range(0,nejet):
             axes[iaxes,1].plot([ejets_c[iejet],ejets_c[iejet]],[-15,15],color='black',linestyle="dashed")
         for iwjet in range(0,nwjet):
