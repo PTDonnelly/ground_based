@@ -1,5 +1,4 @@
 import os
-from re import I
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
@@ -13,10 +12,11 @@ def PlotTemperaturePriorProfiles():
     if not os.path.exists(dir):
         os.makedirs(dir)
     
+    fpath = '/Users/db496/Documents/Research/Observations/NEMESIS_outputs/'
     filename = ['jupiter_v2021', 'jupiter_v2016']
     for fname in filename:
         # Read profile data from NEMESIS prior file 
-        _, pressure, temperature, gas, gasname, nlevel, ngas = ReadTemperaturePriorProfile(f"../../NEMESIS_outputs/{fname}.prf")
+        _, pressure, temperature, gas, gasname, nlevel, ngas = ReadTemperaturePriorProfile(f"{fpath}{fname}.prf")
 
         # Create a figure
         fig, axes = plt.subplots(1, ngas+1, figsize=(12,6), sharey=True)
