@@ -3,7 +3,7 @@ import numpy as np
 import Globals
 from Tools.SetWave import SetWave
 
-def WriteMeridProfiles(files, singles, spectrals):
+def WriteMeridProfiles(dataset, files, singles, spectrals):
     """Save calibrated profiles (and optionally coefficients) as
     numpy arrays and textfiles"""
 
@@ -11,7 +11,7 @@ def WriteMeridProfiles(files, singles, spectrals):
     
     if np.any(singles):
         # If subdirectory does not exist, create it
-        dir = '../outputs/single_merid_profiles/'
+        dir = f'../outputs/{dataset}/single_merid_profiles/'
         if not os.path.exists(dir):
             os.makedirs(dir)
         # Save individual meridional profiles
@@ -28,7 +28,7 @@ def WriteMeridProfiles(files, singles, spectrals):
         
     if np.any(spectrals):
         # If subdirectory does not exist, create it
-        dir = '../outputs/spectral_merid_profiles/'
+        dir = f'../outputs/{dataset}/spectral_merid_profiles/'
         if not os.path.exists(dir):
             os.makedirs(dir)
         # Save spectral meridional profiles

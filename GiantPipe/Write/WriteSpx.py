@@ -2,7 +2,7 @@ import os
 import numpy as np
 import Globals
 
-def WriteMeridSpx(mode, spectrals):
+def WriteMeridSpx(dataset, mode, spectrals):
     """Create spectral input for NEMESIS using central meridian profiles.
        Populate .spxfile with radiances, measurement errors, and geometries."""
 
@@ -42,7 +42,7 @@ def WriteMeridSpx(mode, spectrals):
             f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(wave, rad, rad_err))
 
     # If subdirectory does not exist, create it
-    dir = '../outputs/spxfiles/'
+    dir = f'../outputs/{dataset}/spxfiles/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 
@@ -58,10 +58,10 @@ def WriteMeridSpx(mode, spectrals):
         # Only write spxfile for latitudes with spectral information
         if lats:
             # Open textfile
-            with open(f"../outputs/spxfiles/lat_{lats[0]}.txt", 'w') as f:
+            with open(f"../outputs/{dataset}/spxfiles/lat_{lats[0]}.txt", 'w') as f:
                 create_merid_spx(f, lats, LCMs, mus, rads, rad_errs, waves)
             # Open spxfile
-            with open(f"../outputs/spxfiles/lat_{lats[0]}.spx", 'w') as f:
+            with open(f"../outputs/{dataset}/spxfiles/lat_{lats[0]}.spx", 'w') as f:
                 create_merid_spx(f, lats, LCMs, mus, rads, rad_errs, waves)
 
 def WriteCentreToLimbSpx(mode, spectrals):

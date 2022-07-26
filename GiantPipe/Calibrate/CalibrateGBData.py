@@ -5,10 +5,10 @@ from Calibrate.CentralMerid import CalCentralMerid
 from Calibrate.CylindricalMaps import CalCylindricalMaps
 from Plot.PlotProfiles import PlotMeridProfiles
 
-def CalibrateGBData(mode):
+def CalibrateGBData(dataset, mode):
 
     # Point to location of observations
-    files = FindFiles(mode=mode)
+    files = FindFiles(dataset=dataset, mode=mode)
     nfiles = len(files)
 
     # Steps 1-3: Generate arrays containing spatial and spectral information of each cylindrical map

@@ -9,7 +9,7 @@ def SetWave(filename, wavelength, wavenumber, ifilt):
     else:
         # Consider generalising this too
         filter_name = filename.split('visir_')
-        filter_name = filter_name[-1].split('_2018')
+        filter_name = filter_name[-1].split('_20')
         filter_name = filter_name[0]
 
     if (filter_name == 'J7.9') or (wavelength == 7.90) or (wavenumber == 1253.0625) or (ifilt == 0):

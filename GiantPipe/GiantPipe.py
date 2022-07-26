@@ -29,10 +29,10 @@ def main():
     bin_cmerid  = True     # Use central meridian binning scheme
     bin_ctl     = False     # Use centre-to-limb binning scheme
     # Output
-    save        = False      # Store calculated profiles to local files
+    save        = True      # Store calculated profiles to local files
     plotting    = True      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
-    spx         = False      # Write spxfiles as spectral input for NEMESIS
+    spx         = True      # Write spxfiles as spectral input for NEMESIS
 
     ############################################################
     # Perform geometric registration and radiometric calibration
@@ -44,8 +44,10 @@ def main():
     if calibrate:
         # Define calibration mode
         mode = 'drm'
+        dataset = '2022July'
+
         # Point to observations
-        CalibrateGBData(mode=mode+'_files')
+        CalibrateGBData(dataset=dataset, mode=mode+'_files')
         exit()
 
     ############################################################
@@ -57,8 +59,9 @@ def main():
     
     # Define calibration mode
     mode   = 'giantpipe'
+    dataset = '2022July'
     # Point to observations
-    files  = FindFiles(mode=mode+'_files')
+    files  = FindFiles(dataset=dataset, mode=mode+'_files')
     nfiles = len(files)
     
     if 'fits' in source:
@@ -75,16 +78,16 @@ def main():
 
         if save:
             # Store calculated profiles
-            WriteMeridProfiles(files=files, singles=singles, spectrals=spectrals)
+            WriteMeridProfiles(dataset=dataset, files=files, singles=singles, spectrals=spectrals)
 
         if plotting:
             # Plot mean central meridian profiles
-            # PlotMeridProfiles(mode=mode, files=files, singles=singles, spectrals=spectrals)
-            PlotGlobalSpectrals(spectrals=spectrals)
+            PlotMeridProfiles(dataset=dataset, mode=mode, files=files, singles=singles, spectrals=spectrals)
+            PlotGlobalSpectrals(dataset=dataset, spectrals=spectrals)
 
         if spx:
             # Write mean central meridian profiles to spxfile
-            WriteMeridSpx(mode=mode, spectrals=spectrals)
+            WriteMeridSpx(dataset=dataset, mode=mode, spectrals=spectrals)
     
     if bin_ctl:
 
@@ -96,15 +99,15 @@ def main():
 
         if save:
             # Store calculated profiles
-            WriteCentreToLimbProfiles(mode=mode, files=files, singles=singles, spectrals=spectrals)
+            WriteCentreToLimbProfiles(dataset=dataset, mode=mode, files=files, singles=singles, spectrals=spectrals)
 
-        if plotting:
+        # if plotting:
             # Plot mean central meridian profiles
-            PlotCentreToLimbProfiles(mode=mode, singles=singles, spectrals=spectrals)
+            # PlotCentreToLimbProfiles(dataset=dataset, mode=mode, singles=singles, spectrals=spectrals)
 
         if spx:
             # Write mean central meridian profiles to spxfile
-            WriteCentreToLimbSpx(mode=mode, spectrals=spectrals)
+            WriteCentreToLimbSpx(dataset=dataset, mode=mode, spectrals=spectrals)
 
     ############################################################
     # Read in calibrated data, calculated profiles or retrieved
@@ -126,12 +129,12 @@ def main():
     # Read in spectral inputs for NEMESIS and plot
     ############################################################
 
-    if 'spx' in source:
-        files  = FindFiles(mode=mode+'_spx')
-        nfiles = len(files)
+    # if 'spx' in source:
+    #     files  = FindFiles(mode=mode+'_spx')
+    #     nfiles = len(files)
 
-        if plotting:
-            PlotSpx(files=files)
+        # if plotting:
+        #     PlotSpx(files=files)
 
 if __name__ == '__main__':
     import numpy as np
