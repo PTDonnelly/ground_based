@@ -18,7 +18,7 @@ def PlotMeridProfiles(dataset, files, singles, spectrals):
     iris, cirs = ReadCal(calfile)
 
     # If subdirectory does not exist, create it
-    dir = '../outputs/calibration_profiles_figures/'
+    dir = f'../outputs/{dataset}/calibration_profiles_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 
