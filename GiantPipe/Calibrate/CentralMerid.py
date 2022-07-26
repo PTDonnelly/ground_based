@@ -24,38 +24,39 @@ def CalCentralMerid(nfiles, singles, spectrals, wavenumber):
     for iwave in range(Globals.nfilters):
         # Get filter index for calibration file
         waves = spectrals[:, iwave, 5]
-        wave  = waves[(waves > 0)][0]
-        _, _, ifilt_sc, ifilt_v = SetWave(wavelength=False, wavenumber=wave)
-        # Calculate averages for calibration
-        if ifilt_sc < 12:
-            # Establish shared latitudes for accurate averaging
-            lmin_visir, lmax_visir = np.nanmin(spectrals[:, ifilt_v, 0]), np.nanmax(spectrals[:, ifilt_v, 0])
-            lmin_calib, lmax_calib = np.nanmin(cirs[:, ifilt_sc, 0]), np.nanmax(cirs[:, ifilt_sc, 0])
-            latmin, latmax         = np.max((lmin_visir, lmin_calib, -70)), np.min((lmax_visir, lmax_calib, 70))
-            visirkeep              = (spectrals[:, ifilt_v, 0] >= latmin) & (spectrals[:, ifilt_v, 0] <= latmax)            
-            visirdata              = spectrals[visirkeep, ifilt_v, 3]
-            visirmean              = np.nanmean(spectrals[visirkeep, ifilt_v, 3])
-            # Use CIRS for N-Band
-            calibkeep  = (cirs[:, ifilt_sc, 0] >= latmin) & (cirs[:, ifilt_sc, 0] <= latmax)
-            calib      = cirs[:, ifilt_sc, 1]
-            calibdata  = cirs[calibkeep, ifilt_sc, 1]
-            calibmean  = np.nanmean(calibdata)
-        else:
-            # Establish shared latitudes for accurate averaging
-            lmin_visir, lmax_visir = np.nanmin(spectrals[:, ifilt_v, 0]), np.nanmax(spectrals[:, ifilt_v, 0])
-            lmin_calib, lmax_calib = np.nanmin(iris[:, ifilt_sc, 0]), np.nanmax(iris[:, ifilt_sc, 0])
-            latmin, latmax         = np.max((lmin_visir, lmin_calib)), np.min((lmax_visir, lmax_calib))
-            visirkeep              = (spectrals[:, ifilt_v, 0] >= latmin) & (spectrals[:, ifilt_v, 0] <= latmax)            
-            visirdata              = spectrals[visirkeep, ifilt_v, 3]
-            visirmean              = np.nanmean(spectrals[visirkeep, ifilt_v, 3])
-            # Use IRIS for Q-Band
-            calibkeep  = (iris[:, ifilt_sc, 0] >= latmin) & (iris[:, ifilt_sc, 0] <= latmax)
-            calib      = iris[:, ifilt_sc, 1]
-            calibdata  = iris[calibkeep, ifilt_sc, 1]
-            calibmean  = np.nanmean(calibdata)
-        # Do calibration
-        calib_coeff_spectral[iwave, 0] = wave
-        calib_coeff_spectral[iwave, 1] = visirmean / calibmean
+        if waves[(waves > 0)] != []:
+            wave  = waves[(waves > 0)][0] 
+            _, _, ifilt_sc, ifilt_v = SetWave(wavelength=False, wavenumber=wave)
+            # Calculate averages for calibration
+            if ifilt_sc < 12:
+                # Establish shared latitudes for accurate averaging
+                lmin_visir, lmax_visir = np.nanmin(spectrals[:, ifilt_v, 0]), np.nanmax(spectrals[:, ifilt_v, 0])
+                lmin_calib, lmax_calib = np.nanmin(cirs[:, ifilt_sc, 0]), np.nanmax(cirs[:, ifilt_sc, 0])
+                latmin, latmax         = np.max((lmin_visir, lmin_calib, -70)), np.min((lmax_visir, lmax_calib, 70))
+                visirkeep              = (spectrals[:, ifilt_v, 0] >= latmin) & (spectrals[:, ifilt_v, 0] <= latmax)            
+                visirdata              = spectrals[visirkeep, ifilt_v, 3]
+                visirmean              = np.nanmean(spectrals[visirkeep, ifilt_v, 3])
+                # Use CIRS for N-Band
+                calibkeep  = (cirs[:, ifilt_sc, 0] >= latmin) & (cirs[:, ifilt_sc, 0] <= latmax)
+                calib      = cirs[:, ifilt_sc, 1]
+                calibdata  = cirs[calibkeep, ifilt_sc, 1]
+                calibmean  = np.nanmean(calibdata)
+            else:
+                # Establish shared latitudes for accurate averaging
+                lmin_visir, lmax_visir = np.nanmin(spectrals[:, ifilt_v, 0]), np.nanmax(spectrals[:, ifilt_v, 0])
+                lmin_calib, lmax_calib = np.nanmin(iris[:, ifilt_sc, 0]), np.nanmax(iris[:, ifilt_sc, 0])
+                latmin, latmax         = np.max((lmin_visir, lmin_calib)), np.min((lmax_visir, lmax_calib))
+                visirkeep              = (spectrals[:, ifilt_v, 0] >= latmin) & (spectrals[:, ifilt_v, 0] <= latmax)            
+                visirdata              = spectrals[visirkeep, ifilt_v, 3]
+                visirmean              = np.nanmean(spectrals[visirkeep, ifilt_v, 3])
+                # Use IRIS for Q-Band
+                calibkeep  = (iris[:, ifilt_sc, 0] >= latmin) & (iris[:, ifilt_sc, 0] <= latmax)
+                calib      = iris[:, ifilt_sc, 1]
+                calibdata  = iris[calibkeep, ifilt_sc, 1]
+                calibmean  = np.nanmean(calibdata)
+            # Do calibration
+            calib_coeff_spectral[iwave, 0] = wave
+            calib_coeff_spectral[iwave, 1] = visirmean / calibmean
 
     # Calculate calibration coefficients for the single merid profiles
     print('Calibrating singles...')
