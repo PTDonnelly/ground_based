@@ -175,12 +175,14 @@ def PolynomialAdjust(directory, files, spectrals):
                     iy = len(bandcnorth[:,0])
                     bandc_tmp = np.reshape(bandc_combined, (2, iy, Globals.nx))  
                     bandmu_tmp = np.reshape(bandmu_combined, (2, iy, Globals.nx))
+                    bandc = np.empty((iy, Globals.nx))
+                    bandmu = np.empty((iy, Globals.nx))
                     for x in range(Globals.nx):
                         for y in range(iy):
                             bandc[y, x] = np.nanmean(bandc_tmp[:, y, x])
                             bandmu[y, x] = np.nanmax(bandmu_tmp[:, y, x])
             # Define the region where the polynomial adjustment will be calculated
-            if adj_location == 'northern' or adj_location =='souhtern' or adj_location == 'average':
+            if adj_location == 'northern' or adj_location =='southern' or adj_location == 'average':
                 mask  = (( bandmu > mumin[ifilt]) & (bandc > 90.))
             
             # Calculate polynomial adjustement for the hemispheric method
@@ -218,7 +220,6 @@ def PolynomialAdjust(directory, files, spectrals):
                 ax5.plot(t, (p_south(1))/p_south(t), '-',color='red')
                 ax6 = plt.subplot2grid((2, 3), (1, 2))
                 ax6.scatter(bandmusouth[mask_south], cdata_south)
-
             # Calculate polynomial adjustement for the northern method (igoring filters with only southern views)
             elif adj_location == 'northern':
                 if (ifilt != 6): # ifilt = 6 is only a southern view
