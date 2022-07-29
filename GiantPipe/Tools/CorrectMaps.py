@@ -76,11 +76,7 @@ def PolynomialAdjust(directory, files, spectrals):
     keepdata[:, :, :] = np.nan
     keepmu[:, :, :]   = np.nan
 
-    #adj_location = 'northern'    
-    #adj_location = 'southern'
-    adj_location = 'hemispheric'
-    #adj_location = 'average'
-
+    # Load the cylindrical and mu maps
     cmaps, mumaps, wavelength, wavenumber, viewing_mode = GetCylandMuMaps(files)
 
     # Loop over file to convert radiance maps to brightness temperature maps
@@ -94,6 +90,10 @@ def PolynomialAdjust(directory, files, spectrals):
         keepmu[ifile, keep, :]    = mumaps[ifile, keep, :]
 
     for ifilt in range(Globals.nfilters):
+        # After several tests, best results are obtained with an average polynomial adjustment
+        # on the N-Band filter and a southern polynomial adjustment on the Q-Band Filters for
+        # the VLT/VISIR Jupiter 2018May24-27 dataset. 
+        adj_location = 'average' if ifilt < 10 else 'southern'
         if (ifilt !=  7): # ifilt = 7 cannot be corrected
             # Get filter index for spectral profiles
             waves = spectrals[:, ifilt, 5]
@@ -102,8 +102,8 @@ def PolynomialAdjust(directory, files, spectrals):
             # Find all files for the current filter
             currentdata  = np.empty((Globals.ny, Globals.nx))   # array to append temperature maps of the current filter 
             currentmu    = np.empty((Globals.ny, Globals.nx))   # array to append emission angle maps of the current filter
-            currentdata.fill(np.nan)            # filled of NaN to avoid strange scatter plotting
-            currentmu.fill(np.nan)              # filled of NaN to avoid strange scatter plotting
+            currentdata.fill(np.nan)                            # filled of NaN to avoid strange scatter plotting
+            currentmu.fill(np.nan)                              # filled of NaN to avoid strange scatter plotting
             currentnfiles = 1 # Number of files for the current filter, initialised at 1 to take into account the initialised nan arrays
             for ifile, iwave in enumerate(wavenumber):
                 if iwave == wave:
@@ -118,10 +118,33 @@ def PolynomialAdjust(directory, files, spectrals):
                 for y in range(Globals.ny):
                     bandcmaps[ifilt, y, x] = np.nanmean(selectdata[:, y, x])
                     bandmumaps[ifilt, y, x] = np.nanmean(selectmu[:, y, x])
+            
             # Four posibilities to calculate the polynomial adjustemnt
-            # Hemispheric, Northern, Southern, Average:
-            if adj_location == 'hemispheric':
-                # Define a mask depending on minimum emission angle for each hemisphere
+            # Northern, Southern, Hemispheric, Average:
+            if adj_location == 'northern':
+                if (ifilt != 6): # ifilt = 6 is only a southern view
+                    if (ifilt == 3):
+                        keep = ((lat < 15) & (lat > 10))
+                    elif (ifilt == 4):
+                        keep = ((lat < 25) & (lat > 10))
+                    else:
+                        keep = ((lat < 30) & (lat > 5))
+                    # Store the latitude bands chosen for cyldata and mudata arrays
+                    bandc  = bandcmaps[ifilt, keep, :]
+                    bandmu = bandmumaps[ifilt, keep, :]
+            
+            if adj_location == 'southern':
+                if (ifilt == 3):
+                    keep = ((lat < -10 ) & (lat > -15))
+                elif (ifilt == 4):
+                    keep = ((lat < -10) & (lat > -25))
+                else:
+                    keep  = ((lat < -5) & (lat > -30))
+                # Store the latitude bands chosen for cyldata and mudata arrays
+                bandc  = bandcmaps[ifilt, keep, :]
+                bandmu = bandmumaps[ifilt, keep, :]
+            
+            if adj_location == 'average' or adj_location == 'hemispheric':
                 if (ifilt == 3):
                     keep_north = ((lat < 15) & (lat > 10))
                     keep_south = ((lat < -10 ) & (lat > -15))
@@ -131,13 +154,37 @@ def PolynomialAdjust(directory, files, spectrals):
                 else:
                     keep_north  = ((lat < 30) & (lat > 5))
                     keep_south  = ((lat < -5) & (lat > -30))
+                # Store the north latitude bands chosen for cyldata and mudata arrays
                 bandcnorth  = bandcmaps[ifilt, keep_north, :]
                 bandmunorth = bandmumaps[ifilt, keep_north, :]
+                # Define the northern region where the polynomial adjustment will be calculated
                 mask_north  = (( bandmunorth >  mumin[ifilt]) & (bandcnorth > 90.))
+                # Store the south latitude bands chosen for cyldata and mudata arrays
                 bandcsouth  = bandcmaps[ifilt, keep_south, :]
-                bandmusouth = bandmumaps[ifilt, keep_south, :]           
+                bandmusouth = bandmumaps[ifilt, keep_south, :]
+                # Define the southern region where the polynomial adjustment will be calculated           
                 mask_south  = ((bandmusouth > mumin[ifilt]) & (bandcsouth > 90.))
-                # Calculate polynomial adjustement for each hemisphere (using mask selections)
+
+                # Average the two hemispheric band in case of average method is chosen
+                # For the hemispheric one, a polynomial adjustment will be calculted 
+                # on the mask_north area and another one on the mask_south area
+                if adj_location == 'average':
+                    # Average the two hemispheric bands, considering the poleward variation of hemispheric bands [::-1]
+                    bandc_combined = np.append(bandcnorth, bandcsouth[::-1,:], axis = 1)
+                    bandmu_combined = np.append(bandmunorth, bandmusouth[::-1,:], axis = 1)
+                    iy = len(bandcnorth[:,0])
+                    bandc_tmp = np.reshape(bandc_combined, (2, iy, Globals.nx))  
+                    bandmu_tmp = np.reshape(bandmu_combined, (2, iy, Globals.nx))
+                    for x in range(Globals.nx):
+                        for y in range(iy):
+                            bandc[y, x] = np.nanmean(bandc_tmp[:, y, x])
+                            bandmu[y, x] = np.nanmax(bandmu_tmp[:, y, x])
+            # Define the region where the polynomial adjustment will be calculated
+            if adj_location == 'northern' or adj_location =='souhtern' or adj_location == 'average':
+                mask  = (( bandmu > mumin[ifilt]) & (bandc > 90.))
+            
+            # Calculate polynomial adjustement for the hemispheric method
+            if adj_location == 'hemispheric':
                 if (ifilt != 6): # ifilt = 6 is only a southern view
                     p_north = np.poly1d(np.polyfit(bandmunorth[mask_north], bandcnorth[mask_north],4))
                 p_south = np.poly1d(np.polyfit(bandmusouth[mask_south], bandcsouth[mask_south],4))
@@ -171,75 +218,10 @@ def PolynomialAdjust(directory, files, spectrals):
                 ax5.plot(t, (p_south(1))/p_south(t), '-',color='red')
                 ax6 = plt.subplot2grid((2, 3), (1, 2))
                 ax6.scatter(bandmusouth[mask_south], cdata_south)
-            else:
-                # Define a mask depending on minimum emission angle and the adjustement location chosen
-                if adj_location == 'northern':
-                    if (ifilt != 6): # ifilt = 6 is only a southern view
-                        if (ifilt == 3):
-                            keep = ((lat < 15) & (lat > 10))
-                        elif (ifilt == 4):
-                            keep = ((lat < 25) & (lat > 10))
-                        else:
-                            keep = ((lat < 30) & (lat > 5))
-                if adj_location == 'southern':
-                    if (ifilt == 3):
-                        keep = ((lat < -10 ) & (lat > -15))
-                    elif (ifilt == 4):
-                        keep = ((lat < -10) & (lat > -25))
-                    else:
-                        keep  = ((lat < -5) & (lat > -30))
-                bandc  = bandcmaps[ifilt, keep, :]
-                bandmu = bandmumaps[ifilt, keep, :]
-                if adj_location == 'average':
-                    if (ifilt == 3):
-                        keep_north = ((lat < 15) & (lat > 10))
-                        keep_south = ((lat < -10 ) & (lat > -15))
-                    elif (ifilt == 4):
-                        keep_north = ((lat < 25) & (lat > 10))
-                        keep_south = ((lat < -10) & (lat > -25))
-                    else:
-                        keep_north  = ((lat < 30) & (lat > 5))
-                        keep_south  = ((lat < -5) & (lat > -30))
-                    bandcnorth  = bandcmaps[ifilt, keep_north, :]
-                    bandmunorth = bandmumaps[ifilt, keep_north, :]
-                    mask_north  = (( bandmunorth >  mumin[ifilt]) & (bandcnorth > 90.))
-                    bandcsouth  = bandcmaps[ifilt, keep_south, :]
-                    bandmusouth = bandmumaps[ifilt, keep_south, :]           
-                    mask_south  = ((bandmusouth > mumin[ifilt]) & (bandcsouth > 90.))
-                    # Average the two hemispheric bands
-                    bandc_combined = np.append(bandcnorth, bandcsouth[::-1,:], axis = 1)
-                    bandmu_combined = np.append(bandmunorth, bandmusouth[::-1,:], axis = 1)
-                    iy = len(bandcnorth[:,0])
-                    bandc_tmp = np.reshape(bandc_combined, (2, iy, Globals.nx))  
-                    bandmu_tmp = np.reshape(bandmu_combined, (2, iy, Globals.nx))
-                    for x in range(Globals.nx):
-                        for y in range(iy):
-                            bandc[y, x] = np.nanmean(bandc_tmp[:, y, x])
-                            bandmu[y, x] = np.nanmax(bandmu_tmp[:, y, x])
-                mask  = (( bandmu > mumin[ifilt]) & (bandc > 90.))
-                if adj_location == 'northern':
-                    if (ifilt != 6): # ifilt = 6 is only a southern view
-                        # Calculate polynomial adjustement for each hemisphere (using mask selections)
-                        p = np.poly1d(np.polyfit(bandmu[mask], bandc[mask],4))
-                        coeff = np.polyfit(bandmu[mask], bandc[mask],4)
-                        # Define a linear space to show the polynomial adjustment variation over all emission angle range
-                        t = np.linspace(mumin[ifilt], 0.9, 100)
-                        # Some control printing
-                        print(f"{adj_location} polynome")
-                        print(p)
-                        print(bandc[mask])
-                        # Correct data on the slected latitude band
-                        cdata=bandc[mask]*p(1)/p(bandmu[mask])
-                        # Plot figure showing limb correction using polynomial adjustment method
-                        ax1 = plt.subplot2grid((1, 3), (0, 0))
-                        ax1.scatter(bandmu[mask], bandc[mask])
-                        ax1.plot(t, p(t), '-',color='red')
-                        ax2 = plt.subplot2grid((1, 3), (0, 1))
-                        ax2.plot(t, (p(1))/p(t), '-',color='red')
-                        ax3 = plt.subplot2grid((1, 3), (0, 2))
-                        ax3.scatter(bandmu[mask], cdata)
-                else:
-                    # Calculate polynomial adjustement for each hemisphere (using mask selections)
+
+            # Calculate polynomial adjustement for the northern method (igoring filters with only southern views)
+            elif adj_location == 'northern':
+                if (ifilt != 6): # ifilt = 6 is only a southern view
                     p = np.poly1d(np.polyfit(bandmu[mask], bandc[mask],4))
                     coeff = np.polyfit(bandmu[mask], bandc[mask],4)
                     # Define a linear space to show the polynomial adjustment variation over all emission angle range
@@ -258,6 +240,27 @@ def PolynomialAdjust(directory, files, spectrals):
                     ax2.plot(t, (p(1))/p(t), '-',color='red')
                     ax3 = plt.subplot2grid((1, 3), (0, 2))
                     ax3.scatter(bandmu[mask], cdata)
+            # Calculate polynomial adjustement for the southern or average method
+            else:
+                p = np.poly1d(np.polyfit(bandmu[mask], bandc[mask],4))
+                coeff = np.polyfit(bandmu[mask], bandc[mask],4)
+                # Define a linear space to show the polynomial adjustment variation over all emission angle range
+                t = np.linspace(mumin[ifilt], 0.9, 100)
+                # Some control printing
+                print(f"{adj_location} polynome")
+                print(p)
+                print(bandc[mask])
+                # Correct data on the slected latitude band
+                cdata=bandc[mask]*p(1)/p(bandmu[mask])
+                # Plot figure showing limb correction using polynomial adjustment method
+                ax1 = plt.subplot2grid((1, 3), (0, 0))
+                ax1.scatter(bandmu[mask], bandc[mask])
+                ax1.plot(t, p(t), '-',color='red')
+                ax2 = plt.subplot2grid((1, 3), (0, 1))
+                ax2.plot(t, (p(1))/p(t), '-',color='red')
+                ax3 = plt.subplot2grid((1, 3), (0, 2))
+                ax3.scatter(bandmu[mask], cdata)
+            
             # Save figure showing limb correction using polynomial adjustment method 
             filt = Wavenumbers(ifilt)
             plt.savefig(f"{directory}calib_{filt}_polynomial_adjustment_{adj_location}.png", dpi=300)
