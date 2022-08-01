@@ -33,7 +33,7 @@ def SetWave(wavelength, wavenumber):
         wavenumber = 956.922
         ifilt_sc, ifilt_v = 4, 4
 
-    if (wavelength == 10.77) or (wavenumber == 929.27953):
+    if (wavelength == 10.77) or (wavenumber == 929.27953) or (wavenumber == 929.2795):
         wavelength = 10.77
         wavenumber = 929.27953
         ifilt_sc, ifilt_v = 5, 5
@@ -67,7 +67,7 @@ def SetWave(wavelength, wavenumber):
     # if (wavelength == 13.04):
     #     wavenumber = 766.871
     #    ifilt = 11
-    if (wavelength == 13.04) or (wavenumber == 766.75227):
+    if (wavelength == 13.04) or (wavenumber == 766.75227) or (wavenumber == 766.7523):
         wavelength = 13.04
         wavenumber = 766.75227
         ifilt_sc, ifilt_v = 11, 9
@@ -75,7 +75,7 @@ def SetWave(wavelength, wavenumber):
     # if (wavelength == 17.65):
     #     wavenumber = 566.572
     #    ifilt = 12
-    if (wavelength == 17.65) or (wavenumber == 563.97095):
+    if (wavelength == 17.65) or (wavenumber == 563.97095) or (wavenumber == 563.971):
         wavelength = 17.65
         wavenumber = 563.97095
         ifilt_sc, ifilt_v = 12, 10
@@ -83,7 +83,7 @@ def SetWave(wavelength, wavenumber):
     # if (wavelength == 18.72):
     #     wavenumber = 534.188
     #    ifilt = 13
-    if (wavelength == 18.72) or (wavenumber == 532.73522):
+    if (wavelength == 18.72) or (wavenumber == 532.73522) or (wavenumber == 532.7352):
         wavelength = 18.72
         wavenumber = 532.73522
         ifilt_sc, ifilt_v = 13, 11
@@ -91,7 +91,7 @@ def SetWave(wavelength, wavenumber):
     # if (wavelength == 19.50):
     #     wavenumber = 512.821
     #    ifilt = 14
-    if (wavelength == 19.50) or (wavenumber == 511.97345):
+    if (wavelength == 19.50) or (wavenumber == 511.97345) or (wavenumber == 511.9735):
         wavelength = 19.50
         wavenumber = 511.97345
         ifilt_sc, ifilt_v = 14, 12
