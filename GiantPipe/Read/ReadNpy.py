@@ -1,12 +1,12 @@
 import numpy as np
 from FindFiles import FindFiles
 
-def ReadNpy(return_singles, return_spectrals, return_ksingles, return_kspectrals):
+def ReadNpy(dataset, return_singles, return_spectrals, return_ksingles, return_kspectrals):
     """Read in pre-calculated profiles and/or coefficients from local .npy files"""
 
     if return_singles:
         # Point to stored meridional profiles and calibration coefficients
-        profiles  = FindFiles(mode='singles')
+        profiles  = FindFiles(dataset=dataset, mode='singles')
         # Load .npy files
         singles    = np.asarray([np.load(p) for p in profiles])
         # Fix shape (numpy changes array shape when storing)
@@ -16,7 +16,7 @@ def ReadNpy(return_singles, return_spectrals, return_ksingles, return_kspectrals
     
     if return_spectrals:
         # Point to stored meridional profiles and calibration coefficients
-        profiles  = FindFiles(mode='spectrals')
+        profiles  = FindFiles(dataset=dataset,mode='spectrals')
         # Load .npy files
         spectrals    = np.asarray([np.load(p) for p in profiles])
         # Fix shape (numpy changes array shape when storing)
@@ -26,7 +26,7 @@ def ReadNpy(return_singles, return_spectrals, return_ksingles, return_kspectrals
     
     if return_ksingles:
         # Point to stored meridional profiles and calibration coefficients
-        coeffs  = FindFiles(mode='ksingles')
+        coeffs  = FindFiles(dataset=dataset,mode='ksingles')
         # Load .npy files (no need to fix this 2-d array)
         ksingles    = np.asarray([np.load(p) for p in coeffs])
     else:
@@ -34,7 +34,7 @@ def ReadNpy(return_singles, return_spectrals, return_ksingles, return_kspectrals
     
     if return_kspectrals:
         # Point to stored meridional profiles and calibration coefficients
-        coeffs  = FindFiles(mode='kspectrals')
+        coeffs  = FindFiles(dataset=dataset,mode='kspectrals')
         # Load .npy files (no need to fix this 2-d array)
         kspectrals    = np.asarray([np.load(c) for c in coeffs])
     else:
