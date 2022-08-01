@@ -8,6 +8,9 @@ from Read.ReadSpxFiles import ReadSpxFiles
 def PlotSpxMerid(dataset):
     """ Plot radiances contains into .spx files for checking """
 
+    # Set the path to the .spx files created by GiantPipe
+    dir = f'/Users/db496/Documents/Research/Observations/ground_based_structure_branch/outputs/{dataset}/spxfiles/'
+
     # If subdirectory does not exist, create it
     subdir = f'{dir}/spx_figures/'
     if not os.path.exists(subdir):
@@ -15,9 +18,7 @@ def PlotSpxMerid(dataset):
 
     print('Plotting .spx files before NEMESIS retrieval...')
     
-    # Set the path to the .spx files created by GiantPipe
-    dir = f'/Users/db496/Documents/Research/Observations/ground_based_structure_branch/outputs/{dataset}/spxfiles/'
-    # Read the spectral information and store in dedicated arrays
+        # Read the spectral information and store in dedicated arrays
     radiance, rad_err, wavenumb, latgrid = ReadSpxFiles(dir)
     
     # Loop over each filter to plot the meridian profile of radiance
