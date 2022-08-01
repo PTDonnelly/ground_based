@@ -26,6 +26,13 @@ def RetrieveLatitudeFromCoreNumber(fpath):
 
     return lat_core, ncore, nlevel, ngas
 
+def ReadLogFiles(filepath):
+    """ Read chisq/n from retrieval log files """
+
+    # Retrieve latitude-core_number correspondance
+    lat_core, nlat, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+
+
 def ReadmreFiles(filepath):
     """ Read radiance retrieval outputs for all .mre files """
 
@@ -45,7 +52,7 @@ def ReadmreFiles(filepath):
     # Read and save retrieved profiles
     for ilat in range(nlat):
         ifile = int(lat_core[ilat, 0])
-        with open(f"{filepath}/core_{ifile+1}/nemesis.mre") as f:
+        with open(f"{filepath}/core_{ifile}/nemesis.mre") as f:
             # Read file
             lines = f.readlines()
             # Get dimensions
@@ -63,12 +70,12 @@ def ReadmreFiles(filepath):
                 # Reset temporary variables
                 newline = []
             data_arr = np.asarray(filedata, dtype='float')
-            if ((latitude[ilat] < 0)):
+            if ((latitude[ilat] < 6)):
                 wavenumb[:, ilat] = data_arr[:, 1]
                 radiance[:, ilat] = data_arr[:, 2]
                 rad_err[:, ilat]  = data_arr[:, 3]
                 rad_fit[:, ilat]  = data_arr[:, 5]
-            elif (latitude[ilat] > 0):
+            elif (latitude[ilat] > 6):
                 wavenb = data_arr[:, 1]
                 rad = data_arr[:, 2]
                 err  = data_arr[:, 3]
@@ -102,7 +109,7 @@ def ReadprfFiles(filepath):
     # Read and save retrieved profiles
     for ilat in range(nlat):
         ifile = int(lat_core[ilat, 0])
-        with open(f"{filepath}/core_{ifile+1}/nemesis.prf") as f:
+        with open(f"{filepath}/core_{ifile}/nemesis.prf") as f:
             # Read file
             lines = f.readlines()
             # Save file's data
@@ -137,7 +144,7 @@ def ReadaerFiles(filepath):
     # Read and save retrieved profiles
     for ilat in range(nlat):
         ifile = int(lat_core[ilat, 0])
-        with open(f"{filepath}/core_{ifile+1}/aerosol.prf") as f:
+        with open(f"{filepath}/core_{ifile}/aerosol.prf") as f:
             lines = f.readlines()
             # Read and store aerosol profiles
             newline, data = [], []
