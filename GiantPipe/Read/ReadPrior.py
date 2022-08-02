@@ -65,6 +65,7 @@ def ReadAerosolPriorProfile(filename):
         param = lines[1].split()
         nlevel = int(param[0])
         ncloud = int(param[1])
+        aerosol = np.empty((nlevel, ncloud))
         # Read and store aerosol profiles
         newline, data = [], []
         for iline, line in enumerate(lines[2::]):
@@ -75,9 +76,12 @@ def ReadAerosolPriorProfile(filename):
             # Reset temporary variables
             newline = []
         aer = np.asarray(data, dtype='float')
-        
         altitude = aer[:,0]
-        aerosol  = aer[:,1]
+        if ncloud > 1:
+            for icloud in range(ncloud):
+                aerosol[:, icloud] = aer[:, icloud+1]
+        else:
+            aerosol  = aer[:,1]
 
         return aerosol, altitude, ncloud, nlevel
 
