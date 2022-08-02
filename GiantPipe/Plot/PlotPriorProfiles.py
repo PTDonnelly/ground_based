@@ -34,7 +34,7 @@ def PlotTemperaturePriorProfiles():
         # Add a big axis 
         plt.axes([0.1, 0.09, 0.9, 0.8], frameon=False) 
         plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)        
-        plt.ylabel("Pressure [atm]", size=15)
+        plt.ylabel("Pressure [mbar]", size=15)
         plt.xlabel("Volume Mixing Ratio", size=15)
         plt.title(f"{fname}", size=15)
         # Save figure in the retrievals outputs directory
