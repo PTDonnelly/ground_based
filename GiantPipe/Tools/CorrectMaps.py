@@ -54,6 +54,38 @@ def GetCylandMuMaps(files):
 
     return cmaps, mumaps, wavelength, wavenumber, viewing_mode
 
+def MuNormalization(files):
+    """ Function to normalise by the variation 
+        of the emission angle at power 'mu_power' """
+
+    # Define local inputs
+    Nfiles = len(files)
+    # Load the cylindrical and mu maps
+    cmaps, mumaps, wavelength, wavenumber, viewing_mode = GetCylandMuMaps(files)
+
+    # Loop over file to convert radiance maps to brightness temperature maps
+    for ifile, fpath in enumerate(files):
+        # retrieve name of the filter to set the correct power for mumaps
+        filename = fpath
+        filter_name = filename.split('visir_')
+        filter_name = filter_name[-1].split('_20')
+        filter_name = filter_name[0]
+        # Set the power of mumaps
+        if filter_name == 'J7.9':
+            mu_power = 0.1
+        if filter_name == 'PAH1' or filter_name == 'ARIII':
+            mu_power = 0.3
+        if filter_name =='SIV_1' or filter_name == 'SIV_2' or filter_name == 'NEII_1' or filter_name == 'NEII_2':
+            mu_power = 0.2
+        if filter_name =='Q1' or filter_name == 'Q2' or filter_name =='Q3':
+            mu_power = 0.18
+        # Normalization by mumaps to the power mu_power
+        cmaps[ifile, :, :] = cmaps[ifile, :, :] / mumaps[ifile, :, :]**mu_power
+        # Convert radiance cmaps to brightness temperature 
+        cmaps[ifile, :, :] = ConvertBrightnessTemperature(cmaps[ifile, :, :], wavelength=wavelength[ifile])
+
+    return cmaps, mumaps, wavenumber
+
 def PolynomialAdjust(directory, files, spectrals):
     """ Function to calculate and apply an unique polynomial 
         ajustment per filter over the entire dataset. 
@@ -321,7 +353,7 @@ def ApplyPolynom(directory, files, spectrals):
 
     return cmaps, mumaps, wavenumber
 
-def BlackLineRemoving(directory, files, cblack):
+def BlackLineRemoving(directory, files, cblack, mu_scaling=False):
     """ Function to interpolate observation over the black line latitude
         (when the visir_cleanjup.pro program is not able to properly correct 
         the central brust, we mask it with a black line) """
@@ -334,12 +366,18 @@ def BlackLineRemoving(directory, files, cblack):
     lat = np.arange(-89.75,90,step=0.5) # Latitude range from pole-to-pole
     Nfiles = len(files)
 
-    # Get cylindrical and mu maps 
-    cmaps, mumaps, wavelength, wavenumber, viewing_mode = GetCylandMuMaps(files)
-
+    if mu_scaling == True: 
+        # Normalisation by mumaps to the power something 
+        # conversion into brightness temperature 
+        cmaps, mumaps, wavenumber = MuNormalization(files)
+    else:
+        # Get cylindrical and mu maps 
+        cmaps, mumaps, wavelength, wavenumber, viewing_mode = GetCylandMuMaps(files)
+    
     for ifile in range(Nfiles):
-        # Loop over file to convert radiance maps to brightness temperature maps
-        cmaps[ifile, :, :] = ConvertBrightnessTemperature(cmaps[ifile, :, :], wavelength=wavelength[ifile])
+        if mu_scaling == False:
+            # Loop over file to convert radiance maps to brightness temperature maps
+            cmaps[ifile, :, :] = ConvertBrightnessTemperature(cmaps[ifile, :, :], wavelength=wavelength)
         # Interpolation over latitudes for each longitude containing data
         print(files[ifile])
         lonkeep = []

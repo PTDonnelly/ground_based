@@ -4,7 +4,7 @@ import numpy.ma as ma
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import Globals
-from Tools.CorrectMaps import PolynomialAdjust, ApplyPolynom, BlackLineRemoving
+from Tools.CorrectMaps import PolynomialAdjust, ApplyPolynom, BlackLineRemoving, MuNormalization
 from Tools.SetWave import SetWave
 from Tools.VisirFilterInfo import Wavenumbers
 
@@ -55,7 +55,7 @@ def PlotMaps(dataset, files, spectrals):
         mumin = [0.02, 0.02, 0.1, 0.1, 0.01, 0.05, 0.02, 0.02, 0.02, 0.02, 0.01, 0.01, 0.01]
         Nfilters = Globals.nfilters
     else:
-        cmaps, mumaps, wavenumber = BlackLineRemoving(dir, files, cblack=-60)
+        cmaps, mumaps, wavenumber = BlackLineRemoving(dir, files, cblack=-60, mu_scaling=True)
         mumin = np.empty(13)
         mumin.fill(0.01)
         Nfilters = 10
