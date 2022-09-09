@@ -27,7 +27,7 @@ def PlotPolesFromGlobal(dataset):
     num_parra     = int((90-np.abs(lat_lim)) / dparallel + 1)   # Number of parallel lines per hemisphere
     lon_to_write  = 45                                          # Array to set on which longitude will be written latitude labels
     globalmap     = np.empty((Globals.nfilters, Globals.ny, Globals.nx))
-    Nfilters = Globals.nfilters if dataset == '2018May' else 10
+    Nfilters = Globals.nfilters if dataset == '2018May' else 11
     
     #  Subplot figure with both hemisphere
     for ifilt in range(Nfilters):
@@ -36,7 +36,7 @@ def PlotPolesFromGlobal(dataset):
             filt = Wavenumbers(ifilt)
             adj_location = 'average' if ifilt < 10 else 'southern'
             globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps_{adj_location}_adj.npy')
-        elif dataset == '2022July':
+        elif dataset == '2022July' or dataset == '2022August':
             if ifilt == 4: 
                 filt = Wavenumbers(ifilt+1)
             elif ifilt > 5: 
@@ -115,7 +115,7 @@ def PlotPolesFromGlobal(dataset):
                 latitude_limit=lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
                 longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
             # Save north pole map figure of the current filter
-            if dataset== 'May2018':
+            if dataset== '2018May':
                 plt.savefig(f"{dir}calib_{filt}_north_pole_maps_{adj_location}_adj.png", dpi=300)
                 plt.savefig(f"{dir}calib_{filt}_north_pole_maps_{adj_location}_adj.eps", dpi=300)
             else:
@@ -125,6 +125,7 @@ def PlotPolesFromGlobal(dataset):
             plt.close()
     
         # Southern pole figure
+        plt.figure(figsize=(9, 5), dpi=300)
         PlotOnePole(img=globalmap[ifilt,:,:], vmin=min_south, vmax=max_south, \
             central_longitude=central_lon, central_latitude=-central_lat, \
             latitude_limit=-lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
