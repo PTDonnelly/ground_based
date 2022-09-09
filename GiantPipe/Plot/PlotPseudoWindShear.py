@@ -22,7 +22,7 @@ def PlotPseudoWindShear(dataset):
     globalmaps = np.empty((Globals.nfilters, Globals.ny, Globals.nx))
     zonalmean = np.empty((Globals.nfilters, Globals.ny))
     windshear = np.empty((Globals.nfilters, Globals.ny))
-    Nfilters = Globals.nfilters if dataset == '2018May' else 10
+    Nfilters = Globals.nfilters if dataset == '2018May' else 11
     #  Load Jupiter zonal jets data to determine belts and zones location
     ejets_c, wjets_c, nejet, nwjet = ReadZonalWind("../inputs/jupiter_jets.dat")
     # Load Jupiter gravity data to calculate pseudo-windshear using TB and mu array array
@@ -34,7 +34,7 @@ def PlotPseudoWindShear(dataset):
             filt = Wavenumbers(ifilt)
             adj_location = 'average' if ifilt < 10 else 'southern'
             globalmaps[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps_{adj_location}_adj.npy')
-        elif dataset == '2022July':
+        elif dataset == '2022July' or dataset == '2022August':
             if ifilt == 4: 
                 filt = Wavenumbers(ifilt+1)
             elif ifilt > 5:
@@ -52,7 +52,7 @@ def PlotPseudoWindShear(dataset):
     for ifilt in range(Nfilters):
         if dataset == '2018May':
             filt = Wavenumbers(ifilt)
-        elif dataset == '2022July':
+        elif dataset == '2022July' or dataset == '2022August':
             if ifilt == 4: 
                 filt = Wavenumbers(ifilt+1)
             elif ifilt > 5:
@@ -96,6 +96,7 @@ def PlotPseudoWindShear(dataset):
         plt.ylabel("Pseudo-shear (m s$^{-1}$ km$^{-1}$)", size=15)
         # Save figure
         if dataset == '2018May':
+            adj_location = 'average' if ifilt < 10 else 'southern'
             plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear_{adj_location}_adj.png", dpi=300)
             plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear_{adj_location}_adj.eps", dpi=300)
         else:
@@ -116,7 +117,10 @@ def PlotCompositePseudoWindShear(dataset):
     globalmaps = np.empty((Globals.nfilters, Globals.ny, Globals.nx))
     zonalmean = np.empty((Globals.nfilters, Globals.ny))
     windshear = np.empty((Globals.nfilters, Globals.ny))
-    Nfilters = Globals.nfilters if dataset == '2018May' else 10
+    globalmaps.fill(np.nan)
+    zonalmean.fill(np.nan)
+    windshear.fill(np.nan)
+    Nfilters = Globals.nfilters if dataset == '2018May' else 11
     #  Load Jupiter zonal jets data to determine belts and zones location
     ejets_c, wjets_c, nejet, nwjet = ReadZonalWind("../inputs/jupiter_jets.dat")
     # Load Jupiter gravity data to calculate pseudo-windshear using TB and mu array array
@@ -127,22 +131,27 @@ def PlotCompositePseudoWindShear(dataset):
             filt = Wavenumbers(ifilt)
             adj_location = 'average' if ifilt < 10 else 'southern'
             globalmaps[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps_{adj_location}_adj.npy')
-        elif dataset == '2022July':
+        elif dataset == '2022July' or dataset == '2022August':
             if ifilt == 4: 
                 filt = Wavenumbers(ifilt+1)
+                ifilt_up = ifilt+1
             elif ifilt > 5:
                 filt = Wavenumbers(ifilt+2)
+                ifilt_up = ifilt+2
             else:
                 filt = Wavenumbers(ifilt)
-            globalmaps[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps.npy')
+                ifilt_up = ifilt
+            globalmaps[ifilt_up, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps.npy')
+    for ifilt in range(Globals.nfilters):
         # Zonal mean of the global maps
         for iy in range(Globals.ny):
             zonalmean[ifilt, iy] = np.nanmean(globalmaps[ifilt, iy, :])
         # Calculated the associated thermal/pseudo-windshear
         windshear[ifilt,:]=-(grav/(Coriolis*zonalmean[ifilt,:]))*np.gradient(zonalmean[ifilt, :],y)
-    
+    print(np.shape(windshear))
     # Create a composite figure with all filters
-    fig, axes = plt.subplots(Nfilters, 2, figsize=(12,16), sharey=True)
+    Nlines = Globals.nfilters if dataset == '2018May' else 10
+    fig, axes = plt.subplots(Nlines, 2, figsize=(12,16), sharey=True)
     iaxes = 0
     subplot_array = [0,10,11,12,5,4,6,7,8,9,3,2,1] if dataset == '2018May' else [0,10,11,12,5,8,9,3,2,1]
     for ifilt in subplot_array:
@@ -150,29 +159,29 @@ def PlotCompositePseudoWindShear(dataset):
         wavelength, _, _, _ = SetWave(_, filt)
         # Subplot for the southern hemisphere
         latkeep = (lat <-5)
-        axes[iaxes,0].plot(lat[latkeep],windshear[iaxes,latkeep],linewidth=3.0,color="black")
-        negkeep = (lat <-5) & (windshear[iaxes,:] < 0)
-        axes[iaxes,0].plot(lat[negkeep],windshear[iaxes,negkeep],"bo")
-        poskeep = (lat <-5) & (windshear[iaxes,:] > 0)
-        axes[iaxes,0].plot(lat[poskeep],windshear[iaxes,poskeep],"ro")
+        axes[iaxes,0].plot(lat[latkeep],windshear[ifilt,latkeep],linewidth=3.0,color="black")
+        negkeep = (lat <-5) & (windshear[ifilt,:] < 0)
+        axes[iaxes,0].plot(lat[negkeep],windshear[ifilt,negkeep],"bo")
+        poskeep = (lat <-5) & (windshear[ifilt,:] > 0)
+        axes[iaxes,0].plot(lat[poskeep],windshear[ifilt,poskeep],"ro")
         for iejet in range(0,nejet):
             axes[iaxes,0].plot([ejets_c[iejet],ejets_c[iejet]],[-15,15],color='black',linestyle="dashed")
         for iwjet in range(0,nwjet):
             axes[iaxes,0].plot([wjets_c[iwjet],wjets_c[iwjet]],[-15,15],color='black',linestyle="dotted")
         axes[iaxes,0].plot([-90,-10],[0,0],linewidth=1.0,color="grey")
         axes[iaxes,0].set_xlim(-60,-20)
-        axes[iaxes,0].xaxis.set_ticklabels([]) if (iaxes < 12) else axes[iaxes,0].tick_params(labelsize=20)
+        axes[iaxes,0].xaxis.set_ticklabels([]) if (iaxes < len(subplot_array)-1) else axes[iaxes,0].tick_params(labelsize=20)
         axes[iaxes,0].set_ylim(-0.7,0.7)
         axes[iaxes,0].tick_params(labelsize=20)
         # Subplot for the northern hemisphere
         latkeep = (lat > 5)       
-        axes[iaxes,1].plot(lat[latkeep],windshear[iaxes,latkeep],linewidth=3.0,color="black",label=f"{wavelength}"+"$\mu$m")
-        negkeep = (lat > 5) & (windshear[iaxes,:] < 0)
-        axes[iaxes,1].plot(lat[negkeep],windshear[iaxes,negkeep],"bo")
-        poskeep = (lat > 5) & (windshear[iaxes,:] > 0)
-        axes[iaxes,1].plot(lat[poskeep],windshear[iaxes,poskeep],"ro")
+        axes[iaxes,1].plot(lat[latkeep],windshear[ifilt,latkeep],linewidth=3.0,color="black",label=f"{wavelength}"+"$\mu$m")
+        negkeep = (lat > 5) & (windshear[ifilt,:] < 0)
+        axes[iaxes,1].plot(lat[negkeep],windshear[ifilt,negkeep],"bo")
+        poskeep = (lat > 5) & (windshear[ifilt,:] > 0)
+        axes[iaxes,1].plot(lat[poskeep],windshear[ifilt,poskeep],"ro")
         axes[iaxes,1].set_xlim(20,60)
-        axes[iaxes,1].xaxis.set_ticklabels([]) if (iaxes < 12) else axes[iaxes,1].tick_params(labelsize=20)
+        axes[iaxes,1].xaxis.set_ticklabels([]) if (iaxes < len(subplot_array)-1) else axes[iaxes,1].tick_params(labelsize=20)
         axes[iaxes,1].set_ylim(-0.7,0.7)
         axes[iaxes,1].tick_params(labelsize=20)
         axes[iaxes,1].legend(loc="upper right", fontsize=12, handletextpad=0, handlelength=0, markerscale=0)
@@ -186,6 +195,7 @@ def PlotCompositePseudoWindShear(dataset):
         plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
         plt.xlabel("Planetocentric Latitude", size=25)
         plt.ylabel("Pseudo-shear (m s$^{-1}$ km$^{-1}$)", size=25)
+        print(iaxes, ifilt)
         iaxes += 1
     # Save figure 
     plt.savefig(f"{dir}calib_pseudo_wind_shear.png", dpi=300)
