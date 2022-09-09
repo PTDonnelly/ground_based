@@ -3,8 +3,10 @@ import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
+import operator
+import datetime
 import Globals
-from Tools.CorrectMaps import PolynomialAdjust, ApplyPolynom, BlackLineRemoving, MuNormalization
+from Tools.CorrectMaps import GetCylandMuMaps, PolynomialAdjust, ApplyPolynom, BlackLineRemoving, MuNormalization
 from Tools.SetWave import SetWave
 from Tools.VisirFilterInfo import Wavenumbers
 
@@ -54,8 +56,13 @@ def PlotMaps(dataset, files, spectrals):
         cmaps, mumaps, wavenumber, adj_location = PolynomialAdjust(dir, files, spectrals)
         mumin = [0.02, 0.02, 0.1, 0.1, 0.01, 0.05, 0.02, 0.02, 0.02, 0.02, 0.01, 0.01, 0.01]
         Nfilters = Globals.nfilters
-    else:
+    elif dataset == '2022July':
         cmaps, mumaps, wavenumber = BlackLineRemoving(dir, files, cblack=-60, mu_scaling=True)
+        mumin = np.empty(13)
+        mumin.fill(0.01)
+        Nfilters = 10
+    else:
+        cmaps, mumaps, wavenumber = MuNormalization(files)
         mumin = np.empty(13)
         mumin.fill(0.01)
         Nfilters = 10
@@ -102,6 +109,7 @@ def PlotMaps(dataset, files, spectrals):
             # Save global map figure of the current filter 
             filt = Wavenumbers(ifilt)
             if dataset == '2018May':
+                adj_location = 'average' if ifilt < 10 else 'southern'
                 plt.savefig(f"{dir}calib_{filt}_global_maps_{adj_location}_adj.png", dpi=300)
                 plt.savefig(f"{dir}calib_{filt}_global_maps_{adj_location}_adj.eps", dpi=300)
                 # Clear figure to avoid overlapping between plotting subroutines
@@ -143,7 +151,7 @@ def PlotZoomMaps(dataset, central_lon, lat_target, lon_target, lat_window, lon_w
             filt = Wavenumbers(ifilt)
             adj_location = 'average' if ifilt < 10 else 'southern'
             globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps_{adj_location}_adj.npy')
-        elif dataset == '2022July':
+        elif dataset == '2022July' or dataset == '2022August':
             if ifilt == 4: 
                 filt = Wavenumbers(ifilt+1)
             elif ifilt > 5: 
@@ -153,10 +161,18 @@ def PlotZoomMaps(dataset, central_lon, lat_target, lon_target, lat_window, lon_w
             globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps.npy')
 
         # Set extreme values for mapping
-        max = np.nanmax(globalmap[ifilt, 90:220, 100:170]) 
-        min = np.nanmin(globalmap[ifilt, 90:220, 100:170]-5)
-        print(lon_target-lon_window, lon_target+lon_window)
+        if central_lon > lon_target:
+            lonmax = np.asarray(np.where((lon == lon_target+lon_window+central_lon)))
+            lonmin = np.asarray(np.where((lon == lon_target-lon_window+central_lon)))
+        else:
+            lonmax = np.asarray(np.where((lon == lon_target+lon_window)))
+            lonmin = np.asarray(np.where((lon == lon_target-lon_window)))
+        latmax = np.asarray(np.where((lat == lat_target+lat_window+0.25)))
+        latmin = np.asarray(np.where((lat == lat_target-lat_window+0.25)))
+        max = np.nanmax(globalmap[ifilt, int(latmin):int(latmax), int(lonmax):int(lonmin)]) 
+        min = np.nanmin(globalmap[ifilt, int(latmin):int(latmax), int(lonmax):int(lonmin)])
         # Mapping zoom area
+        plt.figure(figsize=(8, 5), dpi=300)
         projection = ccrs.PlateCarree(central_longitude=central_lon)
         ax = plt.axes(projection = projection)
         im = ax.imshow(globalmap[ifilt, :, :], \
@@ -177,13 +193,14 @@ def PlotZoomMaps(dataset, central_lon, lat_target, lon_target, lat_window, lon_w
         
         plt.xlabel('System III West Longitude')
         plt.ylabel('Planetocentric Latitude')
-        #plt.tick_params(labelsize=15)
-        cbar = plt.colorbar(im, extend='both', fraction=0.046, pad=0.15, orientation='horizontal')
-        #cbar.ax.tick_params(labelsize=15)
+        plt.tick_params(labelsize=20)
+        cbar = plt.colorbar(im, extend='both', fraction=0.046, pad=0.15, orientation='horizontal', format="%.0f")
+        cbar.ax.tick_params(labelsize=20)
+        cbar.ax.locator_params(nbins=6)
         cbar.set_label("Brightness Temperature [K]")
 
         # Save global map figure of the current filter 
-        if dataset == '2022July':
+        if dataset == '2022July' or dataset == '2022August':
             if ifilt == 4: 
                 filt = Wavenumbers(ifilt+1)
             elif ifilt > 5: 
@@ -201,8 +218,112 @@ def PlotZoomMaps(dataset, central_lon, lat_target, lon_target, lat_window, lon_w
         # Clear figure to avoid overlapping between plotting subroutines
         plt.close()
             
+def PlotMapsPerNight(dataset, files):
+    """ In the case of a multiple consecutive night dataset, 
+        we could try to track the planetary-scale waves, for
+        that we need to explore the global dynamics for each 
+        night, therefore we need a global map per night."""
 
+    print('Correcting and plotting global maps per night...')
+    # If subdirectory does not exist, create it
+    dir = f'../outputs/{dataset}/global_maps_per_night_figures/'
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    
+    # Define local inputs
+    Nfiles = len(files)
+    
+    # Create np.arrays for all pixels in all cmaps and mumaps
+    tobs_ifile = np.empty((Nfiles, 2)) # First column: night+hour and second column: ifile
+    TBmaps     = np.empty((Nfiles, Globals.ny, Globals.nx))
+    globalmaps = np.empty((Globals.nfilters, Globals.ny, Globals.nx))
 
+    mumin = [0.02, 0.02, 0.1, 0.1, 0.01, 0.05, 0.02, 0.02, 0.02, 0.02, 0.01, 0.01, 0.01]
+    
+    # Load the cylindrical and mu maps
+    cmaps, mumaps, wavelength, wavenumber, viewing_mode = GetCylandMuMaps(files)
 
+    list_time = []
+    list_ifile = []
+    for ifile, fpath in enumerate(files):
+        print(fpath)
+        # retrieve date, hour of the cylmaps corresponding to 
+        # the current file in an array to be sorted
+        hour = fpath.split('_20')
+        hour  = hour[-1].split('.')
+        hour  = hour[0]
+        hour = hour.replace('T', '')
+        hour = hour.replace('-', '')
+        hour = hour.replace(':', '')
+        print(hour)
+        # Append hour and ifile into lists
+        list_time.append(hour)
+        list_ifile.append(ifile)
+    # Store in the tobs_ifile array
+    tobs_ifile[:, 0] = list_time
+    tobs_ifile[:, 1] = list_ifile
+    # Sort the arrays in function of time 
+    tobs_ifile = sorted(tobs_ifile, key=operator.itemgetter(0))
+    tobs_ifile = np.asarray(tobs_ifile, dtype='float')
+    print(tobs_ifile)
 
+    # for ifilt in range(Globals.nfilters):
+    #     adj_location = 'average' if ifilt < 10 else 'southern'
+    #     # Empty local TBmaps array to avoid overlapping between filter
+    #     TBmaps[:, :, :] = np.nan
+    #     # Get filter index for spectral profiles
+    #     waves = spectrals[:, ifilt, 5]
+    #     if waves[(waves > 0)] != []:
+    #         wave  = waves[(waves > 0)][0]
+    #         _, _, _, ifilt = SetWave(wavelength=False, wavenumber=wave)
+    #         for ifile, iwave in enumerate(wavenumber):
+    #             if iwave == wave:
+    #                 # Store only the cmaps for the current ifilt 
+    #                 TBmaps[ifile, :, :] = cmaps[ifile, :, :]                
+                
+    #                 res = ma.masked_where(mumaps[ifile, :, :] < mumin[ifilt], TBmaps[ifile, :, :])
+    #                 res = ma.masked_where(((res > 201)), res)
+    #                 res = ma.masked_where(((res < 100)), res)
+    #                 TBmaps[ifile,:,:] = res.filled(np.nan)
 
+    #         # Combinig single cylmaps to store in globalmaps array
+    #         for y in range(Globals.ny):
+    #             for x in range(Globals.nx):
+    #                 globalmaps[ifilt, y, x] = np.nanmax(TBmaps[:, y, x])
+
+    #         # Setting brightness temperature extremes to plot global map
+    #         max = np.nanmax(globalmaps[ifilt, :, :]) 
+    #         min = np.nanmin(globalmaps[ifilt, :, :]) 
+    #         # Plotting global map
+    #         im = plt.imshow(globalmaps[ifilt, :, :], origin='lower', vmin=min, vmax=max, cmap='inferno')
+    #         plt.xticks(np.arange(0, Globals.nx+1,  step = 60), list(np.arange(360,-1,-30)))
+    #         plt.yticks(np.arange(0, Globals.ny+1, step = 60), list(np.arange(-90,91,30)))
+    #         plt.xlabel('System III West Longitude')
+    #         plt.ylabel('Planetocentric Latitude')
+    #         #plt.tick_params(labelsize=15)
+    #         cbar = plt.colorbar(im, extend='both', fraction=0.046, pad=0.04)
+    #         #cbar.ax.tick_params(labelsize=15)
+    #         cbar.set_label("Brightness Temperature [K]")
+
+    #         # Save global map figure of the current filter 
+    #         filt = Wavenumbers(ifilt)
+    #         if dataset == '2018May':
+    #             plt.savefig(f"{dir}calib_{filt}_global_maps_{adj_location}_adj.png", dpi=300)
+    #             plt.savefig(f"{dir}calib_{filt}_global_maps_{adj_location}_adj.eps", dpi=300)
+    #             # Clear figure to avoid overlapping between plotting subroutines
+    #             plt.clf()
+    #             # Write global maps to np.array
+    #             np.save(f"{dir}calib_{filt}_global_maps_{adj_location}_adj", globalmaps[ifilt, :, :])
+    #             # Write global maps to txtfiles
+    #             np.savetxt(f"{dir}calib_{filt}_global_maps_{adj_location}_adj.txt", globalmaps[ifilt, :, :])
+    #             # Write global maps to NetCDF files
+    #             #GlobalMapsNetCDF(dir, filt, globalmaps=globalmaps[ifilt, :, :])
+    #         else:
+    #             plt.savefig(f"{dir}calib_{filt}_global_maps.png", dpi=300)
+    #             plt.savefig(f"{dir}calib_{filt}_global_maps.eps", dpi=300)
+    #             # Clear figure to avoid overlapping between plotting subroutines
+    #             plt.clf()
+    #             # Write global maps to np.array
+    #             np.save(f"{dir}calib_{filt}_global_maps", globalmaps[ifilt, :, :])
+    #             # Write global maps to txtfiles
+    #             np.savetxt(f"{dir}calib_{filt}_global_maps.txt", globalmaps[ifilt, :, :])
