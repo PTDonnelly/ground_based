@@ -101,7 +101,8 @@ def PolynomialAdjust(directory, files, spectrals):
     bandmumaps  = np.empty((Globals.nfilters, Globals.ny, Globals.nx))
     keepdata  = np.empty((Nfiles, Globals.ny, Globals.nx))
     keepmu    = np.empty((Nfiles, Globals.ny, Globals.nx))
-
+    # Define location adjustment array to store the latitude band information
+    adj_location = np.empty(Globals.nfilters)
     # Initialise to nan values
     bandcmaps[:, :, :]  = np.nan
     bandmumaps[:, :, :] = np.nan
@@ -125,7 +126,7 @@ def PolynomialAdjust(directory, files, spectrals):
         # After several tests, best results are obtained with an average polynomial adjustment
         # on the N-Band filter and a southern polynomial adjustment on the Q-Band Filters for
         # the VLT/VISIR Jupiter 2018May24-27 dataset. 
-        adj_location = 'average' if ifilt < 10 else 'southern'
+        adj_location= 'average' if ifilt < 10 else 'southern'
         if (ifilt !=  7): # ifilt = 7 cannot be corrected
             # Get filter index for spectral profiles
             waves = spectrals[:, ifilt, 5]
@@ -335,21 +336,23 @@ def ApplyPolynom(directory, files, spectrals):
         cmaps[ifile, :, :] = ConvertBrightnessTemperature(cmaps[ifile, :, :], wavelength=wavelength[ifile])
 
     for ifilt in range(Globals.nfilters):
-        # Get filter index for spectral profiles
-        waves = spectrals[:, ifilt, 5]
-        wave  = waves[(waves > 0)][0]
-        _, _, _, ifilt = SetWave(wavelength=False, wavenumber=wave)
-        # Get polynome coefficient calculating for 2018May dataset 
-        coeff = np.load(f'../outputs/2018May/global_maps_figures/calib_{wave}_polynomial_coefficients_average.npy')
-        # Calculate polynomial adjustement for each hemisphere (using mask selections)
-        p = np.poly1d(coeff)
-        # Some control printing
-        print("Polynome")
-        print(p)
-        # Apply polynomial adjustment over individual cmaps depending of wave value
-        for ifile, iwave in enumerate(wavenumber):
-                if iwave == wave:
-                    cmaps[ifile, :, :] = cmaps[ifile, :, :] * p(1) / p(mumaps[ifile, :, :])
+        adj_location= 'average' if ifilt < 10 else 'southern'
+        if ifilt != 6 and ifilt != 7:
+            # Get filter index for spectral profiles
+            waves = spectrals[:, ifilt, 5]
+            wave  = waves[(waves > 0)][0]
+            _, _, _, ifilt = SetWave(wavelength=False, wavenumber=wave)
+            # Get polynome coefficient calculating for 2018May dataset 
+            coeff = np.load(f'../outputs/2018May/global_maps_figures/calib_{wave}_polynomial_coefficients_{adj_location}.npy')
+            # Calculate polynomial adjustement for each hemisphere (using mask selections)
+            p = np.poly1d(coeff)
+            # Some control printing
+            print("Polynome")
+            print(p)
+            # Apply polynomial adjustment over individual cmaps depending of wave value
+            for ifile, iwave in enumerate(wavenumber):
+                    if iwave == wave:
+                        cmaps[ifile, :, :] = cmaps[ifile, :, :] * p(1) / p(mumaps[ifile, :, :])
 
     return cmaps, mumaps, wavenumber
 
