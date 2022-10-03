@@ -27,11 +27,30 @@ def RetrieveLatitudeFromCoreNumber(fpath):
     return lat_core, ncore, nlevel, ngas
 
 def ReadLogFiles(filepath):
-    """ Read chisq/n from retrieval log files """
+    """ Read chisq/n from retrieval log_** files """
 
     # Retrieve latitude-core_number correspondance
     lat_core, nlat, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
 
+    # Create a latitude array for plotting
+    latitude = np.asarray(lat_core[:,1], dtype='float')
+    # Create a chisquare array
+    chisquare = np.empty((nlat))
+    # Read and save retrieved profiles
+    for ilat in range(nlat):
+        ifile = int(lat_core[ilat, 0])
+        with open(f"{filepath}/core_{ifile}/log_{ifile}") as f:
+            # Read file
+            lines = f.readlines()
+            for iline, line in enumerate(lines):
+                l = line.split()
+                # Identifying the last line of chisq/ny in the current log file
+                if 'chisq/ny' and 'equal' in l:
+                    tmp = line.split(':')
+                    chisq = tmp[-1]
+                    chisquare[ilat] = chisq
+
+    return chisquare, latitude, nlat
 
 def ReadmreFiles(filepath):
     """ Read radiance retrieval outputs for all .mre files """
