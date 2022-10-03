@@ -56,7 +56,7 @@ def PlotMaps(dataset, files, spectrals):
     # Calling the correction method chosen for this dataset
     if dataset == '2018May':
         cmaps, mumaps, wavenumber, adj_location = PolynomialAdjust(dir, files, spectrals)
-        mumin = [0.02, 0.02, 0.1, 0.1, 0.01, 0.05, 0.02, 0.02, 0.02, 0.02, 0.01, 0.01, 0.01]
+        mumin = [0.02, 0.02, 0.1, 0.08, 0.01, 0.05, 0.02, 0.02, 0.02, 0.02, 0.01, 0.01, 0.01]
         Nfilters = Globals.nfilters
     elif dataset == '2022July':
         cmaps, mumaps, wavenumber = BlackLineRemoving(dir, files, cblack=-60, mu_scaling=True)
@@ -259,7 +259,6 @@ def PlotMapsPerNight(dataset, files, spectrals):
         hour = hour.replace('T', '')
         hour = hour.replace('-', '')
         hour = hour.replace(':', '')
-        print(hour)
         # Append hour and ifile into lists
         list_time.append(hour)
         list_ifile.append(ifile)
@@ -337,7 +336,7 @@ def PlotMapsPerNight(dataset, files, spectrals):
                     # Setting brightness temperature extremes to plot global map
                     max = np.nanmax(zonalpert[ifilt, :, :]) 
                     min = np.nanmin(zonalpert[ifilt, :, :])
-                    norm = colors.TwoSlopeNorm(vmin=min, vmax=max, vcenter=0) 
+                    norm = colors.TwoSlopeNorm(vmin=-8, vmax=6, vcenter=0) 
                     # Plotting global map
                     im = plt.imshow(zonalpert[ifilt, :, :], origin='lower', norm=norm, cmap='seismic')
                     plt.xticks(np.arange(0, Globals.nx+1,  step = 60), list(np.arange(360,-1,-30)))
