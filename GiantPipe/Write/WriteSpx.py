@@ -6,7 +6,7 @@ def WriteMeridSpx(dataset, mode, spectrals):
     """Create spectral input for NEMESIS using central meridian profiles.
        Populate .spxfile with radiances, measurement errors, and geometries."""
 
-    print('Creating spectra...')
+    print('Creating meridian spectra...')
 
     def create_merid_spx(f, lats, LCMs, mus, rads, rad_errs, waves):
         """Write spxfile for meridional binning method """
@@ -42,7 +42,7 @@ def WriteMeridSpx(dataset, mode, spectrals):
             f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(wave, rad, rad_err))
 
     # If subdirectory does not exist, create it
-    dir = f'../outputs/{dataset}/spxfiles/'
+    dir = f'../outputs/{dataset}/spxfiles_no852_no887/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 
@@ -58,11 +58,75 @@ def WriteMeridSpx(dataset, mode, spectrals):
         # Only write spxfile for latitudes with spectral information
         if lats:
             # Open textfile
-            with open(f"../outputs/{dataset}/spxfiles/lat_{lats[0]}.txt", 'w') as f:
+            with open(f"{dir}lat_{lats[0]}.txt", 'w') as f:
                 create_merid_spx(f, lats, LCMs, mus, rads, rad_errs, waves)
             # Open spxfile
-            with open(f"../outputs/{dataset}/spxfiles/lat_{lats[0]}.spx", 'w') as f:
+            with open(f"{dir}lat_{lats[0]}.spx", 'w') as f:
                 create_merid_spx(f, lats, LCMs, mus, rads, rad_errs, waves)
+
+def WriteParaSpx(dataset, mode, spectrals):
+    """Create spectral input for NEMESIS using parallel profiles at a specific latitude range.
+       Populate .spxfile with radiances, measurement errors, and geometries."""
+
+    print('Creating parallel spectra...')
+
+    def create_para_spx(f, LCPs, lons, mus, rads, rad_errs, waves):
+        """Write spxfile for meridional binning method """
+        # Write first line of texfile with relevant formatting
+        LCP = np.mean(LCPs)
+        clon  = lons[0]
+        nmu  = len(mus)
+        f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:12.5f}\n".format(0, LCP, clon, nmu))
+
+        # Loop over NGEOM geometries (no. of geometries = no. of emission angle points)
+        for igeom, mu in enumerate(mus):
+            # Calculate NCONV spectral points (NCONV = no. of wavenumbers per geometry = 1 for merid binning)
+            nconv = 1
+            # I can't remember what NAV is... check the NEMESIS manual
+            nav   = 1
+            # The "angles line": this defines a "geometry" that holds a "spectrum"
+            clat           = LCPs[igeom]
+            clon           = lons[igeom]
+            solar_ang      = 0
+            emission_angle = mu
+            azimuth_angle  = 0
+            wgeom          = 1 
+            # The spectrum lines: these are the spectral points that occur at a given "geometry"
+            wave    = waves[igeom]
+            rad     = rads[igeom]
+            rad_err = rad_errs[igeom]
+
+            # Write output to texfile with relevant formatting
+            f.write("{0:d}\n".format(nconv))
+            f.write("{0:d}\n".format(nav))
+            f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:12.5f}  {4:12.5f}  {5:12.5f}\n".format(clat, clon, solar_ang, emission_angle, azimuth_angle, wgeom))
+            f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(wave, rad, rad_err))        
+    
+    # If subdirectory does not exist, create it
+    dir = f'../outputs/{dataset}/spxfiles_para_no852_no887/'
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    
+    # Loop over latitudes to create one .spxfile per latitude
+    for ilon in range(Globals.nlonbins):
+        print(np.shape(spectrals))
+        # print(np.shape(LCPs))
+        # Extract variables and throw NaNs
+        LCPs     = [spectrals[ilon, ifilt, 0] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilon, ifilt, 0]) == False]
+        lons     = [spectrals[ilon, ifilt, 1] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilon, ifilt, 1]) == False]
+        mus      = [spectrals[ilon, ifilt, 2] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilon, ifilt, 2]) == False]
+        rads     = [spectrals[ilon, ifilt, 3] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilon, ifilt, 3]) == False]
+        rad_errs = [spectrals[ilon, ifilt, 4] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilon, ifilt, 4]) == False]
+        waves    = [spectrals[ilon, ifilt, 5] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilon, ifilt, 5]) == False]
+        # Only write spxfile for longitudes with spectral information
+        if lons:
+            # Open textfile
+            with open(f"{dir}lon_{lons[0]}.txt", 'w') as f:
+                create_para_spx(f, LCPs, lons, mus, rads, rad_errs, waves)
+            # Open spxfile
+            with open(f"{dir}lon_{lons[0]}.spx", 'w') as f:
+                create_para_spx(f, LCPs, lons, mus, rads, rad_errs, waves)
+
 
 def WriteCentreToLimbSpx(mode, spectrals):
     """Create spectral input for NEMESIS using centre-to-limb profiles.

@@ -2,12 +2,20 @@
    such as the binning, calibration, plotting, and writing."""
 
 import numpy as np
-
-latrange    = -90, 90          			         # Latitude range for binning pixels (planetographic)
+## Central Meridian binning
+latrange    = -90, 90          			          # Latitude range for binning pixels (planetographic)
 latstep     = 1                                  # Latitude increment for binning pixels (planetographic)
 latgrid     = np.arange(-89.5, 90, latstep)      # Latitude range from pole-to-pole
-nlatbins    = len(latgrid)
-lonrange    = 360, 0            		         # Longitude range for binning pixels (Sys III)
-merid_width = 30                                 # Longitude range about the central meridian for averaging
+nlatbins    = len(latgrid)                       # Number of latitude bins
+merid_width = 90                                 # Longitude range about the central meridian for averaging
+                                                 # 30 for c_merid binning 
+## "Central Parallel" binning
+lonrange    = 360, 0            		             # Longitude range for binning pixels (Sys III)
+lonstep     = 1                                  # Longitude increment for binning pixel 
+longrid     = np.arange(360, 0, -lonstep)         # Longitude range
+nlonbins    = len(longrid)                       # Number of longitude bins
+para_width  = 1                                  # Latitude range about the central parallel for averaging
+LCP = -80                                        #
+
 nfilters    = 13                                 # Set manually if using irregularly-sampled data
-# mu_max      = 80.0                 		     # Maximum emission angle
+# mu_max      = 80.0                 		       # Maximum emission angle

@@ -43,11 +43,11 @@ def BinCentralMerid(nfiles, spectrum, LCMIII):
                         if np.any(spx):
                             # Pull out variables
                             LCM      = bn.nanmean(spx[:, 1])
-                            mu       = bn.nanmin(spx[:, 2])
-                            rad      = bn.nanmean(spx[:, 3])
-                            rad_err  = bn.nanmean(spx[:, 4])
-                            wavenum  = spx[:, 5][0]
-                            view     = spx[:, 6][0]
+                            mu       = bn.nanmin(spx[:, 4])
+                            rad      = bn.nanmean(spx[:, 5])
+                            rad_err  = bn.nanmean(spx[:, 6])
+                            wavenum  = spx[:, 7][0]
+                            view     = spx[:, 8][0]
                             # Store individual meridional profiles
                             single_merids[ilat, ifile, 0] = clat
                             single_merids[ilat, ifile, 1] = LCM

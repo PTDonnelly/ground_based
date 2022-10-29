@@ -3,9 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
 from copy import copy
+from scipy.interpolate import UnivariateSpline, interp1d
 import Globals
 from Read.ReadCal import ReadCal
 from Tools.SetWave import SetWave
+
+# Colormap definition
+cmap = plt.get_cmap("magma")
 
 def PlotMeridProfiles(dataset, mode, files, singles, spectrals):
     """ Plot meridian profiles and spacecraft data to illustrate 
@@ -33,10 +37,10 @@ def PlotMeridProfiles(dataset, mode, files, singles, spectrals):
             _, _, iwave, _, _ = SetWave(filename=fname, wavelength=None, wavenumber=None, ifilt=None)
             if iwave == wave:
                 axes[0].plot(singles[:, ifile, 0], singles[:, ifile, 3], color='black', lw=0, marker='.', markersize=2)
-        axes[0].plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3], color='orange', lw=0, marker='o', markersize=2, label='VLT/VISIR av')
-        axes[0].set_title(f"{wave}"+" cm$^{-1}$")
+        axes[0].plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3], color='orange', lw=0, marker='o', markersize=2, label=f"averaged VLT/VISIR at {int(wave)}"+" cm$^{-1}$")
+        # axes[0].set_title(f"{wave}"+" cm$^{-1}$")
         axes[0].set_xlim((-90, 90))
-        axes[0].legend()
+        axes[0].legend(fontsize=20)
 
         # subplot showing the calibration of the spectral merid profile to spacecraft data
         if ifilt_sc < 12:
@@ -45,27 +49,72 @@ def PlotMeridProfiles(dataset, mode, files, singles, spectrals):
         else:
             # Use IRIS for Q-Band
             axes[1].plot(iris[:, ifilt_sc, 0], iris[:, ifilt_sc, 1], color='k', lw=1, label='Voyager/IRIS')
-        axes[1].plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3], color='orange', lw=0, marker='o', markersize=3, label='VLT/VISIR av')
+        axes[1].plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3], color='orange', lw=0, marker='o', markersize=3, label=f"averaged VLT/VISIR at {int(wave)}"+" cm$^{-1}$")
         axes[1].set_xlim((-90, 90))
-        axes[1].legend()
+        axes[1].legend(fontsize=20)
 
         # add a big axis, hide frame
         fig.add_subplot(111, frameon=False)
         # hide tick and tick label of the big axis
         plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
-        plt.xlabel("Latitude", size=15)
-        plt.ylabel("Radiance (W cm$^{-2}$ sr$^{-1}$ (cm$^{-1}$)$^{-1}$)", size=15)
+        plt.xlabel("Latitude", size=20)
+        plt.ylabel("Radiance (W cm$^{-2}$ sr$^{-1}$ (cm$^{-1}$)$^{-1}$)", size=20)
 
         # Save figure showing calibation method 
         _, _, wave, _, _ = SetWave(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)
-        plt.savefig(f"{dir}{wave}_calibration_merid_profiles.png", dpi=900)
+        plt.savefig(f"{dir}{wave}_calibration_merid_profiles.png", dpi=150, bbox_inches='tight')
+        #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
+        # Clear figure to avoid overlapping between plotting subroutines
+        plt.clf()
+
+def PlotParaProfiles(dataset, mode, files, singles, spectrals):
+    """ Plot parallel profiles """
+
+    print('Plotting parallel profiles...')
+
+    # If subdirectory does not exist, create it
+    dir = f'../outputs/{dataset}/parallel_profiles_figures/'
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+
+    for ifilt in range(Globals.nfilters):
+        # Get filter index for plotting spacecraft and calibrated data
+        _, _, wave, _, ifilt_v = SetWave(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)
+        # Create a figure per filter
+        fig = plt.subplots(1, 1, figsize=(8, 3), sharex=True, sharey=True)
+        # subplot showing the averaging of each singles merid profiles (ignoring negative beam)
+        for ifile, fname in enumerate(files):
+            _, _, iwave, _, _ = SetWave(filename=fname, wavelength=None, wavenumber=None, ifilt=None)
+            if iwave == wave:
+                plt.plot(singles[:, ifile, 1], singles[:, ifile, 3], lw=0, marker='.', markersize=2, color = 'black')
+        plt.plot(spectrals[:, ifilt_v, 1], spectrals[:, ifilt_v, 3], color='orange', lw=0, marker='o', markersize=2, label=f"{int(wave)}"+" cm$^{-1}$ VLT/VISIR profile at "+f"{Globals.LCP}"+"$^{\circ}$")
+        # x = np.arange(0.5, 360.5, 1)
+        # y = np.flipud(spectrals[:, ifilt_v, 3])
+        # w = np.isnan(y)
+        # y[w] = 0.
+        # spl = UnivariateSpline(x, y, w=~w, k=5, s=0.01)
+        # xs = np.arange(0.5, 360.5, 1)
+        # plt.plot(np.flipud(xs), np.flipud(spl(xs)), color='blue', lw=0, marker='.', markersize=1, label=f"1-D smoothing spline fit")
+        # # spl2 = UnivariateSpline(x, y, w=~w, k=5, s=1.e9)
+        # # plt.plot(np.flipud(xs), np.flipud(spl2(xs)), color='green', lw=0, marker='.', markersize=1, label=f"SPL")
+        plt.legend(fontsize=12)
+        plt.grid()
+        plt.tick_params(labelsize=12) 
+        plt.xlabel("System III West Longitude", size=15)
+        print(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1])
+        if spectrals[0, ifilt_v, 1] >=0 and spectrals[-1, ifilt_v, 1]>=0:
+            plt.xlim(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1]) 
+            plt.xticks(ticks=np.arange(360,-1,-30), labels=list(np.arange(360,-1,-30)))
+        plt.ylabel("Radiance (W cm$^{-1}$ sr$^{-1}$)", size=15)
+        # Save figure showing calibation method 
+        plt.savefig(f"{dir}{wave}_parallel_profiles.png", dpi=150, bbox_inches='tight')
         #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
         # Clear figure to avoid overlapping between plotting subroutines
         plt.clf()
 
 def PlotGlobalSpectrals(dataset, spectrals):
     """Basic code to plot the central meridian profiles with wavenumber
-    (or spectral profiles with latitude, depending on the persepctive).
+    (or spectral profiles with latitude, depending on the perspective).
     Displays the global pseudo-spectrum in a way resembling a normal spectrum."""
     
     # If subdirectory does not exist, create it
@@ -92,7 +141,7 @@ def PlotGlobalSpectrals(dataset, spectrals):
     #plt.xlim((xmin, xmax))
     plt.ylabel('Latitude', size=15)
     plt.ylim((-90, 90))
-    plt.savefig(f"{dir}global_spectrals.png", dpi=900)
+    plt.savefig(f"{dir}global_spectrals.png", dpi=150, bbox_inches='tight')
     plt.close()
  
     plt.figure
@@ -105,7 +154,7 @@ def PlotGlobalSpectrals(dataset, spectrals):
     #plt.xlim((xmin, xmax))
     plt.ylabel('Latitude', size=15)
     plt.ylim((-90, 90))
-    plt.savefig(f"{dir}global_spectrals_res1.png", dpi=900)
+    plt.savefig(f"{dir}global_spectrals_res1.png", dpi=150, bbox_inches='tight')
     plt.close()
 
     plt.figure
@@ -118,7 +167,7 @@ def PlotGlobalSpectrals(dataset, spectrals):
     #plt.xlim((xmin, xmax))
     plt.ylabel('Latitude', size=15)
     plt.ylim((-90, 90))
-    plt.savefig(f"{dir}global_spectrals_res2.png", dpi=900)
+    plt.savefig(f"{dir}global_spectrals_res2.png", dpi=150, bbox_inches='tight')
     plt.close()
 
 def PlotCentreTotLimbProfiles(mode, singles, spectrals):
