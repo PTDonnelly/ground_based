@@ -175,9 +175,34 @@ def PlotCentreTotLimbProfiles(mode, singles, spectrals):
     
     a = 1
 
-def ColorNuance(colorm, ncolor, i):
-    pal = get_cmap(name=colorm)
-    coltab = [pal(icolor) for icolor in np.linspace(0,0.9,ncolor)]
-    
-    return coltab[i]
+def PlotBiDimMaps(dataset, mode, spectrals):
+    """ Plot radiance maps """
 
+    print('Plotting radiances maps...')
+
+    # If subdirectory does not exist, create it
+    dir = f'../outputs/{dataset}/maps_radiance_figures/'
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+
+    for ifilt in range(Globals.nfilters):
+        # Get filter index for plotting spacecraft and calibrated data
+        _, _, wave, _, ifilt = SetWave(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)
+        # Create a figure per filter
+        fig = plt.subplots(1, 1, figsize=(8, 3))
+        im = plt.imshow(spectrals[:, ifilt, 3], origin='lower', vmin=min, vmax=max, cmap='cividis')
+        plt.tick_params(labelsize=12) 
+        plt.xlabel("System III West Longitude", size=15)
+        print(spectrals[0, ifilt, 1], spectrals[-1, ifilt, 1])
+        if spectrals[0, ifilt, 1] >=0 and spectrals[-1, ifilt, 1]>=0:
+            plt.xlim(spectrals[0, ifilt, 1], spectrals[-1, ifilt, 1]) 
+            plt.xticks(ticks=np.arange(360,-1,-30), labels=list(np.arange(360,-1,-30)))
+        plt.ylabel("Latitude", size=15)
+        cbar = plt.colorbar(im, extend='both')
+        cbar.ax.tick_params(labelsize=12)
+        cbar.set_label("Radiance (W cm$^{-1}$ sr$^{-1}$)")
+        # Save figure showing calibation method 
+        plt.savefig(f"{dir}{wave}_parallel_profiles.png", dpi=150, bbox_inches='tight')
+        #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
+        # Clear figure to avoid overlapping between plotting subroutines
+        plt.clf()

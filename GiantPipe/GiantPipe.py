@@ -9,24 +9,29 @@ def main():
     from Binning.CentralMerid import BinCentralMerid
     from Binning.CentralParallel import BinCentralPara
     from Binning.CentreToLimb import BinCentreToLimb
+    from Binning.CentralBiDim import BinBiDimension
     from Calibrate.CalibrateGBData import CalibrateGBData
     from Calibrate.CentralMerid import CalCentralMerid
     # from Calibrate.CylindricalMaps import CalCylindricalMaps
     from Plot.PlotProfiles import PlotMeridProfiles
     from Plot.PlotProfiles import PlotParaProfiles
     from Plot.PlotProfiles import PlotGlobalSpectrals
+    from Plot.PlotProfiles import PlotBiDimMaps
     from Plot.PlotMaps import PlotMaps
     from Read.ReadNpy import ReadCentralMeridNpy
     from Read.ReadNpy import ReadCentralParallelNpy
     from Read.ReadNpy import ReadCentreToLimbNpy
+    from Read.ReadNpy import ReadBiDimension
     from Read.ReadSpx import ReadSpx
     from Write.WriteProfiles import WriteMeridProfiles
     from Write.WriteProfiles import WriteParallelProfiles
     from Write.WriteProfiles import WriteCentreToLimbProfiles
+    from Write.WriteProfiles import WriteBiDim
     from Write.WriteSpx import WriteMeridSpx
     from Write.WriteSpx import WriteParaSpx
     from Write.WriteSpx import WriteCentreToLimbSpx
-    
+    from Write.WriteSpx import WriteBiDimSpx
+
     # Define flags to configure pipeline
     calibrate   = False      # Read raw data and calibrate
     source      = 'fits'     # Source of data: local cmaps ('fits') or local numpy arrays ('npy')
@@ -34,11 +39,12 @@ def main():
     bin_cmerid  = False     # Use central meridian binning scheme
     bin_cpara   = True     # Use central parallel binning scheme
     bin_ctl     = False     # Use centre-to-limb binning scheme
+    bin_2d      = False     # Use 2d binning scheme (for a zoom retrieval)
     # Output
-    save        = False      # Store calculated profiles to local files
+    save        = True      # Store calculated profiles to local files
     plotting    = True      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
-    spx         = False      # Write spxfiles as spectral input for NEMESIS
+    spx         = True      # Write spxfiles as spectral input for NEMESIS
 
     ############################################################
     # Perform geometric registration and radiometric calibration
@@ -75,7 +81,9 @@ def main():
         if bin_cmerid:
             spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning='bin_cmerid')
         if bin_cpara:
-            spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files,  binning='bin_cpara')
+            spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning='bin_cpara')
+        if bin_2d:
+            spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning='bin_2d')
 
 
     if bin_cmerid:
@@ -118,7 +126,6 @@ def main():
             WriteParaSpx(dataset=dataset, mode=mode, spectrals=spectrals)
 
     if bin_ctl:
-
         # Execute the central meridian binning scheme
         if 'fits' in source:
             singles, spectrals = BinCentreToLimb(nfiles=nfiles, spectrum=spectrum)
@@ -136,6 +143,23 @@ def main():
         if spx:
             # Write mean central meridian profiles to spxfile
             WriteCentreToLimbSpx(dataset=dataset, mode=mode, spectrals=spectrals)
+
+    if bin_2d: 
+        # Execute the bi-dimensional binning scheme 
+        if 'fits' in source: 
+            singles, spectrals = BinBiDimension(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
+        if 'npy' in source:
+            singles, spectrals = ReadBiDimension(dataset=dataset, mode=mode, return_singles=True, return_spectrals=True)
+
+        if save:
+            # Store calculated maps
+            WriteBiDim(dataset=dataset, files=files, singles=singles, spectrals=spectrals)
+        if plotting:
+            # Plot bi-dimensional maps
+            PlotBiDimMaps(dataset=dataset, mode=mode, spectrals=spectrals)
+        if spx:
+            # Write bi-dimensional maps to spxfile
+            WriteBiDimSpx(dataset=dataset, mode=mode, spectrals=spectrals)
 
     ############################################################
     # Read in calibrated data, calculated profiles or retrieved
