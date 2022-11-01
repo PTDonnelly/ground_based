@@ -12,7 +12,7 @@ def CalibrateGBData(dataset, mode):
     nfiles = len(files)
 
     # Steps 1-3: Generate arrays containing spatial and spectral information of each cylindrical map
-    spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files)
+    spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning="bin_cmerid")
 
     # Steps 4-5: Generate average meridional profiles for each observation and each filter
     rawsingles, rawspectrals = BinCentralMerid(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
