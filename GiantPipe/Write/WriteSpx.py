@@ -42,7 +42,7 @@ def WriteMeridSpx(dataset, mode, spectrals):
             f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(wave, rad, rad_err))
 
     # If subdirectory does not exist, create it
-    dir = f'../outputs/{dataset}/spxfiles_no852_no887/'
+    dir = f'../outputs/{dataset}/spxfiles_merid_no852_no887/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 
@@ -182,7 +182,6 @@ def WriteBiDimSpx(dataset, mode, spectrals):
     # Loop over latitudes and logitudes to create one .spxfile per pixel into the 2D selected maps
     for ilat in range(Globals.nlatbins):
         for ilon in range(Globals.nlonbins):
-            print(np.shape(spectrals))
             # print(np.shape(LCPs))
             # Extract variables and throw NaNs
             lats     = [spectrals[ilat, ilon, ifilt, 0] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 0]) == False]

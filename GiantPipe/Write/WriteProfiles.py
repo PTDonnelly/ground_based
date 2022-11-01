@@ -49,7 +49,7 @@ def WriteParallelProfiles(dataset, files, singles, spectrals):
     
     if np.any(singles):
         # If subdirectory does not exist, create it
-        dir = f'../outputs/{dataset}/single_para_profiles/'
+        dir = f'../outputs/{dataset}/single_para_{Globals.LCP}_profiles/'
         if not os.path.exists(dir):
             os.makedirs(dir)
         # Save individual parallel profiles
@@ -66,7 +66,7 @@ def WriteParallelProfiles(dataset, files, singles, spectrals):
         
     if np.any(spectrals):
         # If subdirectory does not exist, create it
-        dir = f'../outputs/{dataset}/spectral_para_profiles/'
+        dir = f'../outputs/{dataset}/spectral_para_{Globals.LCP}_profiles/'
         if not os.path.exists(dir):
             os.makedirs(dir)
         # Save spectral parallel profiles
@@ -104,11 +104,11 @@ def WriteBiDim(dataset, files, singles, spectrals):
             name = fname.split('.fits.gz')
             name = name[0].split('/')
             # Write individual mean profiles to np.array
-            np.save(f"{dir}{name[-1]}_map", singles[:, :, ifile, :])
+            np.savez(f"{dir}{name[-1]}_map", singles[:, :, ifile, :])
             # Write individual mean profiles to textfile
-            np.savetxt(f"{dir}{name[-1]}_map.txt", singles[:, :, ifile, :],
-                        fmt=['%4.2f', '%5.2f', '%4.2f', '%8.5e', '%8.5e', '%8.5f', '%s'],
-                        header='LAT    LON    MU    RAD    ERROR    NU    VIEW')
+            # np.savetxt(f"{dir}{name[-1]}_map.txt", singles[:, :, ifile, :],
+            #             fmt=['%4.2f', '%5.2f', '%4.2f', '%8.5e', '%8.5e', '%8.5f', '%s'],
+            #             header='LAT    LON    MU    RAD    ERROR    NU    VIEW')
         
     if np.any(spectrals):
         # If subdirectory does not exist, create it
@@ -119,8 +119,8 @@ def WriteBiDim(dataset, files, singles, spectrals):
         for ifilt in range(Globals.nfilters):
             # Write spectral mean profiles to np.array
             _, _, wave, _, _ = SetWave(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)
-            np.save(f"{dir}{wave}_map", spectrals[:, :, ifilt, :])
+            np.savez(f"{dir}{wave}_map", spectrals[:, :, ifilt, :])
             # Write spectral mean profiles to textfiles
-            np.savetxt(f"{dir}{wave}_map.txt", spectrals[:, :, ifilt, :],
-                        fmt=['%4.2f', '%5.2f', '%4.2f', '%8.5e', '%8.5e', '%8.5f'],
-                        header='LAT    LON    MU    RAD    ERROR    NU')
+            # np.savetxt(f"{dir}{wave}_map.txt", spectrals[:, :, ifilt, :],
+            #             fmt=['%4.2f', '%5.2f', '%4.2f', '%8.5e', '%8.5e', '%8.5f'],
+            #             header='LAT    LON    MU    RAD    ERROR    NU')
