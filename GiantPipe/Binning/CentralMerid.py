@@ -38,7 +38,7 @@ def BinCentralMerid(nfiles, spectrum, LCMIII):
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", category=RuntimeWarning)
                     # Throw away hemisphere with negative beam
-                    view = np.mean(spx[:, 6])
+                    view = np.mean(spx[:, 8])
                     if (view == 1) and (lat1 >=-5) or (view == -1) and (lat1 <= 5):
                         if np.any(spx):
                             # Pull out variables
