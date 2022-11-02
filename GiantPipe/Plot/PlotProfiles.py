@@ -40,10 +40,12 @@ def PlotMeridProfiles(dataset, mode, files, singles, spectrals):
         # Select the suitable spacecraft meridian profile
         if ifilt_sc < 12:
             # Use CIRS for N-Band
-            plt.plot(cirs[:, ifilt_sc, 0], cirs[:, ifilt_sc, 1], color='green', lw=2, label='Cassini/CIRS')
+            cirskeep = (cirs[:, ifilt_sc, 0] >= -70) & (cirs[:, ifilt_sc, 0] < 70)
+            plt.plot(cirs[cirskeep, ifilt_sc, 0], cirs[cirskeep, ifilt_sc, 1], color='green', lw=2, label='Cassini/CIRS')
         else:
             # Use IRIS for Q-Band
-            plt.plot(iris[:, ifilt_sc, 0], iris[:, ifilt_sc, 1], color='green', lw=2, label='Voyager/IRIS')
+            iriskeep = (iris[:, ifilt_sc, 0] >= -70) & (iris[:, ifilt_sc, 0] < 70)
+            plt.plot(iris[iriskeep, ifilt_sc, 0], iris[iriskeep, ifilt_sc, 1], color='green', lw=2, label='Voyager/IRIS')
         # Plot the VLT/VISIR pole-to-pole meridian profile
         plt.plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3], color='orange', lw=0, marker='o', markersize=3, label=f"averaged VLT/VISIR at {int(wave)}"+" cm$^{-1}$")
         plt.xlim((-90, 90))
@@ -66,7 +68,7 @@ def PlotParaProfiles(dataset, mode, files, singles, spectrals):
     print('Plotting parallel profiles...')
 
     # If subdirectory does not exist, create it
-    dir = f'../outputs/{dataset}/parallel_profiles_figures/'
+    dir = f'../outputs/{dataset}/parallel_{Globals.LCP}_profiles_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 
@@ -85,7 +87,6 @@ def PlotParaProfiles(dataset, mode, files, singles, spectrals):
         plt.grid()
         plt.tick_params(labelsize=12) 
         plt.xlabel("System III West Longitude", size=15)
-        print(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1])
         if spectrals[0, ifilt_v, 1] >=0 and spectrals[-1, ifilt_v, 1]>=0:
             plt.xlim(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1]) 
             plt.xticks(ticks=np.arange(360,-1,-30), labels=list(np.arange(360,-1,-30)))
@@ -165,7 +166,7 @@ def PlotBiDimMaps(dataset, mode, spectrals):
     print('Plotting radiances maps...')
 
     # If subdirectory does not exist, create it
-    dir = f'../outputs/{dataset}/maps_radiance_figures/'
+    dir = f'../outputs/{dataset}/maps_radiance_lat{Globals.lat_target}_lon{Globals.lon_target}_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
    

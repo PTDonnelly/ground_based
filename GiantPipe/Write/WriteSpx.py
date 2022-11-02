@@ -103,14 +103,12 @@ def WriteParaSpx(dataset, mode, spectrals):
             f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(wave, rad, rad_err))        
     
     # If subdirectory does not exist, create it
-    dir = f'../outputs/{dataset}/spxfiles_para_no852_no887/'
+    dir = f'../outputs/{dataset}/spxfiles_para_{Globals.LCP}_no852_no887/'
     if not os.path.exists(dir):
         os.makedirs(dir)
     
     # Loop over longitudes to create one .spxfile per longitude
     for ilon in range(Globals.nlonbins):
-        print(np.shape(spectrals))
-        # print(np.shape(LCPs))
         # Extract variables and throw NaNs
         LCPs     = [spectrals[ilon, ifilt, 0] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilon, ifilt, 0]) == False]
         lons     = [spectrals[ilon, ifilt, 1] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilon, ifilt, 1]) == False]
@@ -175,7 +173,7 @@ def WriteBiDimSpx(dataset, mode, spectrals):
             f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(wave, rad, rad_err))        
     
     # If subdirectory does not exist, create it
-    dir = f'../outputs/{dataset}/spxfiles_bidim_no852_no887/'
+    dir = f'../outputs/{dataset}/spxfiles_lat{Globals.lat_target}_lon{Globals.lon_target}_no852_no887/'
     if not os.path.exists(dir):
         os.makedirs(dir)
     

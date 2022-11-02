@@ -41,11 +41,6 @@ def BinBiDimension(nfiles, spectrum, LCMIII):
                         for ifile in range(nfiles):
                             lats = spectrum[:, :, ifile, 0]
                             lons = spectrum[:, :, ifile, 1]
-                            print(ifile)
-                            print(lat_target1, lat_target2)
-                            print(lat1, lat2)
-                            print(lon_target1, lon_target2)
-                            print(lon1, lon2)
                             keep = (lats >= lat1) & (lats < lat2) & (lats >= lat_target1) & (lats < lat_target2) \
                                  & (lons > lon1) & (lons <= lon2) & (lons > lon_target1) & (lons <= lon_target2)
                             spx = spectrum[keep, ifile, :]
@@ -70,8 +65,6 @@ def BinBiDimension(nfiles, spectrum, LCMIII):
                                     single_paras[ilat, ilon, ifile, 5] = wavenum
                                     # print(ilon, ifile, wavenum)
                                     single_paras[ilat, ilon, ifile, 6] = view
-                                    print("I did one")
-                                    print(single_paras[ilat, ilon, ifile, 3])
         # Throw away zeros
         single_paras[single_paras == 0] = np.nan
 
