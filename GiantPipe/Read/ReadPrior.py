@@ -1,18 +1,22 @@
 import numpy as np
 
-def ReadTemperaturePriorProfile(filepath):
+def ReadTemperatureGasesPriorProfile(filepath):
     """Read temperature and gases prior profiles file and return arrays of profiles"""
     filename = f"{filepath}nemesis.ref"
     with open(filename) as f:
         # Read header contents
         lines = f.readlines()
+        if '##' in lines[0]:
+            line_number = 54
+        else: 
+            line_number = 3
         # Save header information
-        prior_param = lines[54].split()
+        prior_param = lines[line_number].split()
         nlevel = int(prior_param[2])
         ngas = int(prior_param[3])
         # Store NEMESIS gases codes 
         newline, gasdata = [], []
-        for iline, line in enumerate(lines[55:ngas+55]):
+        for iline, line in enumerate(lines[line_number+1:ngas+line_number+1]):
             l = line.split()
             [newline.append(il) for il in l]
             # Store codes
@@ -23,7 +27,7 @@ def ReadTemperaturePriorProfile(filepath):
 
         # Read and save prior file's data
         priordata = []
-        for iline, line in enumerate(lines[ngas+56::]):
+        for iline, line in enumerate(lines[ngas+line_number+2::]):
             l = line.split()
             [newline.append(il) for il in l]
             # Store data 

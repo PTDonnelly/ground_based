@@ -26,19 +26,47 @@ def RetrieveLatitudeFromCoreNumber(fpath):
 
     return lat_core, ncore, nlevel, ngas
 
-def ReadLogFiles(filepath):
+def RetrieveLongitudeFromCoreNumber(fpath):
+    """ Function to retrieve longitude value from the 
+        .mre file of each core subdirectory """
+    # Initialize local variables
+    ncore = int(359)                     # number of core directories (360-1), 
+                                    # which is also equivalent to the number of longitude points 
+    lon_core = np.empty((ncore, 2)) # 2D array containing longitude and core directory number
+    # Read all .prf files through all core directories
+    for ifile in range(ncore):
+        filename = f"{fpath}_{ifile+1}/nemesis.mre"
+        with open(filename) as f:
+            # Read header contents
+            lines = f.readlines()
+            # Save header information
+            prior_param = lines[2].split()
+            lon_core[ifile, 0] = int(ifile+1)                    # Store core number 
+            lon_core[ifile, 1] = float(prior_param[1])    # Store corresponding longitude value
+    # Sorted on longitude values
+    lon_core = sorted(lon_core, key=operator.itemgetter(1))
+    lon_core = np.asarray(lon_core, dtype='float')
+
+    return lon_core, ncore
+
+def ReadLogFiles(filepath, over_axis):
     """ Read chisq/n from retrieval log_** files """
 
-    # Retrieve latitude-core_number correspondance
-    lat_core, nlat, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
-
-    # Create a latitude array for plotting
-    latitude = np.asarray(lat_core[:,1], dtype='float')
+    if over_axis == "latitude":
+        # Retrieve latitude-core_number correspondance
+        coor_core, ncoor, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+        
+    elif over_axis =="longitude":
+        # Retrieve longitude-core_number correspondance
+        coor_core, ncoor = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+    
+    # Create a latitude or longitude array for plotting
+    coor_axis = np.asarray(coor_core[:,1], dtype='float')
     # Create a chisquare array
-    chisquare = np.empty((nlat))
+    chisquare = np.empty((ncoor))
     # Read and save retrieved profiles
-    for ilat in range(nlat):
-        ifile = int(lat_core[ilat, 0])
+    for icoor in range(ncoor):
+        ifile = int(coor_core[icoor, 0])
         with open(f"{filepath}/core_{ifile}/log_{ifile}") as f:
             # Read file
             lines = f.readlines()
@@ -48,29 +76,34 @@ def ReadLogFiles(filepath):
                 if 'chisq/ny' and 'equal' in l:
                     tmp = line.split(':')
                     chisq = tmp[-1]
-                    chisquare[ilat] = chisq
+                    chisquare[icoor] = chisq
 
-    return chisquare, latitude, nlat
+    return chisquare, coor_core, ncoor
 
-def ReadmreFiles(filepath):
+def ReadmreFiles(filepath, over_axis):
     """ Read radiance retrieval outputs for all .mre files """
 
-    # Retrieve latitude-core_number correspondance
-    lat_core, nlat, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+    if over_axis=="latitude":
+        # Retrieve latitude-core_number correspondance
+        coor_core, ncoor, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+        
+    elif over_axis=="longitude":
+        # Retrieve longitude-core_number correspondance
+        coor_core, ncoor = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
     
-    radiance = np.empty((Globals.nfilters, nlat))
-    rad_err = np.empty((Globals.nfilters, nlat))
-    rad_fit = np.empty((Globals.nfilters, nlat))
-    wavenumb = np.empty((Globals.nfilters, nlat))
+    radiance = np.empty((Globals.nfilters, ncoor))
+    rad_err = np.empty((Globals.nfilters, ncoor))
+    rad_fit = np.empty((Globals.nfilters, ncoor))
+    wavenumb = np.empty((Globals.nfilters, ncoor))
     radiance.fill(np.nan)
     rad_err.fill(np.nan)
     rad_fit.fill(np.nan)
     wavenumb.fill(np.nan) 
-    # Create a latitude array for plotting
-    latitude = np.asarray(lat_core[:,1], dtype='float')
+    # Create a latitude or longitude array for plotting
+    coor_axis = np.asarray(coor_core[:,1], dtype='float')
     # Read and save retrieved profiles
-    for ilat in range(nlat):
-        ifile = int(lat_core[ilat, 0])
+    for icoor in range(ncoor):
+        ifile = int(coor_core[icoor, 0])
         with open(f"{filepath}/core_{ifile}/nemesis.mre") as f:
             # Read file
             lines = f.readlines()
@@ -89,48 +122,78 @@ def ReadmreFiles(filepath):
                 # Reset temporary variables
                 newline = []
             data_arr = np.asarray(filedata, dtype='float')
-            if ((latitude[ilat] < 6)):
-                wavenumb[:, ilat] = data_arr[:, 1]
-                radiance[:, ilat] = data_arr[:, 2]
-                rad_err[:, ilat]  = data_arr[:, 3]
-                rad_fit[:, ilat]  = data_arr[:, 5]
-            elif (latitude[ilat] > 6):
-                wavenb = data_arr[:, 1]
-                rad = data_arr[:, 2]
-                err  = data_arr[:, 3]
-                fit  = data_arr[:, 5]
-                for ifilt in range(Globals.nfilters-2):
-                    if ifilt <= 5:
-                        wavenumb[ifilt, ilat] = wavenb[ifilt]
-                        radiance[ifilt, ilat] = rad[ifilt]
-                        rad_err[ifilt, ilat]  = err[ifilt]
-                        rad_fit[ifilt, ilat]  = fit[ifilt]
-                    else:
-                        wavenumb[ifilt+2, ilat] = wavenb[ifilt]
-                        radiance[ifilt+2, ilat] = rad[ifilt]
-                        rad_err[ifilt+2, ilat]  = err[ifilt]
-                        rad_fit[ifilt+2, ilat]  = fit[ifilt]
+            if Globals.nfilters > 11:
+                if ((coor_axis[icoor] < 6)):
+                    wavenumb[:, icoor] = data_arr[:, 1]
+                    radiance[:, icoor] = data_arr[:, 2]
+                    rad_err[:, icoor]  = data_arr[:, 3]
+                    rad_fit[:, icoor]  = data_arr[:, 5]
+                elif (coor_axis[icoor] > 6):
+                    wavenb = data_arr[:, 1]
+                    rad = data_arr[:, 2]
+                    err  = data_arr[:, 3]
+                    fit  = data_arr[:, 5]
+                    if Globals.nfilters ==12:
+                        for ifilt in range(Globals.nfilters-1):
+                            if ifilt <= 5:
+                                wavenumb[ifilt, icoor] = wavenb[ifilt]
+                                radiance[ifilt, icoor] = rad[ifilt]
+                                rad_err[ifilt, icoor]  = err[ifilt]
+                                rad_fit[ifilt, icoor]  = fit[ifilt]
+                            else:
+                                wavenumb[ifilt+1, icoor] = wavenb[ifilt]
+                                radiance[ifilt+1, icoor] = rad[ifilt]
+                                rad_err[ifilt+1, icoor]  = err[ifilt]
+                                rad_fit[ifilt+1, icoor]  = fit[ifilt]
+                    elif Globals.nfilters ==13:
+                        for ifilt in range(Globals.nfilters-2):
+                            if ifilt <= 5:
+                                wavenumb[ifilt, icoor] = wavenb[ifilt]
+                                radiance[ifilt, icoor] = rad[ifilt]
+                                rad_err[ifilt, icoor]  = err[ifilt]
+                                rad_fit[ifilt, icoor]  = fit[ifilt]
+                            else:
+                                wavenumb[ifilt+2, icoor] = wavenb[ifilt]
+                                radiance[ifilt+2, icoor] = rad[ifilt]
+                                rad_err[ifilt+2, icoor]  = err[ifilt]
+                                rad_fit[ifilt+2, icoor]  = fit[ifilt]
+            else:
+                wavenumb[:, icoor] = data_arr[:, 1]
+                radiance[:, icoor] = data_arr[:, 2]
+                rad_err[:, icoor]  = data_arr[:, 3]
+                rad_fit[:, icoor]  = data_arr[:, 5]
 
-    return radiance, wavenumb, rad_err, rad_fit, latitude, nlat
+    return radiance, wavenumb, rad_err, rad_fit, coor_axis, ncoor
 
-def ReadprfFiles(filepath):
+def ReadprfFiles(filepath, over_axis):
     """ Read retrieved temperature and gases output profiles for all .prf files """
 
-    # Retrieve latitude-core_number correspondance
-    lat_core, nlat, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+    if over_axis=="latitude":
+        # Retrieve latitude-core_number correspondance
+        coor_core, ncoor, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+        
+    elif over_axis=="longitude":
+        # Retrieve longitude-core_number correspondance
+        coor_core, ncoor = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
     # Initialize output arrays
-    height      = np.empty((nlevel, nlat))          # height array which varies with latitude
+    height      = np.empty((nlevel, ncoor))          # height array which varies with latitude
     pressure    = np.empty((nlevel))                # pressure array 
-    temperature = np.empty((nlevel, nlat))          # temperature array with profiles for all latitude + pressure profiles ([:,0])
-    gases       = np.empty((nlevel, nlat, ngas))    # gases array with profiles for all latitude + pressure profiles ([:,0])
-    # Create a latitude array for plotting
-    latitude = np.asarray(lat_core[:,1], dtype='float')
+    temperature = np.empty((nlevel, ncoor))          # temperature array with profiles for all latitude + pressure profiles ([:,0])
+    gases       = np.empty((nlevel, ncoor, ngas))    # gases array with profiles for all latitude + pressure profiles ([:,0])
+    gases_id    = np.empty((ngas))
+    # Create a latitude or longitude array for plotting
+    coor_axis = np.asarray(coor_core[:,1], dtype='float')
     # Read and save retrieved profiles
-    for ilat in range(nlat):
-        ifile = int(lat_core[ilat, 0])
+    for icoor in range(ncoor):
+        ifile = int(coor_core[icoor, 0])
         with open(f"{filepath}/core_{ifile}/nemesis.prf") as f:
             # Read file
             lines = f.readlines()
+            # Store gases id
+            for igas in range(ngas):
+                id = lines[igas+2].split()
+                gases_id[igas] = id[0]
+                gases_id = np.asarray(gases_id, dtype=int)
             # Save file's data
             newline, filedata = [], []
             for iline, line in enumerate(lines[ngas+3::]):
@@ -142,27 +205,33 @@ def ReadprfFiles(filepath):
                 newline = []
             data_arr = np.asarray(filedata, dtype='float')
             # Split temperature and gases profiles in separate (dedicated) arrays
-            height[:, ilat]         = data_arr[:, 0]            # height profile
+            height[:, icoor]         = data_arr[:, 0]            # height profile
             pressure[:]             = data_arr[:, 1] * 1013.25  # pressure profile converted in mbar
-            temperature[:, ilat]    = data_arr[:, 2]            # temperature profile
+            temperature[:, icoor]    = data_arr[:, 2]            # temperature profile
             for igas in range(ngas):
-                gases[:, ilat, igas] = data_arr[:,igas+3]
+                gases[:, icoor, igas] = data_arr[:,igas+3]
     
-    return temperature, gases, latitude, height, pressure, nlat, nlevel, ngas
+    return temperature, gases, coor_axis, height, pressure, ncoor, nlevel, ngas, gases_id
 
-def ReadaerFiles(filepath):
+def ReadaerFiles(filepath, over_axis):
     """ Read retrieved aerosol output profiles for all .aer files """
 
-    # Retrieve latitude-core_number correspondance
-    lat_core, nlat, nlevel, _ = RetrieveLatitudeFromCoreNumber(fpath=f"{filepath}/core")
+    if over_axis=="latitude":
+        # Retrieve latitude-core_number correspondance
+        coor_core, ncoor, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+        
+    elif over_axis=="longitude":
+        # Retrieve longitude-core_number correspondance
+        coor_core, ncoor = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+
     # Initialize output arrays
-    aerosol = np.empty((nlevel, nlat)) # aerosol array with profiles for all latitude
-    height  = np.empty((nlevel, nlat)) # height array with profiles for all latitude 
-    # Create a latitude array for plotting
-    latitude = lat_core[:,1]
+    aerosol = np.empty((nlevel, ncoor)) # aerosol array with profiles for all latitude
+    height  = np.empty((nlevel, ncoor)) # height array with profiles for all latitude 
+    # Create a latitude or longitude array for plotting
+    coor_axis = coor_core[:,1]
     # Read and save retrieved profiles
-    for ilat in range(nlat):
-        ifile = int(lat_core[ilat, 0])
+    for icoor in range(ncoor):
+        ifile = int(coor_core[icoor, 0])
         with open(f"{filepath}/core_{ifile}/aerosol.prf") as f:
             lines = f.readlines()
             # Read and store aerosol profiles
@@ -176,7 +245,59 @@ def ReadaerFiles(filepath):
                 newline = []
             aer = np.asarray(data, dtype='float')
             # Split altitude and aerosol profiles in separate (dedicated) arrays
-            height[:, ilat] = aer[:,0]
-            aerosol[:, ilat]  = aer[:,1]
+            height[:, icoor] = aer[:,0]
+            aerosol[:, icoor]  = aer[:,1]
 
-    return aerosol, height, latitude, nlevel, nlat
+    return aerosol, height, coor_axis, nlevel, ncoor
+
+def ReadmreParametricTest(filepath):
+
+    ncores = 1000
+    radiance = np.empty((Globals.nfilters, ncores))
+    rad_err = np.empty((Globals.nfilters, ncores))
+    rad_fit = np.empty((Globals.nfilters, ncores))
+    rad_diff = np.empty((Globals.nfilters, ncores))
+    wavenumb = np.empty((Globals.nfilters, ncores))
+    coeffs = np.empty ((3, ncores))
+    radiance.fill(np.nan)
+    rad_err.fill(np.nan)
+    rad_fit.fill(np.nan)
+    rad_diff.fill(np.nan)
+    wavenumb.fill(np.nan) 
+    coeffs.fill(np.nan)
+    # Read and save retrieved profiles
+    for icore in range(ncores):
+        with open(f"{filepath}core_{icore+1}/nemesis.mre") as f:
+            # Read file
+            lines = f.readlines()
+            # Get dimensions
+            param = lines[1].split()
+            ispec = int(param[0])
+            ngeom = int(param[1])
+            nx    = int(param[3])
+            # Save file's data
+            newline, filedata = [], []
+            for iline, line in enumerate(lines[5:ngeom+5]):
+                l = line.split()
+                [newline.append(il) for il in l]
+                # Store data 
+                filedata.append(newline)
+                # Reset temporary variables
+                newline = []
+            data_arr = np.asarray(filedata, dtype='float')
+            # Fill the wavenumber, radiance prior, radiance error and radiance fitted arrays
+            wavenumb[:, icore] = data_arr[:, 1]
+            radiance[:, icore] = data_arr[:, 2]
+            rad_err[:, icore]  = data_arr[:, 3]
+            rad_fit[:, icore]  = data_arr[:, 5]
+            rad_diff[:, icore]  = data_arr[:, 6]
+    # Retrieve coefficients for the three hydrocarbons profiles in each core subdirectories        
+    for icore in range(ncores):
+        with open(f"{filepath}core_{icore+1}/coeff_hydrocarbons.txt") as f:
+            tmp = f.readlines()
+            tmp = tmp[0].split()
+            coeffs[0, icore] = tmp[0]
+            coeffs[1, icore] = tmp[1]
+            coeffs[2, icore] = tmp[2]
+
+    return radiance, wavenumb, rad_err, rad_fit, rad_diff, coeffs, ncores
