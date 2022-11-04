@@ -60,7 +60,56 @@ def PlotMeridProfiles(dataset, mode, files, singles, spectrals):
         plt.savefig(f"{dir}{wave}_calibration_merid_profiles.png", dpi=150, bbox_inches='tight')
         #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
         # Clear figure to avoid overlapping between plotting subroutines
-        plt.clf()
+        plt.close()
+
+    fig, ax = plt.subplots(6, 2, figsize=(12, 12), sharex=True, sharey=False)
+    iax = 0
+    for ifilt in [0,10,11,12,5,4,6,7,8,9,3,2,1]:
+        if ifilt < 6 or ifilt > 7:
+            irow = [0,1,1,2,2,3,3,4,4,5,5]
+            icol = [0,0,1,0,1,0,1,0,1,0,1]
+            ititle = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)', '(i)', '(j)', '(k)']
+            # Remove the frame of the empty subplot
+            ax[0][1].set_frame_on(False)
+            ax[0][1].tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+            # Get filter index for plotting spacecraft and calibrated data
+            _, wavl, wave, ifilt_sc, ifilt_v = SetWave(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)
+            
+            # subplot showing the averaging of each singles merid profiles (ignoring negative beam)
+            for ifile, fname in enumerate(files):
+                _, _, iwave, _, _ = SetWave(filename=fname, wavelength=None, wavenumber=None, ifilt=None)
+                if iwave == wave:
+                    ax[irow[iax]][icol[iax]].plot(singles[:, ifile, 0], singles[:, ifile, 3]*1.e9, lw=0, marker='.', markersize=2, color = 'black')
+            # Select the suitable spacecraft meridian profile
+            if ifilt_sc < 12:
+                # Use CIRS for N-Band
+                cirskeep = (cirs[:, ifilt_sc, 0] >= -70) & (cirs[:, ifilt_sc, 0] < 70)
+                ax[irow[iax]][icol[iax]].plot(cirs[cirskeep, ifilt_sc, 0], cirs[cirskeep, ifilt_sc, 1]*1.e9, color='green', lw=2, label='Cassini/CIRS')
+            else:
+                # Use IRIS for Q-Band
+                iriskeep = (iris[:, ifilt_sc, 0] >= -70) & (iris[:, ifilt_sc, 0] < 70)
+                ax[irow[iax]][icol[iax]].plot(iris[iriskeep, ifilt_sc, 0], iris[iriskeep, ifilt_sc, 1]*1.e9, color='green', lw=2, label='Voyager/IRIS')
+            # Plot the VLT/VISIR pole-to-pole meridian profile
+            ax[irow[iax]][icol[iax]].plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3]*1.e9, color='orange', lw=0, marker='o', markersize=2, label=f"{(wavl)}"+" $\mu$m")# at "+f"{abs(Globals.LCP)}"+"$^{\circ}$S")
+            ax[irow[iax]][icol[iax]].legend(fontsize=11)#, loc='lower right')
+            ax[irow[iax]][icol[iax]].grid()
+            ax[irow[iax]][icol[iax]].set_xlim(-90, 90)
+            ax[irow[iax]][icol[iax]].set_xticks([]) if (iax < 9) else ax[irow[iax]][icol[iax]].set_xticks(ticks=np.arange(-90, 90 , 30), labels=list(np.arange(-90, 90 , 30)))
+            ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
+            ax[irow[iax]][icol[iax]].set_title(ititle[iax], fontfamily='serif', loc='left', fontsize='medium')
+            iax+=1 
+    plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
+    plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+    plt.xlabel("Planetocentric Latitude", size=18)
+    # if spectrals[0, ifilt_v, 1] >=0 and spectrals[-1, ifilt_v, 1]>=0:
+    #     plt.xlim(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1]) 
+    #     plt.xticks(ticks=np.arange(360,-1,-60), labels=list(np.arange(360,-1,-60)))
+    plt.ylabel("Radiance (nW cm$^{-1}$ sr$^{-1}$)", size=18)
+    # Save figure showing calibation method 
+    plt.savefig(f"{dir}all_filters_calibration_merid_profiles.png", dpi=150, bbox_inches='tight')
+    #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
+    # Clear figure to avoid overlapping between plotting subroutines
+    plt.close()
 
 def PlotParaProfiles(dataset, mode, files, singles, spectrals):
     """ Plot parallel profiles """
@@ -95,7 +144,48 @@ def PlotParaProfiles(dataset, mode, files, singles, spectrals):
         plt.savefig(f"{dir}{wave}_parallel_profiles.png", dpi=150, bbox_inches='tight')
         #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
         # Clear figure to avoid overlapping between plotting subroutines
-        plt.clf()
+        plt.close()
+
+    # Create a subplots figures with all filters
+    fig, ax = plt.subplots(6, 2, figsize=(12, 12), sharex=True, sharey=False)
+    iax = 0
+    for ifilt in [0,10,11,12,5,4,6,7,8,9,3,2,1]:
+        if ifilt < 6 or ifilt > 7:
+            irow = [0,1,1,2,2,3,3,4,4,5,5]
+            icol = [0,0,1,0,1,0,1,0,1,0,1]
+            ititle = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)', '(i)', '(j)', '(k)']
+            # Remove the frame of the empty subplot
+            ax[0][1].set_frame_on(False)
+            ax[0][1].tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+            # Get filter index for plotting spacecraft and calibrated data
+            _, wavl, wave, _, ifilt_v = SetWave(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)
+            
+            # subplot showing the averaging of each singles merid profiles (ignoring negative beam)
+            for ifile, fname in enumerate(files):
+                _, _, iwave, _, _ = SetWave(filename=fname, wavelength=None, wavenumber=None, ifilt=None)
+                if iwave == wave:
+                    ax[irow[iax]][icol[iax]].plot(singles[:, ifile, 1], singles[:, ifile, 3]*1.e9, lw=0, marker='.', markersize=2, color = 'black')
+            ax[irow[iax]][icol[iax]].plot(spectrals[:, ifilt_v, 1], spectrals[:, ifilt_v, 3]*1.e9, color='orange', lw=0, marker='o', markersize=2, label=f"{(wavl)}"+" $\mu$m")# at "+f"{abs(Globals.LCP)}"+"$^{\circ}$S")
+            ax[irow[iax]][icol[iax]].legend(fontsize=12, loc='lower right')
+            ax[irow[iax]][icol[iax]].grid()
+            ax[irow[iax]][icol[iax]].set_xlim(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1])
+            ax[irow[iax]][icol[iax]].set_xticks([]) if (iax < 9) else ax[irow[iax]][icol[iax]].set_xticks(ticks=np.arange(360,-1,-60), labels=list(np.arange(360,-1,-60)))
+            ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
+            ax[irow[iax]][icol[iax]].set_title(ititle[iax], fontfamily='serif', loc='left', fontsize='medium')
+            iax+=1 
+    plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
+    plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+    plt.xlabel("System III West Longitude", size=18)
+    # if spectrals[0, ifilt_v, 1] >=0 and spectrals[-1, ifilt_v, 1]>=0:
+    #     plt.xlim(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1]) 
+    #     plt.xticks(ticks=np.arange(360,-1,-60), labels=list(np.arange(360,-1,-60)))
+    plt.ylabel("Radiance (nW cm$^{-1}$ sr$^{-1}$)", size=18)
+    # Save figure showing calibation method 
+    plt.savefig(f"{dir}all_filters_parallel_profiles.png", dpi=150, bbox_inches='tight')
+    #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
+    # Clear figure to avoid overlapping between plotting subroutines
+    plt.close()
+
 
 def PlotGlobalSpectrals(dataset, spectrals):
     """Basic code to plot the central meridian profiles with wavenumber
