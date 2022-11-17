@@ -4,7 +4,7 @@ import warnings
 import Globals
 from Tools.SetWave import SetWave
 
-def BinBiDimension(nfiles, spectrum, LCMIII):
+def BinRegional(nfiles, spectrum, LCMIII):
     """ Step 4: Create 2D aera average for each observation
         Step 5: Create 2D aera average for each wavelength"""
     
