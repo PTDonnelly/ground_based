@@ -20,6 +20,6 @@ def CalCylindricalMaps(files, ksingles, kspectrals):
         imgdata /= ksingles[ifile, 1]
         cyldata /= kspectrals[ifilt_v, 1]
         cyldata /= ksingles[ifile, 1]
-
+        print(f"{fpath}")
         # Write calibrated observations (images and cmaps) to .fits files
         WriteFits(filepath=f"{fpath}", imghead=imghead, imgdata=imgdata, cylhead=cylhead, cyldata=cyldata, muhead=muhead, mudata=mudata)

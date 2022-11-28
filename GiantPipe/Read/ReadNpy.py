@@ -54,7 +54,7 @@ def ReadCentralParallelNpy(dataset, mode, return_singles, return_spectrals):
 def ReadCentreToLimbNpy(mode, return_singles, return_spectrals):
     a=1
 
-def ReadBiDimension(dataset, mode, return_singles, return_spectrals):
+def ReadRegionalNpy(dataset, mode, return_singles, return_spectrals):
     """Read in pre-calculated maps and/or coefficients from local .npy files"""
 
     if return_singles:
@@ -78,3 +78,6 @@ def ReadBiDimension(dataset, mode, return_singles, return_spectrals):
         spectrals = None
 
     return singles, spectrals
+
+def ReadRegionalAverageNpy(dataset, mode, return_singles, return_spectrals):
+    a=1

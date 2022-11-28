@@ -9,37 +9,43 @@ def main():
     from Binning.CentralMerid import BinCentralMerid
     from Binning.CentralParallel import BinCentralPara
     from Binning.CentreToLimb import BinCentreToLimb
-    from Binning.CentralBiDim import BinBiDimension
+    from Binning.CentralRegional import BinRegional
+    from Binning.CentralRegionalAverage import BinRegionalAverage
     from Calibrate.CalibrateGBData import CalibrateGBData
     from Calibrate.CentralMerid import CalCentralMerid
     # from Calibrate.CylindricalMaps import CalCylindricalMaps
     from Plot.PlotProfiles import PlotMeridProfiles
     from Plot.PlotProfiles import PlotParaProfiles
     from Plot.PlotProfiles import PlotGlobalSpectrals
-    from Plot.PlotProfiles import PlotBiDimMaps
+    from Plot.PlotProfiles import PlotRegionalMaps
+    from Plot.PlotProfiles import PlotRegionalAverage
     from Plot.PlotMaps import PlotMaps
     from Read.ReadNpy import ReadCentralMeridNpy
     from Read.ReadNpy import ReadCentralParallelNpy
     from Read.ReadNpy import ReadCentreToLimbNpy
-    from Read.ReadNpy import ReadBiDimension
+    from Read.ReadNpy import ReadRegionalNpy
+    from Read.ReadNpy import ReadRegionalAverageNpy
     from Read.ReadSpx import ReadSpx
     from Write.WriteProfiles import WriteMeridProfiles
     from Write.WriteProfiles import WriteParallelProfiles
     from Write.WriteProfiles import WriteCentreToLimbProfiles
-    from Write.WriteProfiles import WriteBiDim
+    from Write.WriteProfiles import WriteRegional
+    from Write.WriteProfiles import WriteRegionalAverage
     from Write.WriteSpx import WriteMeridSpx
     from Write.WriteSpx import WriteParaSpx
     from Write.WriteSpx import WriteCentreToLimbSpx
-    from Write.WriteSpx import WriteBiDimSpx
+    from Write.WriteSpx import WriteRegionalSpx
+    from Write.WriteSpx import WriteRegionalAverageSpx
 
     # Define flags to configure pipeline
     calibrate   = False      # Read raw data and calibrate
     source      = 'fits'     # Source of data: local cmaps ('fits') or local numpy arrays ('npy')
     # Binning
     bin_cmerid  = False     # Use central meridian binning scheme
-    bin_cpara   = True     # Use central parallel binning scheme
+    bin_cpara   = False     # Use central parallel binning scheme
     bin_ctl     = False     # Use centre-to-limb binning scheme
-    bin_2d      = False     # Use 2d binning scheme (for a zoom retrieval)
+    bin_region  = False     # Use regional binning scheme (for a zoom retrieval)
+    bin_av_region = True   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
     save        = True      # Store calculated profiles to local files
     plotting    = True      # Plot calculated profiles
@@ -82,9 +88,10 @@ def main():
             spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning='bin_cmerid')
         if bin_cpara:
             spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning='bin_cpara')
-        if bin_2d:
-            spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning='bin_2d')
-
+        if bin_region:
+            spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning='bin_region')
+        if bin_av_region:
+            spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning='bin_av_region')
 
     if bin_cmerid:
         # Execute the central meridian binning scheme
@@ -144,22 +151,39 @@ def main():
             # Write mean central meridian profiles to spxfile
             WriteCentreToLimbSpx(dataset=dataset, mode=mode, spectrals=spectrals)
 
-    if bin_2d: 
+    if bin_region: 
         # Execute the bi-dimensional binning scheme 
         if 'fits' in source: 
-            singles, spectrals = BinBiDimension(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
+            singles, spectrals = BinRegional(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
         if 'npy' in source:
-            singles, spectrals = ReadBiDimension(dataset=dataset, mode=mode, return_singles=True, return_spectrals=True)
+            singles, spectrals = ReadRegionalNpy(dataset=dataset, mode=mode, return_singles=True, return_spectrals=True)
 
         if save:
             # Store calculated maps
-            WriteBiDim(dataset=dataset, files=files, singles=singles, spectrals=spectrals)
+            WriteRegional(dataset=dataset, files=files, singles=singles, spectrals=spectrals)
         if plotting:
             # Plot bi-dimensional maps
-            PlotBiDimMaps(dataset=dataset, mode=mode, spectrals=spectrals)
+            PlotRegionalMaps(dataset=dataset, mode=mode, spectrals=spectrals)
         if spx:
             # Write bi-dimensional maps to spxfile
-            WriteBiDimSpx(dataset=dataset, mode=mode, spectrals=spectrals)
+            WriteRegionalSpx(dataset=dataset, mode=mode, spectrals=spectrals)
+    
+    if bin_av_region: 
+        # Execute the bi-dimensional binning scheme 
+        if 'fits' in source: 
+            singles, spectrals = BinRegionalAverage(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
+        if 'npy' in source:
+            singles, spectrals = ReadRegionalAverageNpy(dataset=dataset, mode=mode, return_singles=True, return_spectrals=True)
+
+        if save:
+            # Store calculated maps
+            WriteRegionalAverage(dataset=dataset, files=files, singles=singles, spectrals=spectrals)
+        # if plotting:
+        #     # Plot bi-dimensional maps
+        #     PlotRegionalAverage(dataset=dataset, mode=mode, spectrals=spectrals)
+        if spx:
+            # Write bi-dimensional maps to spxfile
+            WriteRegionalAverageSpx(dataset=dataset, mode=mode, spectrals=spectrals)
 
     ############################################################
     # Read in calibrated data, calculated profiles or retrieved

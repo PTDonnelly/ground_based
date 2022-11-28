@@ -8,7 +8,7 @@ def BinRegionalAverage(nfiles, spectrum, LCMIII):
     """ Step 4: Create 2D aera average for each observation
         Step 5: Create 2D aera average for each wavelength"""
     
-    print('Calculating 2D spectral maps...')
+    print('Calculating average spectral of regional maps...')
 
     def singles(nfiles, spectrum, LCMIII):
         """Create 2D aera average for each observation"""
@@ -23,26 +23,36 @@ def BinRegionalAverage(nfiles, spectrum, LCMIII):
         lon_target1 = (Globals.lon_target - Globals.merid_width)
         lon_target2 = (Globals.lon_target + Globals.merid_width)
         for ilat, _ in enumerate(Globals.latgrid):
-            # print(ilat)
             # Define centre and edges of latitude bin
-            # clat = Globals.latrange[0] + (Globals.latstep)*ilat + (Globals.latstep/2)
-            # lat1 = Globals.latrange[0] + (Globals.latstep)*ilat
-            # lat2 = Globals.latrange[0] + (Globals.latstep)*(ilat+1)
-            # Check if the current ilat binning is contained in the target boxe
-            if (ilat >= lat_target1) & (ilat <= lat_target2):
+            lat1 = Globals.latrange[0] + (Globals.latstep)*ilat
+            lat2 = Globals.latrange[0] + (Globals.latstep)*(ilat+1)
+            # Check if the current ilat binning is surrounding the latitude target
+            if (lat1 >= Globals.lat_target-Globals.latstep) & (lat2 <= Globals.lat_target+Globals.latstep):
                 for ilon, _ in enumerate(Globals.longrid):
                     # Define centre and edges of longitude bin
-                    # clon = Globals.lonrange[0] - (Globals.lonstep)*ilon - (Globals.lonstep/2)
-                    # lon2 = Globals.lonrange[0] - (Globals.lonstep)*ilon
-                    # lon1 = Globals.lonrange[0] - (Globals.lonstep)*(ilon+1)
-                    # Check if the current ilon binning is contained in the target boxe
-                    if (ilon >= lon_target1) & (ilon <= lon_target2):
+                    lon2 = Globals.lonrange[0] - (Globals.lonstep)*ilon
+                    lon1 = Globals.lonrange[0] - (Globals.lonstep)*(ilon+1)
+                    # Check if the current ilon binning is surrounding the longitude target
+                    if (lon1 >= Globals.lon_target-Globals.lonstep) & (lon2 <= Globals.lon_target+Globals.lonstep):
                     # Loop over the spectrum array of each input file if ilat,ilon pixel is in the target boxe
                         for ifile in range(nfiles):
                             lats = spectrum[:, :, ifile, 0]
                             lons = spectrum[:, :, ifile, 1]
-                            keep = (lats >= lat_target1) & (lats < lat_target2) \
-                                 & (lons > lon_target1) & (lons <= lon_target2)
+
+                            if int(Globals.lon_target + Globals.merid_width) > 360:
+                                lon_target2 = (Globals.lon_target + Globals.merid_width) - 360
+                                if ilon <= 180:
+                                    keep = (lats >= lat_target1) & (lats < lat_target2) & (lons <= lon_target2)
+                                elif ilon > 180:
+                                    keep = (lats >= lat_target1) & (lats < lat_target2) & (lons >= lon_target1)
+                            elif int(Globals.lon_target - Globals.merid_width) < 0:
+                                lon_target1 = (Globals.lon_target - Globals.merid_width) + 360
+                                if ilon <= 180:
+                                    keep = (lats >= lat_target1) & (lats < lat_target2) & (lons >= lon_target2)
+                                elif ilon > 180:
+                                    keep = (lats >= lat_target1) & (lats < lat_target2) & (lons <= lon_target1)
+                            else:    
+                                keep = (lats >= lat_target1) & (lats < lat_target2) & (lons > lon_target1) & (lons <= lon_target2)
                             spx = spectrum[keep, ifile, :]
                             # Expect to see RuntimeWarnings in this block
                             with warnings.catch_warnings():
@@ -63,7 +73,7 @@ def BinRegionalAverage(nfiles, spectrum, LCMIII):
                                     single_paras[ilat, ilon, ifile, 3] = rad
                                     single_paras[ilat, ilon, ifile, 4] = rad_err
                                     single_paras[ilat, ilon, ifile, 5] = wavenum
-                                    # print(ilon, ifile, wavenum)
+                                    # print(ilat, ilon, ifile, wavenum)
                                     single_paras[ilat, ilon, ifile, 6] = view
         # Throw away zeros
         single_paras[single_paras == 0] = np.nan
@@ -84,28 +94,30 @@ def BinRegionalAverage(nfiles, spectrum, LCMIII):
             for ilat, _ in enumerate(Globals.latgrid):
                 # Define centre and edges of latitude bin
                 clat = Globals.latrange[0] + (Globals.latstep)*ilat + (Globals.latstep/2)
+                if (clat >= Globals.lat_target-Globals.latstep) & (clat <= Globals.lat_target+Globals.latstep):
                 # Loop over longitudes and create individual mean profiles
-                for ilon, _ in enumerate(Globals.longrid):
-                    # Define centre and edges of longitude bin
-                    clon = Globals.lonrange[0] - (Globals.lonstep)*ilon - (Globals.lonstep/2)
-                    # Select a filter to calculate average
-                    filters = single_paras[ilat, ilon, :, 5]
-                    keep = (filters == wave)
-                    spx = single_paras[ilat, ilon, keep, :]
-                    if np.any(spx):
-                        # Pull out variables
-                        mu       = bn.nanmin(spx[:, 2])
-                        rad      = bn.nanmax(spx[:, 3])
-                        rad_err  = bn.nanmean(spx[:, 4])
-                        wavenum  = spx[:, 5][0]
-                        # Store spectral paraional profiles
-                        spectral_paras[ilat, ilon, ifilt, 0] = clat
-                        spectral_paras[ilat, ilon, ifilt, 1] = clon
-                        spectral_paras[ilat, ilon, ifilt, 2] = mu
-                        spectral_paras[ilat, ilon, ifilt, 3] = rad
-                        spectral_paras[ilat, ilon, ifilt, 4] = rad_err
-                        spectral_paras[ilat, ilon, ifilt, 5] = wavenum
-                        print(spectral_paras[ilat, ilon, ifilt, 3])
+                    for ilon, _ in enumerate(Globals.longrid):
+                        # Define centre and edges of longitude bin
+                        clon = Globals.lonrange[0] - (Globals.lonstep)*ilon - (Globals.lonstep/2)
+                        if (clon >= Globals.lon_target-Globals.lonstep) & (clon <= Globals.lon_target+Globals.lonstep):
+                        # Define centre and edges of longitude bin
+                            # Select a filter to calculate average
+                            filters = single_paras[ilat, ilon, :, 5]
+                            keep = (filters == wave)
+                            spx = single_paras[ilat, ilon, keep, :]
+                            if np.any(spx):
+                                # Pull out variables
+                                mu       = bn.nanmin(spx[:, 2])
+                                rad      = bn.nanmax(spx[:, 3])
+                                rad_err  = bn.nanmean(spx[:, 4])
+                                wavenum  = spx[:, 5][0]
+                                # Store spectral paraional profiles
+                                spectral_paras[ilat, ilon, ifilt, 0] = Globals.lat_target
+                                spectral_paras[ilat, ilon, ifilt, 1] = Globals.lon_target
+                                spectral_paras[ilat, ilon, ifilt, 2] = mu
+                                spectral_paras[ilat, ilon, ifilt, 3] = rad
+                                spectral_paras[ilat, ilon, ifilt, 4] = rad_err
+                                spectral_paras[ilat, ilon, ifilt, 5] = wavenum
         # Throw away zeros
         spectral_paras[spectral_paras == 0] = np.nan
 
