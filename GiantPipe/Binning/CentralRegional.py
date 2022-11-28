@@ -14,7 +14,7 @@ def BinRegional(nfiles, spectrum, LCMIII):
         """Create 2D aera average for each observation"""
 
         # Create np.array for all individual mean profiles (one per file)
-        single_paras = np.zeros((Globals.nlatbins, Globals.nlonbins, nfiles, 7))
+        single_regions = np.zeros((Globals.nlatbins, Globals.nlonbins, nfiles, 7))
         # Loop over latitudes and create individual mean profiles
         print('Binning singles...')
         # Select lat-lon region around 2D aera to calculate average
@@ -57,24 +57,24 @@ def BinRegional(nfiles, spectrum, LCMIII):
                                     wavenum  = spx[:, 7][0]
                                     view     = spx[:, 8][0]
                                     # Store individual paraional profiles
-                                    single_paras[ilat, ilon, ifile, 0] = clat
-                                    single_paras[ilat, ilon, ifile, 1] = clon
-                                    single_paras[ilat, ilon, ifile, 2] = mu
-                                    single_paras[ilat, ilon, ifile, 3] = rad
-                                    single_paras[ilat, ilon, ifile, 4] = rad_err
-                                    single_paras[ilat, ilon, ifile, 5] = wavenum
+                                    single_regions[ilat, ilon, ifile, 0] = clat
+                                    single_regions[ilat, ilon, ifile, 1] = clon
+                                    single_regions[ilat, ilon, ifile, 2] = mu
+                                    single_regions[ilat, ilon, ifile, 3] = rad
+                                    single_regions[ilat, ilon, ifile, 4] = rad_err
+                                    single_regions[ilat, ilon, ifile, 5] = wavenum
                                     # print(ilon, ifile, wavenum)
-                                    single_paras[ilat, ilon, ifile, 6] = view
+                                    single_regions[ilat, ilon, ifile, 6] = view
         # Throw away zeros
-        single_paras[single_paras == 0] = np.nan
+        single_regions[single_regions == 0] = np.nan
 
-        return single_paras
+        return single_regions
 
-    def spectrals(nfiles, spectrum, single_paras):
+    def spectrals(nfiles, spectrum, single_regions):
         """Create 2D aera average for each wavelength"""
 
         # Create np.array for all spectral mean profiles (one per filter)
-        spectral_paras = np.zeros((Globals.nlatbins, Globals.nlonbins, Globals.nfilters, 6))
+        spectral_regions = np.zeros((Globals.nlatbins, Globals.nlonbins, Globals.nfilters, 6))
 
         print('Binning spectrals...')
         # Loop over filters and create mean spectral profiles
@@ -89,9 +89,9 @@ def BinRegional(nfiles, spectrum, LCMIII):
                     # Define centre and edges of longitude bin
                     clon = Globals.lonrange[0] - (Globals.lonstep)*ilon - (Globals.lonstep/2)
                     # Select a filter to calculate average
-                    filters = single_paras[ilat, ilon, :, 5]
+                    filters = single_regions[ilat, ilon, :, 5]
                     keep = (filters == wave)
-                    spx = single_paras[ilat, ilon, keep, :]
+                    spx = single_regions[ilat, ilon, keep, :]
                     if np.any(spx):
                         # Pull out variables
                         mu       = bn.nanmin(spx[:, 2])
@@ -99,17 +99,17 @@ def BinRegional(nfiles, spectrum, LCMIII):
                         rad_err  = bn.nanmean(spx[:, 4])
                         wavenum  = spx[:, 5][0]
                         # Store spectral paraional profiles
-                        spectral_paras[ilat, ilon, ifilt, 0] = clat
-                        spectral_paras[ilat, ilon, ifilt, 1] = clon
-                        spectral_paras[ilat, ilon, ifilt, 2] = mu
-                        spectral_paras[ilat, ilon, ifilt, 3] = rad
-                        spectral_paras[ilat, ilon, ifilt, 4] = rad_err
-                        spectral_paras[ilat, ilon, ifilt, 5] = wavenum
-                        print(spectral_paras[ilat, ilon, ifilt, 3])
+                        spectral_regions[ilat, ilon, ifilt, 0] = clat
+                        spectral_regions[ilat, ilon, ifilt, 1] = clon
+                        spectral_regions[ilat, ilon, ifilt, 2] = mu
+                        spectral_regions[ilat, ilon, ifilt, 3] = rad
+                        spectral_regions[ilat, ilon, ifilt, 4] = rad_err
+                        spectral_regions[ilat, ilon, ifilt, 5] = wavenum
+                        print(spectral_regions[ilat, ilon, ifilt, 3])
         # Throw away zeros
-        spectral_paras[spectral_paras == 0] = np.nan
+        spectral_regions[spectral_regions == 0] = np.nan
 
-        return spectral_paras
+        return spectral_regions
 
     singles = singles(nfiles, spectrum, LCMIII)
     spectrals = spectrals(nfiles, spectrum, singles)
