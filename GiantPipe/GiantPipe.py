@@ -85,13 +85,13 @@ def main():
     if 'fits' in source:
         # Generate arrays containing spatial and spectral information of each cylindrical map
         if bin_cmerid:
-            spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning='bin_cmerid')
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_cmerid')
         if bin_cpara:
-            spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning='bin_cpara')
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_cpara')
         if bin_region:
-            spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning='bin_region')
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_region')
         if bin_av_region:
-            spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files, binning='bin_av_region')
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_av_region')
 
     if bin_cmerid:
         # Execute the central meridian binning scheme
@@ -171,19 +171,19 @@ def main():
     if bin_av_region: 
         # Execute the bi-dimensional binning scheme 
         if 'fits' in source: 
-            singles, spectrals = BinRegionalAverage(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
+            singles, spectrals = BinRegionalAverage(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII, DATE=DATE, per_night=True, Nnight=4)
         if 'npy' in source:
             singles, spectrals = ReadRegionalAverageNpy(dataset=dataset, mode=mode, return_singles=True, return_spectrals=True)
 
         if save:
             # Store calculated maps
-            WriteRegionalAverage(dataset=dataset, files=files, singles=singles, spectrals=spectrals)
+            WriteRegionalAverage(dataset=dataset, files=files, singles=singles, spectrals=spectrals, per_night=True, Nnight=4)
         # if plotting:
         #     # Plot bi-dimensional maps
         #     PlotRegionalAverage(dataset=dataset, mode=mode, spectrals=spectrals)
         if spx:
             # Write bi-dimensional maps to spxfile
-            WriteRegionalAverageSpx(dataset=dataset, mode=mode, spectrals=spectrals)
+            WriteRegionalAverageSpx(dataset=dataset, mode=mode, spectrals=spectrals, per_night=True, Nnight=4)
 
     ############################################################
     # Read in calibrated data, calculated profiles or retrieved

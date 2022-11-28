@@ -27,6 +27,7 @@ def RegisterMaps(files, binning):
     wavelength     = np.empty(Nfiles)
     wavenumber     = np.empty(Nfiles)
     LCMIII         = np.empty(Nfiles)
+    DATE           = [None]*(Nfiles)
 
     # Define flags
     pg2pc = 0                   # Optional conversion of latitudes from planetographic to planetocentric
@@ -43,6 +44,9 @@ def RegisterMaps(files, binning):
         posang  = imghead['HIERARCH ESO ADA POSANG'] + 360
         view = 1 if chopang == posang else -1
         viewing_mode[ifile] = view
+
+        # Store observaing date
+        DATE[ifile] = cylhead['DATE-OBS']
         
         # Store central meridian longitude
         LCMIII[ifile] = cylhead['LCMIII']
@@ -101,4 +105,4 @@ def RegisterMaps(files, binning):
                     spectrum[y, x, ifile, 7] = wavenum
                     spectrum[y, x, ifile, 8] = view
     
-    return spectrum, wavelength, wavenumber, LCMIII
+    return spectrum, wavelength, wavenumber, LCMIII, DATE
