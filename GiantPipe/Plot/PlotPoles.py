@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import matplotlib.path as mpath
 import cartopy.crs as ccrs
 import Globals
-from Tools.VisirFilterInfo import Wavenumbers
+from Tools.VisirFilterInfo import Wavenumbers, Wavelengths
+from Tools.SetWave import SetWave
 from matplotlib import ticker
 
 def PlotPolesFromGlobal(dataset):
@@ -31,120 +32,175 @@ def PlotPolesFromGlobal(dataset):
     
     #  Subplot figure with both hemisphere
     for ifilt in range(Nfilters):
-        if dataset == '2018May':
-            # Retrive wavenumber corresponding to ifilt
-            filt = Wavenumbers(ifilt)
-            adj_location = 'average' if ifilt < 10 else 'southern'
-            globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps_{adj_location}_adj.npy')
-        elif dataset == '2022July' or dataset == '2022August':
-            if ifilt == 4: 
-                filt = Wavenumbers(ifilt+1)
-            elif ifilt > 5: 
-                filt = Wavenumbers(ifilt+2)
-            else:
-                filt = Wavenumbers(ifilt)
-            globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps.npy')
-        # Set extreme values for mapping
-        max = np.nanmax(globalmap[ifilt, :, :]) 
-        min = np.nanmin(globalmap[ifilt, :, :])
         if ifilt < 6 or ifilt > 7:
+            if dataset == '2018May':
+                # Retrive wavenumber corresponding to ifilt
+                filt = Wavenumbers(ifilt)
+                adj_location = 'average' if ifilt < 10 else 'southern'
+                globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps_{adj_location}_adj.npy')
+            elif dataset == '2022July' or dataset == '2022August':
+                if ifilt == 4: 
+                    filt = Wavenumbers(ifilt+1)
+                elif ifilt > 5: 
+                    filt = Wavenumbers(ifilt+2)
+                else:
+                    filt = Wavenumbers(ifilt)
+                globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps.npy')
+            # Set extreme values for mapping
+            max = np.nanmax(globalmap[ifilt, :, :]) 
+            min = np.nanmin(globalmap[ifilt, :, :])
+        
             northkeep = ((lat > 15) & (lat < 75))
             max_north = np.nanmax(globalmap[ifilt, northkeep, :])
             min_north = np.nanmin(globalmap[ifilt, northkeep, :]) 
-        southkeep = ((lat < -15) & (lat > -75))
-        max_south = np.nanmax(globalmap[ifilt, southkeep, :])
-        min_south = np.nanmin(globalmap[ifilt, southkeep, :])
+            southkeep = ((lat < -15) & (lat > -75))
+            max_south = np.nanmax(globalmap[ifilt, southkeep, :])
+            min_south = np.nanmin(globalmap[ifilt, southkeep, :])
 
 
-        plt.figure(figsize=(15, 8), dpi=300)
-        # Northern pole subplot
-        proj = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
-                                        central_latitude=central_lat, globe=None)
-        ax1 = plt.subplot2grid((1, 2), (0, 0), projection = proj)
-        ax1.imshow(globalmap[ifilt, :, :], \
-                        transform=ccrs.PlateCarree(central_longitude=central_lon), \
-                        origin='lower', extent=[0, 360, -90, 90], vmin=min, vmax=max, \
-                        regrid_shape=1000, cmap='inferno')
-        # Define locations of longitude labels and write them
-        CustomLongitudeLabels(ax1, central_lat, lat_lim, num_merid)
-        # Define locations of latitude labels and write them along lon_to_write array
-        CustomLatitudeLabels(ax1, central_lat, lat_lim, num_parra, num_merid, lon_to_write)
-        # Set the boundary of the polar projection
-        CustomBoundaryLatitude(ax1, proj, lat_lim)
-        # Draw the gridlines without the default labels        
-        ax1.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
-                        xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel), linestyle='--')
-        # Southern pole subplot
-        proj = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
-                                        central_latitude=-central_lat, globe=None)
-        ax2 = plt.subplot2grid((1, 2), (0, 1), projection = proj)
-        im = ax2.imshow(globalmap[ifilt, :, :], \
-                        transform=ccrs.PlateCarree(central_longitude=central_lon), \
-                        origin='lower', extent=[0, 360, -90, 90], vmin=min, vmax=max, \
-                        regrid_shape=1000, cmap='inferno')
-        # Define locations of longitude labels and write them
-        CustomLongitudeLabels(ax2, -central_lat, -lat_lim, num_merid)
-        # Define locations of latitude labels and write them along lon_to_write array
-        CustomLatitudeLabels(ax2, -central_lat, -lat_lim, num_parra, num_merid, lon_to_write)
-        # Set the boundary of the polar projection
-        CustomBoundaryLatitude(ax2, proj, -lat_lim)
-        # Draw the gridlines without the default labels        
-        ax2.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
-                        xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
-        # Define a colorbar
-        cax = plt.axes([0.1, 0.1, 0.8, 0.03])
-        cbar = plt.colorbar(im, cax=cax, extend='both', orientation='horizontal')
-        #cbar.ax.tick_params(labelsize=15)
-        cbar.set_label("Brightness Temperature [K]")
-        # Save pole map figure of the current filter
-        if dataset== '2018May': 
-            plt.savefig(f"{dir}calib_{filt}_pole_maps_{adj_location}_adj.png", dpi=300)
-            plt.savefig(f"{dir}calib_{filt}_pole_maps_{adj_location}_adj.eps", dpi=300)
-        else:
-            plt.savefig(f"{dir}calib_{filt}_pole_maps.png", dpi=300)
-            plt.savefig(f"{dir}calib_{filt}_pole_maps.eps", dpi=300)
-        # Clear figure to avoid overlapping between plotting subroutines
-        plt.close()
-    
-
-        plt.figure(figsize=(9, 5), dpi=300)
-        if ifilt < 6 or ifilt > 7:
+            plt.figure(figsize=(15, 5))
+            # Northern pole subplot
+            proj = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
+                                            central_latitude=central_lat, globe=None)
+            ax1 = plt.subplot2grid((1, 2), (0, 0), projection = proj)
+            ax1.imshow(globalmap[ifilt, :, :], \
+                            transform=ccrs.PlateCarree(central_longitude=central_lon), \
+                            origin='lower', extent=[0, 360, -90, 90], vmin=min, vmax=max, \
+                            regrid_shape=1000, cmap='inferno')
+            # Define locations of longitude labels and write them
+            CustomLongitudeLabels(ax1, central_lat, lat_lim, num_merid)
+            # Define locations of latitude labels and write them along lon_to_write array
+            CustomLatitudeLabels(ax1, central_lat, lat_lim, num_parra, num_merid, lon_to_write)
+            # Set the boundary of the polar projection
+            CustomBoundaryLatitude(ax1, proj, lat_lim)
+            # Draw the gridlines without the default labels        
+            ax1.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
+                            xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel), linestyle='--')
+            # Southern pole subplot
+            proj = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
+                                            central_latitude=-central_lat, globe=None)
+            ax2 = plt.subplot2grid((1, 2), (0, 1), projection = proj)
+            im = ax2.imshow(globalmap[ifilt, :, :], \
+                            transform=ccrs.PlateCarree(central_longitude=central_lon), \
+                            origin='lower', extent=[0, 360, -90, 90], vmin=min, vmax=max, \
+                            regrid_shape=1000, cmap='inferno')
+            # Define locations of longitude labels and write them
+            CustomLongitudeLabels(ax2, -central_lat, -lat_lim, num_merid)
+            # Define locations of latitude labels and write them along lon_to_write array
+            CustomLatitudeLabels(ax2, -central_lat, -lat_lim, num_parra, num_merid, lon_to_write)
+            # Set the boundary of the polar projection
+            CustomBoundaryLatitude(ax2, proj, -lat_lim)
+            # Draw the gridlines without the default labels        
+            ax2.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
+                            xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
+            # Define a colorbar
+            cax = plt.axes([0.1, 0.1, 0.8, 0.03])
+            cbar = plt.colorbar(im, cax=cax, extend='both', orientation='horizontal')
+            #cbar.ax.tick_params(labelsize=15)
+            cbar.set_label("Brightness Temperature [K]")
+            # Save pole map figure of the current filter
+            filt = Wavenumbers(ifilt)
+            if dataset== '2018May': 
+                plt.savefig(f"{dir}calib_{filt}_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
+                # plt.savefig(f"{dir}calib_{filt}_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+            else:
+                plt.savefig(f"{dir}calib_{filt}_pole_maps.png", dpi=150, bbox_inches='tight')
+                # plt.savefig(f"{dir}calib_{filt}_pole_maps.eps", dpi=150, bbox_inches='tight')
+            # Clear figure to avoid overlapping between plotting subroutines
+            plt.close()
+           
             # Northern pole figure
-            PlotOnePole(img=globalmap[ifilt,:,:], vmin=min_north, vmax=max_north, \
+            PlotOnePole(img=globalmap[ifilt,:,:], filter=filt, vmin=min_north, vmax=max_north, \
                 central_longitude=central_lon, central_latitude=central_lat, \
                 latitude_limit=lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
                 longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
             # Save north pole map figure of the current filter
             if dataset== '2018May':
-                plt.savefig(f"{dir}calib_{filt}_north_pole_maps_{adj_location}_adj.png", dpi=300)
-                plt.savefig(f"{dir}calib_{filt}_north_pole_maps_{adj_location}_adj.eps", dpi=300)
+                plt.savefig(f"{dir}calib_{filt}_north_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
+                # plt.savefig(f"{dir}calib_{filt}_north_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
             else:
-                plt.savefig(f"{dir}calib_{filt}_north_pole_maps.png", dpi=300)
-                plt.savefig(f"{dir}calib_{filt}_north_pole_maps.eps", dpi=300)
+                plt.savefig(f"{dir}calib_{filt}_north_pole_maps.png", dpi=150, bbox_inches='tight')
+                # plt.savefig(f"{dir}calib_{filt}_north_pole_maps.eps", dpi=150, bbox_inches='tight')
             # Clear figure to avoid overlapping between plotting subroutines
             plt.close()
     
-        # Southern pole figure
-        plt.figure(figsize=(9, 5), dpi=300)
-        PlotOnePole(img=globalmap[ifilt,:,:], vmin=min_south, vmax=max_south, \
-            central_longitude=central_lon, central_latitude=-central_lat, \
-            latitude_limit=-lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
-            longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
-        # Save south pole map figure of the current filter 
-        if dataset == '2018May':
-            plt.savefig(f"{dir}calib_{filt}_south_pole_maps_{adj_location}_adj.png", dpi=300)
-            plt.savefig(f"{dir}calib_{filt}_south_pole_maps_{adj_location}_adj.eps", dpi=300)
-        else:
-            plt.savefig(f"{dir}calib_{filt}_south_pole_maps.png", dpi=300)
-            plt.savefig(f"{dir}calib_{filt}_south_pole_maps.eps", dpi=300)
-        # Clear figure to avoid overlapping between plotting subroutines
-        plt.close()
+            # Southern pole figure
+            PlotOnePole(img=globalmap[ifilt,:,:], filter=filt, vmin=min_south, vmax=max_south, \
+                central_longitude=central_lon, central_latitude=-central_lat, \
+                latitude_limit=-lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
+                longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
+            # Save south pole map figure of the current filter 
+            if dataset == '2018May':
+                plt.savefig(f"{dir}calib_{filt}_south_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
+                # plt.savefig(f"{dir}calib_{filt}_south_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+            else:
+                plt.savefig(f"{dir}calib_{filt}_south_pole_maps.png", dpi=150, bbox_inches='tight')
+                # plt.savefig(f"{dir}calib_{filt}_south_pole_maps.eps", dpi=150, bbox_inches='tight')
+            # Clear figure to avoid overlapping between plotting subroutines
+            plt.close()
 
-def PlotOnePole(img, vmin, vmax, central_longitude, central_latitude, latitude_limit, \
+
+        # Create a subplots figures with all filters
+    # projection = ccrs.AzimuthalEquidistant(central_longitude=central_lon, \
+    #                                         central_latitude=central_lat, globe=None)
+    # ax = plt.subplot2grid(6, 2, figsize=(12, 12), projection = projection)
+    # iax = 0
+    # for ifilt in [0,10,11,12,5,4,6,7,8,9,3,2,1]:
+    #     if ifilt < 6 or ifilt > 7:
+    #         irow = [0,1,1,2,2,3,3,4,4,5,5]
+    #         icol = [0,0,1,0,1,0,1,0,1,0,1]
+    #         ititle = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)', '(i)', '(j)', '(k)']
+            
+
+    #         # Remove the frame of the empty subplot
+    #         ax[0][1].set_frame_on(False)
+    #         ax[0][1].tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+
+    #         im = ax[irow[iax]][icol[iax]].imshow(globalmap[ifilt,:,:], transform=ccrs.PlateCarree(central_longitude=central_lon), \
+    #                         origin='lower', extent=[0, 360, -90, 90], vmin=min_south, vmax=max_south, \
+    #                         regrid_shape=1000, cmap='inferno')
+    #         # Define locations of longitude labels and write them
+    #         CustomLongitudeLabels(axes=ax[irow[iax]][icol[iax]], clat=central_lat, lat_lim=lat_lim, num_merid=num_merid)
+    #         # Define locations of latitude labels and write them along lon_to_write array
+    #         CustomLatitudeLabels(axes=ax[irow[iax]][icol[iax]], clat=central_lat, lat_lim=lat_lim, num_parra=num_parra, 
+    #                                 num_merid=num_merid, lon_to_write=lon_to_write)
+    #         # Set the boundary of the polar projection
+    #         CustomBoundaryLatitude(axes=ax[irow[iax]][icol[iax]], proj=projection, lat_lim=lat_lim)
+    #         # Draw the gridlines without the default labels        
+    #         ax[irow[iax]][icol[iax]].gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
+    #                         xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
+    #         ax[irow[iax]][icol[iax]].set_title(ititle[iax], fontfamily='serif', loc='left', fontsize=12)
+    #         # Define a colorbar
+    #         # cax = plt.axes([0.75, 0.1, 0.02, 0.8])
+    #         # cbar = plt.colorbar(im, cax=ax[irow[iax]][icol[iax]], format="%.0f", extend='both')#, fraction=0.046, pad=0.05)
+    #         # cbar.ax.tick_params(labelsize=12)
+    #         # cbar.locator = ticker.MaxNLocator(nbins=10)
+    #         # cbar.update_ticks()
+    #         # filter = Wavelengths(ifilt)
+    #         # cbar.set_label(r" T$_{B}$ [K] at "+f"{filter}"+r" $\mu$m", size=15)
+
+    #         # ax[irow[iax]][icol[iax]].PlotOnePole(img=globalmap[ifilt,:,:], filter=filt, vmin=min_south, vmax=max_south, \
+    #         # central_longitude=central_lon, central_latitude=-central_lat, \
+    #         # latitude_limit=-lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
+    #         # longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
+    #         iax +=1
+    # # Save south pole map figure of the current filter 
+    # if dataset == '2018May':
+    #     plt.savefig(f"{dir}calib_all_south_pole_maps.png", dpi=150, bbox_inches='tight')
+    #     # plt.savefig(f"{dir}calib_all_south_pole_maps.eps", dpi=150, bbox_inches='tight')
+    # else:
+    #     plt.savefig(f"{dir}calib_all_south_pole_maps.png", dpi=150, bbox_inches='tight')
+    #     # plt.savefig(f"{dir}calib_all_south_pole_maps.eps", dpi=150, bbox_inches='tight')
+    #     # Clear figure to avoid overlapping between plotting subroutines
+    #     plt.close()
+            
+
+
+def PlotOnePole(img, filter, vmin, vmax, central_longitude, central_latitude, latitude_limit, \
                 number_meridian, number_parrallel, longitude_to_write, \
                 delta_meridian, delta_parallel):
     """ Setting routine to make pretty polar projection for a single pole"""
-
+    plt.figure(figsize=(8, 3))
     projection = ccrs.AzimuthalEquidistant(central_longitude=central_longitude, \
                                             central_latitude=central_latitude, globe=None)
     ax = plt.axes(projection = projection)
@@ -162,12 +218,12 @@ def PlotOnePole(img, vmin, vmax, central_longitude, central_latitude, latitude_l
     ax.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
                     xlocs=range(-180,180,delta_meridian), ylocs=range(-90,91,delta_parallel),linestyle='--')
     # Define a colorbar
-    cax = plt.axes([0.85, 0.1, 0.03, 0.8])
+    cax = plt.axes([0.75, 0.1, 0.02, 0.8])
     cbar = plt.colorbar(im, cax=cax, format="%.0f", extend='both')#, fraction=0.046, pad=0.05)
-    cbar.ax.tick_params(labelsize=20)
+    cbar.ax.tick_params(labelsize=12)
     cbar.locator = ticker.MaxNLocator(nbins=10)
     cbar.update_ticks()
-    cbar.set_label("Brightness Temperature [K]", size=15)
+    cbar.set_label(r" T$_{B}$ [K] at "+f"{int(filter)}"+r" cm$^{-1}$", size=15)
 
 def CustomLongitudeLabels(axes, clat, lat_lim, num_merid):
     """ Small routine to define the longitude labels of the polar projection """
@@ -179,9 +235,9 @@ def CustomLongitudeLabels(axes, clat, lat_lim, num_merid):
 
     for (alon, alat) in zip(lond, latd):
         if clat>0:
-            projx, projy = axes.projection.transform_point(alon, lat_lim-2., ccrs.Geodetic())
+            projx, projy = axes.projection.transform_point(alon, lat_lim-3., ccrs.Geodetic())
         if clat<0:
-            projx, projy = axes.projection.transform_point(alon, lat_lim+2., ccrs.Geodetic())
+            projx, projy = axes.projection.transform_point(alon, lat_lim+3., ccrs.Geodetic())
         # Define the labeling orientation depending of the longitude value
         if alon>0 and alon<180:
             ha = 'left'
@@ -204,10 +260,10 @@ def CustomLongitudeLabels(axes, clat, lat_lim, num_merid):
         # Write the longitude labels 
         if (alon<360. and alon>0):
             txt = f"{int(360-alon)}"+degree_symbol+'W'
-            axes.text(projx, projy, txt, va=va, ha=ha, color='black',fontsize = 20)
+            axes.text(projx, projy, txt, va=va, ha=ha, color='black',fontsize = 12)
         if (alon==0):
             txt = f"{int(alon)}"+degree_symbol+'W'
-            axes.text(projx, projy, txt, va=va, ha=ha, color='black',fontsize = 20)
+            axes.text(projx, projy, txt, va=va, ha=ha, color='black',fontsize = 12)
 
 def CustomLatitudeLabels(axes, clat, lat_lim, num_parra, num_merid, lon_to_write):
     """ Small routine to define the latitude labels of the polar projection """
@@ -224,12 +280,12 @@ def CustomLatitudeLabels(axes, clat, lat_lim, num_parra, num_merid, lon_to_write
         if (clat < 0 and alat <= -20 and alat >- 90):
             projx, projy = axes.projection.transform_point(alon, alat, ccrs.Geodetic())
             txt = f"{int(alat)}"+ degree_symbol
-            axes.text(projx, projy, txt, va='center', ha='center', color='white',fontsize = 15) 
+            axes.text(projx, projy, txt, va='center', ha='center', color='white',fontsize = 8) 
         # Northern hemisphere labelisation
         if (clat > 0 and alat >= 20 and alat < 90):
             projx, projy = axes.projection.transform_point(alon, alat, ccrs.Geodetic())
             txt = f"{int(alat)}"+degree_symbol
-            axes.text(projx, projy, txt, va='center', ha='center', color='white',fontsize = 15)
+            axes.text(projx, projy, txt, va='center', ha='center', color='white',fontsize = 8)
 
 def CustomBoundaryLatitude(axes, proj, lat_lim):
     """ Small routine to define the latitude limit of the polar projection """

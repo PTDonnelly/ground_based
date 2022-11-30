@@ -2,7 +2,7 @@ import os
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
-from Read.ReadPrior import ReadTemperaturePriorProfile, ReadAerosolPriorProfile
+from Read.ReadPrior import ReadTemperatureGasesPriorProfile, ReadAerosolPriorProfile
 
 def PlotTemperaturePriorProfiles():
 
@@ -16,7 +16,7 @@ def PlotTemperaturePriorProfiles():
     filename = ['jupiter_v2021', 'jupiter_v2016']
     for fname in filename:
         # Read profile data from NEMESIS prior file 
-        _, pressure, temperature, gas, gasname, nlevel, ngas = ReadTemperaturePriorProfile(f"{fpath}{fname}.prf")
+        _, pressure, temperature, gas, gasname, nlevel, ngas = ReadTemperatureGasesPriorProfile(f"{fpath}{fname}.prf")
 
         # Create a figure
         fig, axes = plt.subplots(1, ngas+1, figsize=(12,6), sharey=True)
@@ -38,8 +38,8 @@ def PlotTemperaturePriorProfiles():
         plt.xlabel("Volume Mixing Ratio", size=15)
         plt.title(f"{fname}", size=15)
         # Save figure in the retrievals outputs directory
-        plt.savefig(f"{dir}{fname}_prior_profiles.png", dpi=300)
-        plt.savefig(f"{dir}{fname}_prior_profiles.eps", dpi=300)
+        plt.savefig(f"{dir}{fname}_prior_profiles.png", dpi=150, bbox_inches='tight')
+        plt.savefig(f"{dir}{fname}_prior_profiles.eps", dpi=150, bbox_inches='tight')
         # Clear figure to avoid overlapping between plotting subroutines
         plt.clf()
         
@@ -70,8 +70,8 @@ def PlotAerosolPriorProfiles():
     plt.ylabel("Height [km]", size=20)
     plt.xlabel("?", size=20)
     # Save figure in the retrievals outputs directory
-    plt.savefig(f"{dir}aerosol_prior_profiles.png", dpi=300)
-    plt.savefig(f"{dir}aerosol_prior_profiles.eps", dpi=300)
+    plt.savefig(f"{dir}aerosol_prior_profiles.png", dpi=150, bbox_inches='tight')
+    plt.savefig(f"{dir}aerosol_prior_profiles.eps", dpi=150, bbox_inches='tight')
     # Clear figure to avoid overlapping between plotting subroutines
     plt.clf()
 
@@ -94,8 +94,8 @@ def PlotAerosolPriorProfiles():
         plt.xlabel("?", size=20)
         plt.title(f"{fname}", size=20)
         # Save figure in the retrievals outputs directory
-        plt.savefig(f"{dir}{fname}_prior_profiles.png", dpi=300)
-        plt.savefig(f"{dir}{fname}_prior_profiles.eps", dpi=300)
+        plt.savefig(f"{dir}{fname}_prior_profiles.png", dpi=150, bbox_inches='tight')
+        plt.savefig(f"{dir}{fname}_prior_profiles.eps", dpi=150, bbox_inches='tight')
         # Clear figure to avoid overlapping between plotting subroutines
         plt.clf()
         

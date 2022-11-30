@@ -35,6 +35,6 @@ def PlotSpxMerid(dataset):
         plt.xlabel("Latitude", size=20)
         plt.ylabel("Radiance [nW cm$^{-2}$ sr$^{-1}$ cm]", size=20)
         # Save figure in the retrievals outputs directory
-        plt.savefig(f"{subdir}spx_merid_radiance_at_{wavenumb[ifilt]}.png", dpi=300)
+        plt.savefig(f"{subdir}spx_merid_radiance_at_{wavenumb[ifilt]}.png", dpi=150, bbox_inches='tight')
         # Close figure to avoid overlapping between plotting subroutines
         plt.close()

@@ -57,8 +57,8 @@ def PlotMeridProfiles(dataset, files, singles, spectrals):
         plt.ylabel("Radiance (W cm$^{-2}$ sr$^{-1}$ (cm$^{-1}$)$^{-1}$)", size=15)
         # Save figure showing calibation method 
         filt = Wavenumbers(ifilt)
-        plt.savefig(f"{dir}{filt}_calibration_merid_profiles.png", dpi=900)
-        plt.savefig(f"{dir}{filt}_calibration_merid_profiles.eps", dpi=900)
+        plt.savefig(f"{dir}{filt}_calibration_merid_profiles.png", dpi=150, bbox_inches='tight')
+        plt.savefig(f"{dir}{filt}_calibration_merid_profiles.eps", dpi=150, bbox_inches='tight')
     # Clear figure to avoid overlapping between plotting subroutines
     plt.clf()
 

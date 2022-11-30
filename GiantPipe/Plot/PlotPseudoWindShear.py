@@ -97,11 +97,11 @@ def PlotPseudoWindShear(dataset):
         # Save figure
         if dataset == '2018May':
             adj_location = 'average' if ifilt < 10 else 'southern'
-            plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear_{adj_location}_adj.png", dpi=300)
-            plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear_{adj_location}_adj.eps", dpi=300)
+            plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
         else:
-            plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear.png", dpi=300)
-            plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear.eps", dpi=300)
+            plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear.png", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear.eps", dpi=150, bbox_inches='tight')
 
 def PlotCompositePseudoWindShear(dataset):
     """ Plotting thermal shear using stored global maps numpy array """
@@ -198,6 +198,6 @@ def PlotCompositePseudoWindShear(dataset):
         print(iaxes, ifilt)
         iaxes += 1
     # Save figure 
-    plt.savefig(f"{dir}calib_pseudo_wind_shear.png", dpi=300)
-    plt.savefig(f"{dir}calib_pseudo_wind_shear.eps", dpi=300)
+    plt.savefig(f"{dir}calib_pseudo_wind_shear.png", dpi=150, bbox_inches='tight')
+    plt.savefig(f"{dir}calib_pseudo_wind_shear.eps", dpi=150, bbox_inches='tight')
     plt.close()
