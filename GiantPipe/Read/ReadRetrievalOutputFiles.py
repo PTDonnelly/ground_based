@@ -35,6 +35,14 @@ def RetrieveLongitudeFromCoreNumber(fpath):
     lon_core = np.empty((ncore, 2)) # 2D array containing longitude and core directory number
     # Read all .prf files through all core directories
     for ifile in range(ncore):
+        filename = f"{fpath}_{ifile+1}/nemesis.prf"
+        with open(filename) as f:
+            # Read header contents
+            lines = f.readlines()
+            # Save header information
+            prior_param = lines[1].split()
+            nlevel             = int(prior_param[2])
+            ngas               = int(prior_param[3])
         filename = f"{fpath}_{ifile+1}/nemesis.mre"
         with open(filename) as f:
             # Read header contents
@@ -47,18 +55,61 @@ def RetrieveLongitudeFromCoreNumber(fpath):
     lon_core = sorted(lon_core, key=operator.itemgetter(1))
     lon_core = np.asarray(lon_core, dtype='float')
 
-    return lon_core, ncore
+    return lon_core, ncore, nlevel, ngas
+
+def RetrieveLongitudeLatitudeFromCoreNumber(fpath):
+    """ Function to retrieve longitude and latitude
+        value from the .mre file of each core
+        subdirectory in case of 2D retrieval """
+    # Initialize local variables
+    ncore = int(800)                # number of core directories (800-1), 
+                                    # which is also equivalent to the number of longitude points 
+    lat_lon_core = np.empty((ncore, 3)) # 3D array containing latitude, longitude and core directory number
+    # Read all .prf files through all core directories
+    for ifile in range(ncore):
+        filename = f"{fpath}_{ifile+1}/nemesis.prf"
+        with open(filename) as f:
+            # Read header contents
+            lines = f.readlines()
+            # Save header information
+            prior_param = lines[1].split()
+            nlevel             = int(prior_param[2])
+            ngas               = int(prior_param[3])
+        filename = f"{fpath}_{ifile+1}/nemesis.mre"
+        with open(filename) as f:
+            # Read header contents
+            lines = f.readlines()
+            # Save header information
+            prior_param = lines[2].split()
+            lat_lon_core[ifile, 0] = int(ifile+1)               # Store core number
+            lat_lon_core[ifile, 1] = float(prior_param[0])      # Store corresponding latitude value
+            lat_lon_core[ifile, 2] = float(prior_param[1])      # Store corresponding longitude value
+    # Sorted on latitude and longitude values
+    lat_lon_core = sorted(lat_lon_core, key=operator.itemgetter(2), reverse=True) # Sorted descending longitude values to fit the System III W longitude
+    lat_lon_core = sorted(lat_lon_core, key=operator.itemgetter(1)) # Sorted ascending latitude values
+    lat_lon_core = np.asarray(lat_lon_core, dtype='float')
+    # Create longitude and latitude output arrays
+    latitude = [] 
+    [latitude.append(x) for x in lat_lon_core[:,1] if x not in latitude]
+    latitude = np.asarray(latitude, dtype='float')
+    longitude = [] 
+    [longitude.append(x) for x in lat_lon_core[:,2] if x not in longitude]
+    longitude = np.asarray(longitude, dtype='float')
+
+    return lat_lon_core, latitude, longitude, ncore, nlevel, ngas
 
 def ReadLogFiles(filepath, over_axis):
     """ Read chisq/n from retrieval log_** files """
 
     if over_axis == "latitude":
         # Retrieve latitude-core_number correspondance
-        coor_core, ncoor, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
-        
+        coor_core, ncoor, _, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
     elif over_axis =="longitude":
         # Retrieve longitude-core_number correspondance
-        coor_core, ncoor = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, _, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+    elif over_axis=="2D":
+        # Retrieve latitude-longitude-core_number correspondance
+        coor_core, latitude, longitude, ncoor, _, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
     
     # Create a latitude or longitude array for plotting
     coor_axis = np.asarray(coor_core[:,1], dtype='float')
@@ -77,20 +128,30 @@ def ReadLogFiles(filepath, over_axis):
                     tmp = line.split(':')
                     chisq = tmp[-1]
                     chisquare[icoor] = chisq
+    if over_axis=="2D":
+        # Create suitable dimensions for output arrays
+        nlat = len(latitude)
+        nlon = len(longitude)
+        # Reshape the output arrays in case of 2D retrieval
+        chisquare = np.reshape(chisquare, (nlat, nlon))
 
-    return chisquare, coor_core, ncoor
+    if over_axis=="2D": return chisquare, latitude, nlat, longitude, nlon
+    if over_axis=="latitude" or "longitude": return chisquare, coor_axis, ncoor
 
 def ReadmreFiles(filepath, over_axis):
     """ Read radiance retrieval outputs for all .mre files """
 
     if over_axis=="latitude":
         # Retrieve latitude-core_number correspondance
-        coor_core, ncoor, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
-        
+        coor_core, ncoor, _, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}/core") 
     elif over_axis=="longitude":
         # Retrieve longitude-core_number correspondance
-        coor_core, ncoor = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
-    
+        coor_core, ncoor, _, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+    elif over_axis=="2D":
+        # Retrieve latitude-longitude-core_number correspondance
+        coor_core, latitude, longitude, ncoor, _, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
+
+    # Create outputs arrays with suitable dimensions
     radiance = np.empty((Globals.nfilters, ncoor))
     rad_err = np.empty((Globals.nfilters, ncoor))
     rad_fit = np.empty((Globals.nfilters, ncoor))
@@ -162,8 +223,19 @@ def ReadmreFiles(filepath, over_axis):
                 radiance[:, icoor] = data_arr[:, 2]
                 rad_err[:, icoor]  = data_arr[:, 3]
                 rad_fit[:, icoor]  = data_arr[:, 5]
+    
+    if over_axis=="2D":
+        # Create suitable dimensions for output arrays
+        nlat = len(latitude)
+        nlon = len(longitude)
+        # Reshape the output arrays in case of 2D retrieval
+        radiance = np.reshape(radiance, (Globals.nfilters, nlat, nlon))
+        rad_err  = np.reshape(rad_err, (Globals.nfilters, nlat, nlon))
+        rad_fit  = np.reshape(rad_fit, (Globals.nfilters, nlat, nlon))
+        wavenumb = np.reshape(wavenumb, (Globals.nfilters, nlat, nlon))
 
-    return radiance, wavenumb, rad_err, rad_fit, coor_axis, ncoor
+    if over_axis=="2D": return radiance, wavenumb, rad_err, rad_fit, latitude, nlat, longitude, nlon
+    if over_axis=="latitude" or "longitude": return radiance, wavenumb, rad_err, rad_fit, coor_axis, ncoor 
 
 def ReadprfFiles(filepath, over_axis):
     """ Read retrieved temperature and gases output profiles for all .prf files """
@@ -171,10 +243,13 @@ def ReadprfFiles(filepath, over_axis):
     if over_axis=="latitude":
         # Retrieve latitude-core_number correspondance
         coor_core, ncoor, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
-        
     elif over_axis=="longitude":
         # Retrieve longitude-core_number correspondance
-        coor_core, ncoor = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, nlevel, ngas = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+    elif over_axis=="2D":
+        # Retrieve latitude-longitude-core_number correspondance
+        coor_core, latitude, longitude, ncoor, nlevel, ngas = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
+    
     # Initialize output arrays
     height      = np.empty((nlevel, ncoor))          # height array which varies with latitude
     pressure    = np.empty((nlevel))                # pressure array 
@@ -211,18 +286,30 @@ def ReadprfFiles(filepath, over_axis):
             for igas in range(ngas):
                 gases[:, icoor, igas] = data_arr[:,igas+3]
     
-    return temperature, gases, coor_axis, height, pressure, ncoor, nlevel, ngas, gases_id
+    if over_axis=="2D":
+        # Create suitable dimensions for output arrays
+        nlat = len(latitude)
+        nlon = len(longitude)
+        # Reshape the output arrays in case of 2D retrieval
+        height      = np.reshape(height, (nlevel, nlat, nlon))
+        temperature = np.reshape(temperature, (nlevel, nlat, nlon))
+        gases       = np.reshape(gases, (nlevel, nlat, nlon, ngas))
+    
+    if over_axis=="2D": return temperature, gases, latitude, longitude, height, pressure, ncoor, nlevel, nlat, nlon, ngas, gases_id
+    if over_axis=="latitude" or "longitude": return temperature, gases, coor_axis, height, pressure, ncoor, nlevel, ngas, gases_id
 
 def ReadaerFiles(filepath, over_axis):
     """ Read retrieved aerosol output profiles for all .aer files """
 
     if over_axis=="latitude":
         # Retrieve latitude-core_number correspondance
-        coor_core, ncoor, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
-        
+        coor_core, ncoor, nlevel, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
     elif over_axis=="longitude":
         # Retrieve longitude-core_number correspondance
-        coor_core, ncoor = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, nlevel, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+    elif over_axis=="2D":
+        # Retrieve latitude-longitude-core_number correspondance
+        coor_core, latitude, longitude, ncoor, nlevel, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
 
     # Initialize output arrays
     aerosol = np.empty((nlevel, ncoor)) # aerosol array with profiles for all latitude
@@ -248,7 +335,16 @@ def ReadaerFiles(filepath, over_axis):
             height[:, icoor] = aer[:,0]
             aerosol[:, icoor]  = aer[:,1]
 
-    return aerosol, height, coor_axis, nlevel, ncoor
+    if over_axis=="2D":
+        # Create suitable dimensions for output arrays
+        nlat = len(latitude)
+        nlon = len(longitude)
+        # Reshape the output arrays in case of 2D retrieval
+        height  = np.reshape(height, (nlevel, nlat, nlon))
+        aerosol = np.reshape(aerosol, (nlevel, nlat, nlon))
+        
+    if over_axis=="2D": return aerosol, height, nlevel, latitude, nlat, longitude, nlon, ncoor
+    if over_axis=="latitude" or "longitude": return aerosol, height, coor_axis, nlevel, ncoor
 
 def ReadmreParametricTest(filepath):
 
