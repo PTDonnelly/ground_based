@@ -35,7 +35,7 @@ def GetCylandMuMaps(files):
         # Set the central wavelengths for each filter. Must be
         # identical to the central wavelength specified for the
         # production of the k-tables
-        wavelen, wavenum, _, _  = SetWave(wavelength=cylhead['lambda'], wavenumber=False)
+        _, wavelen, wavenum, _, _  = SetWave(filename=fpath, wavelength=cylhead['lambda'], wavenumber=None, ifilt=None)
         wavelength[ifile] = wavelen
         wavenumber[ifile] = wavenum
 
@@ -130,7 +130,9 @@ def PolynomialAdjust(directory, files, spectrals):
             # Get filter index for spectral profiles
             waves = spectrals[:, ifilt, 5]
             wave  = waves[(waves > 0)][0]
-            _, _, _, ifilt = SetWave(wavelength=False, wavenumber=wave)
+            # print(ifilt)
+            # _, _, _, _, ifilt = SetWave(filename=None, wavelength=False, wavenumber=wave, ifilt=False)
+            # print(ifilt)
             # Find all files for the current filter
             currentdata  = np.empty((Globals.ny, Globals.nx))   # array to append temperature maps of the current filter 
             currentmu    = np.empty((Globals.ny, Globals.nx))   # array to append emission angle maps of the current filter
@@ -306,13 +308,13 @@ def PolynomialAdjust(directory, files, spectrals):
                 axes[2].tick_params(labelsize=12)
 
             # Save figure showing limb correction using polynomial adjustment method 
-            filt = Wavenumbers(ifilt)
-            plt.savefig(f"{directory}calib_{filt}_polynomial_adjustment_{adj_location}.png", dpi=150, bbox_inches='tight')
-            # plt.savefig(f"{directory}calib_{filt}_polynomial_adjustment_{adj_location}.eps", dpi=150, bbox_inches='tight')
+            _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+            plt.savefig(f"{directory}calib_{wavnb}_polynomial_adjustment_{adj_location}.png", dpi=150, bbox_inches='tight')
+            # plt.savefig(f"{directory}calib_{wavnb}_polynomial_adjustment_{adj_location}.eps", dpi=150, bbox_inches='tight')
             # Save polynomial coefficients
             if adj_location != 'hemispheric':
-                np.save(f"{directory}calib_{filt}_polynomial_coefficients_{adj_location}", coeff)
-                # np.savetxt(f"{directory}calib_{filt}_polynomial_coefficients_{adj_location}.txt", coeff)            
+                np.save(f"{directory}calib_{wavnb}_polynomial_coefficients_{adj_location}", coeff)
+                # np.savetxt(f"{directory}calib_{wavnb}_polynomial_coefficients_{adj_location}.txt", coeff)            
             # Apply polynomial adjustment over individual cmaps depending of wave value
             for ifile, iwave in enumerate(wavenumber):
                 if iwave == wave:
@@ -351,7 +353,7 @@ def ApplyPolynom(directory, files, spectrals):
             # Get filter index for spectral profiles
             waves = spectrals[:, ifilt, 5]
             wave  = waves[(waves > 0)][0]
-            _, _, _, ifilt = SetWave(wavelength=False, wavenumber=wave)
+            _, _, _, _, ifilt = SetWave(filename=None, wavelength=False, wavenumber=wave, ifilt=False)
             # Get polynome coefficient calculating for 2018May dataset 
             coeff = np.load(f'../outputs/2018May/global_maps_figures/calib_{wave}_polynomial_coefficients_{adj_location}.npy')
             # Calculate polynomial adjustement for each hemisphere (using mask selections)
