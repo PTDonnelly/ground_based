@@ -5,7 +5,7 @@ from Read.ReadFits import ReadFits
 from Tools.SetWave import SetWave
 from Tools.CalculateErrors import CalculateErrors
 
-def RegisterMaps(files):
+def RegisterMaps(files, binning):
     """ Step 1: Read img, cmap and mufiles
         Step 2: Geometric registration of pixel information
         Step 3: Gather pixel information for all files"""
@@ -18,13 +18,16 @@ def RegisterMaps(files):
     Nfiles = len(files)
 
     # Create np.array for all pixels in all cmaps and mumaps
-    spectrum = np.empty((ny, nx, Nfiles, 7))
+    spectrum = np.empty((ny, nx, Nfiles, 9))
+    # Throw away zeros
+    spectrum.fill(np.nan)
 
     # Define arrays
     viewing_mode   = np.empty(Nfiles)
     wavelength     = np.empty(Nfiles)
     wavenumber     = np.empty(Nfiles)
     LCMIII         = np.empty(Nfiles)
+    DATE           = [None]*(Nfiles)
 
     # Define flags
     pg2pc = 0                   # Optional conversion of latitudes from planetographic to planetocentric
@@ -41,6 +44,9 @@ def RegisterMaps(files):
         posang  = imghead['HIERARCH ESO ADA POSANG'] + 360
         view = 1 if chopang == posang else -1
         viewing_mode[ifile] = view
+
+        # Store observaing date
+        DATE[ifile] = cylhead['DATE-OBS']
         
         # Store central meridian longitude
         LCMIII[ifile] = cylhead['LCMIII']
@@ -54,7 +60,7 @@ def RegisterMaps(files):
         # Set the central wavelengths for each filter. Must be
         # identical to the central wavelength specified for the
         # production of the k-tables
-        wavelen, wavenum, _, _  = SetWave(wavelength=cylhead['lambda'], wavenumber=False)
+        _, wavelen, wavenum, _, _  = SetWave(filename=fpath, wavelength=cylhead['lambda'], wavenumber=None, ifilt=None)
         wavelength[ifile] = wavelen
         wavenumber[ifile] = wavenum
 
@@ -83,16 +89,20 @@ def RegisterMaps(files):
                     mu  = 180/pi * acos(mu_ang)
                     # Calculate pxel radiance and error
                     rad = cyldata[y, x] * 1e-7
+                    
                     ## Step 3: Gather pxel information for all files
                     # Store spectral information in spectrum array
+                    # print(y, x, ifile)
+                    # print(LCP, lat, lon, mu, rad, wavenum, view)
+                    # input()
                     spectrum[y, x, ifile, 0] = lat
-                    spectrum[y, x, ifile, 1] = LCMIII[ifile]
-                    spectrum[y, x, ifile, 2] = mu
-                    spectrum[y, x, ifile, 3] = rad
-                    spectrum[y, x, ifile, 4] = rad_error * rad
-                    spectrum[y, x, ifile, 5] = wavenum
-                    spectrum[y, x, ifile, 6] = view
-    # Throw away zeros
-    spectrum[spectrum == 0] = np.nan
-
-    return spectrum, wavelength, wavenumber, LCMIII
+                    spectrum[y, x, ifile, 1] = lon
+                    spectrum[y, x, ifile, 2] = Globals.LCP if binning == 'bin_cpara' else np.nan
+                    spectrum[y, x, ifile, 3] = LCMIII[ifile]
+                    spectrum[y, x, ifile, 4] = mu
+                    spectrum[y, x, ifile, 5] = rad
+                    spectrum[y, x, ifile, 6] = rad_error * rad
+                    spectrum[y, x, ifile, 7] = wavenum
+                    spectrum[y, x, ifile, 8] = view
+    
+    return spectrum, wavelength, wavenumber, LCMIII, DATE

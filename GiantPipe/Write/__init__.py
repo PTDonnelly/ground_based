@@ -1,5 +1,5 @@
 from .WriteFits import WriteFits
 from .WriteProfiles import WriteMeridProfiles
-from .WriteProfiles import WriteCTLProfiles
+from .WriteProfiles import WriteCentreToLimbProfiles
 from .WriteSpx import WriteMeridSpx
-from .WriteSpx import WriteCTLSpx
+from .WriteSpx import WriteCentreToLimbSpx

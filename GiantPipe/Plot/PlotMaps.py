@@ -10,7 +10,6 @@ import datetime
 import Globals
 from Tools.CorrectMaps import GetCylandMuMaps, PolynomialAdjust, ApplyPolynom, BlackLineRemoving, MuNormalization
 from Tools.SetWave import SetWave
-from Tools.VisirFilterInfo import Wavenumbers
 
 def GlobalMapsNetCDF(dir, filt, globalmaps):
     """Function to save into NetCDF file"""

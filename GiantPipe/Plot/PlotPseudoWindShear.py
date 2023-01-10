@@ -2,8 +2,6 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import Globals
-from Tools.SetWave import SetWave
-from Tools.VisirFilterInfo import Wavenumbers
 from Read.ReadZonalWind import ReadZonalWind
 from Read.ReadGravity import ReadGravity
 

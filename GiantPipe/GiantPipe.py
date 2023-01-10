@@ -6,146 +6,191 @@ PTD 01/06/22: Code to calibrate VISIR cylindrical maps and
 def main():
     from FindFiles import FindFiles
     from RegisterMaps import RegisterMaps
-    # from Binning.CentralMerid import BinCentralMerid
-    # from Binning.CentreToLimb import BinCentreToLimb
-    # from Calibrate.CentralMerid import CalCentralMerid
+    from Binning.CentralMerid import BinCentralMerid
+    from Binning.CentralParallel import BinCentralPara
+    from Binning.CentreToLimb import BinCentreToLimb
+    from Binning.CentralRegional import BinRegional
+    from Binning.CentralRegionalAverage import BinRegionalAverage
+    from Calibrate.CalibrateGBData import CalibrateGBData
+    from Calibrate.CentralMerid import CalCentralMerid
     # from Calibrate.CylindricalMaps import CalCylindricalMaps
-    # from Plot.PlotProfiles import PlotMeridProfiles
-    from Plot.PlotMaps import PlotMaps, PlotZoomMaps
-    from Plot.PlotPoles import PlotPolesFromGlobal
-    from Plot.PlotPseudoWindShear import PlotPseudoWindShear, PlotCompositePseudoWindShear
-    from Plot.PlotBrightnessTemperatureProf import PlotCompositeTBprofile
-    from Plot.PlotPriorProfiles import PlotTemperaturePriorProfiles, PlotAerosolPriorProfiles
-    from Plot.PlotRetrievalOutputs import PlotRetrievedTemperature, PlotRetrievedTemperatureProfile, PlotRetrievedRadiance, PlotRetrievedAerosolProfile, PlotRetrievedRadianceMeridian
-    from Read.ReadNpy import ReadNpy
-    # from Write.WriteProfiles import WriteMeridProfiles
-    # from Write.WriteProfiles import WriteCTLProfiles
-    # from Write.WriteSpx import WriteMeridSpx
-    # from Write.WriteSpx import WriteCTLSpx
-    from Plot.PlotSpx import PlotSpxMerid
-    
+    from Plot.PlotProfiles import PlotMeridProfiles
+    from Plot.PlotProfiles import PlotParaProfiles
+    from Plot.PlotProfiles import PlotGlobalSpectrals
+    from Plot.PlotProfiles import PlotRegionalMaps
+    from Plot.PlotProfiles import PlotRegionalAverage
+    from Plot.PlotMaps import PlotMaps
+    from Read.ReadNpy import ReadCentralMeridNpy
+    from Read.ReadNpy import ReadCentralParallelNpy
+    from Read.ReadNpy import ReadCentreToLimbNpy
+    from Read.ReadNpy import ReadRegionalNpy
+    from Read.ReadNpy import ReadRegionalAverageNpy
+    from Read.ReadSpx import ReadSpx
+    from Write.WriteProfiles import WriteMeridProfiles
+    from Write.WriteProfiles import WriteParallelProfiles
+    from Write.WriteProfiles import WriteCentreToLimbProfiles
+    from Write.WriteProfiles import WriteRegional
+    from Write.WriteProfiles import WriteRegionalAverage
+    from Write.WriteSpx import WriteMeridSpx
+    from Write.WriteSpx import WriteParaSpx
+    from Write.WriteSpx import WriteCentreToLimbSpx
+    from Write.WriteSpx import WriteRegionalSpx
+    from Write.WriteSpx import WriteRegionalAverageSpx
+
     # Define flags to configure pipeline
-    source      = 3     # Raw data (to be calibrated) (0), or calibrated data (1), pre-calculated .npy profiles (2)
+    calibrate   = False      # Read raw data and calibrate
+    source      = 'fits'     # Source of data: local cmaps ('fits') or local numpy arrays ('npy')
     # Binning
-    bin_cmerid  = 1     # Use central meridian binning scheme (1), or not (0)
-    bin_ctl     = 0     # Use centre-to-limb binning scheme (1), or not (0)
+    bin_cmerid  = False     # Use central meridian binning scheme
+    bin_cpara   = False     # Use central parallel binning scheme
+    bin_ctl     = False     # Use centre-to-limb binning scheme
+    bin_region  = False     # Use regional binning scheme (for a zoom retrieval)
+    bin_av_region = True   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
-    save        = 1     # Store calculated profiles to local files (1), or not (0)
-    plotting    = 1     # Plot calculated profiles (1), or not (0)
-    mapping     = 1     # Plot maps of observations or retrieval (1), or not (0)
-    spx         = 0     # Write spxfiles as spectral input for NEMESIS (1), or not (0)
-    retrieval   = 0     # Plot retrieval outputs
+    save        = True      # Store calculated profiles to local files
+    plotting    = True      # Plot calculated profiles
+    mapping     = False      # Plot maps of observations or retrieval
+    spx         = True      # Write spxfiles as spectral input for NEMESIS
 
-    # ############################################################
-    # # Perform geometric registration and radiometric calibration
-    # # of cylindrically-mapped data through central meridian binning
-    # # and comparison to spacecraft data, then output calculated
-    # # profiles and coefficients. Recommended as a first pass. For 
-    # # plotting, mapping and spxing use calibrated data and .npy files
-    # ############################################################
+    ############################################################
+    # Perform geometric registration and radiometric calibration
+    # of cylindrically-mapped data through central meridian binning
+    # and comparison to spacecraft data. Recommended as a first pass. For 
+    # plotting, mapping and spxing use calibrated data and .npy files.
+    ############################################################
 
-    if source == 0:
-        from Binning.CentralMerid import BinCentralMerid
-        from Calibrate.CentralMerid import CalCentralMerid
-        from Calibrate.CylindricalMaps import CalCylindricalMaps
-        from Plot.PlotProfiles import PlotMeridProfiles
-        from Write.WriteProfiles import WriteMeridProfiles
-        from Write.WriteSpx import WriteMeridSpx
-    
-        dataset='2022July'
-
-        # Point to location of observations
-        files       = FindFiles(mode='images_raw', dataset=dataset)
-        nfiles      = len(files)
-
-        # Steps 1-3: Generate arrays containing spatial and spectral information of each cylindrical map
-        spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files)
-
-        # Steps 4-5: Generate average meridional profiles for each observation and each filter
-        rawsingles, rawspectrals = BinCentralMerid(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
-        
-        # Steps 6-7: Generate calibrated versions of the profiles from Steps 4 and 5
-        singles, spectrals, ksingles, kspectrals = CalCentralMerid(nfiles=nfiles, singles=rawsingles, spectrals=rawspectrals, wavenumber=wavenumber)
-
-        # Step 8: Calibrate cylindrical maps using calculated calibration coefficients
-        CalCylindricalMaps(files, ksingles)
-
-        # Step 9: Store calculated profiles and calibration parameters
-        WriteMeridProfiles(dataset=dataset, files=files, singles=singles, spectrals=spectrals, ksingles=ksingles, kspectrals=kspectrals)
-
-
-    # ############################################################
-    # # Read in calibrated cylindrical maps of radiance, emission
-    # # angle (and optionally Doppler velocity) and create profiles
-    # # depending on the chosen binning scheme.
-    # ############################################################
-
-    if source == 1:
-        from Binning.CentralMerid import BinCentralMerid
-        from Binning.CentreToLimb import BinCentreToLimb
-        from Calibrate.CentralMerid import CalCentralMerid
-        from Write.WriteProfiles import WriteMeridProfiles
-        from Write.WriteProfiles import WriteCTLProfiles
-        from Plot.PlotProfiles import PlotMeridProfiles
-
+    if calibrate:
+        # Define calibration mode
+        mode = 'drm'
         dataset = '2018May'
-        # Point to location of observations
-        files       = FindFiles(mode='images_raw', dataset=dataset)
-        nfiles      = len(files)
+
+
+        # Point to observations
+        CalibrateGBData(dataset=dataset, mode=mode+'_files')
+        exit()
+
+    ############################################################
+    # source = 'fits': read in calibrated cylindrical maps of 
+    # radiance, emission angle (and optionally Doppler velocity), 
+    # or pre-calculated profiles saved to local numpy files, and
+    # create profiles depending on the chosen binning scheme.
+    ############################################################
+    
+    # Define calibration mode
+    mode   = 'giantpipe'
+    dataset = '2018May_completed'
+    # Point to observations
+    files  = FindFiles(dataset=dataset, mode=mode+'_files')
+    nfiles = len(files)
+    
+    if 'fits' in source:
 
         # Generate arrays containing spatial and spectral information of each cylindrical map
-        spectrum, wavelength, wavenumber, LCMIII = RegisterMaps(files=files)
+        if bin_cmerid:
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_cmerid')
+        if bin_cpara:
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_cpara')
+        if bin_region:
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_region')
+        if bin_av_region:
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_av_region')
 
-        if bin_cmerid == 1:
-            # Execute the central meridian binning scheme
+    if bin_cmerid:
+        # Execute the central meridian binning scheme
+        if 'fits' in source:
             singles, spectrals = BinCentralMerid(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
+        if 'npy' in source:
+            singles, spectrals = ReadCentralMeridNpy(dataset=dataset, mode=mode, return_singles=True, return_spectrals=True)
 
-            singles, spectrals, ksingles, kspectrals = CalCentralMerid(nfiles=nfiles, singles=singles, spectrals=spectrals, wavenumber=wavenumber)
+        if save:
+            # Store calculated profiles
+            WriteMeridProfiles(dataset=dataset, files=files, singles=singles, spectrals=spectrals)
 
-            if save == 1:
-                # Store calculated profiles
-                WriteMeridProfiles(dataset=dataset, files=files, singles=singles, spectrals=spectrals, ksingles=ksingles, kspectrals=kspectrals)
+        if plotting:
+            # Plot mean central meridian profiles
+            PlotMeridProfiles(dataset=dataset, mode=mode, files=files, singles=singles, spectrals=spectrals)
+            PlotGlobalSpectrals(dataset=dataset, spectrals=spectrals)
 
-            if plotting == 1:
-                # Create plots
-                PlotMeridProfiles(dataset=dataset, files=files, singles=singles, spectrals=spectrals)
-                PlotSpxMerid(dataset='2018May')
+        if spx:
+            # Write mean central meridian profiles to spxfile
+            WriteMeridSpx(dataset=dataset, mode=mode, spectrals=spectrals)
+    
+    if bin_cpara:
+        # Execute the central parallel binning scheme
+        if 'fits' in source:
+            singles, spectrals = BinCentralPara(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
+        if 'npy' in source:
+            singles, spectrals = ReadCentralParallelNpy(dataset=dataset, mode=mode, return_singles=True, return_spectrals=True)
 
-        # if bin_ctl == 1:
-        #     # Execute the centre-to-limb binning scheme
-        #     output = BinCentreToLimb(nfiles, spectrum)
+        if save:
+            # Store calculated profiles
+            WriteParallelProfiles(dataset=dataset, files=files, singles=singles, spectrals=spectrals)
 
-        #     if save == 1:
-        #         # Store calculated profiles
-        #         WriteCTLProfiles(files=files)
+        if plotting:
+            # Plot mean central parallel profiles
+            PlotParaProfiles(dataset=dataset, mode=mode, files=files, singles=singles, spectrals=spectrals)
 
+        if spx:
+            # Write mean central parallel profiles to spxfile
+            WriteParaSpx(dataset=dataset, mode=mode, spectrals=spectrals)
 
-    # ############################################################
-    # # Read in pre-calculated and locally-stored numpy arrays (.npy)
-    # # of radiance
-    # ############################################################
+    if bin_ctl:
+        # Execute the central meridian binning scheme
+        if 'fits' in source:
+            singles, spectrals = BinCentreToLimb(nfiles=nfiles, spectrum=spectrum)
+        if 'npy' in source:
+            singles, spectrals = ReadCentreToLimbNpy(mode=mode, return_singles=False, return_spectrals=True)
 
-    if source == 2:
-        from Plot.PlotProfiles import PlotMeridProfiles
-        if bin_cmerid == 1:
+        if save:
+            # Store calculated profiles
+            WriteCentreToLimbProfiles(dataset=dataset, mode=mode, files=files, singles=singles, spectrals=spectrals)
 
-            # Read in profiles and coefficients
-            singles, spectrals, ksingles, kspectrals = ReadNpy(return_singles=True, return_spectrals=True, return_ksingles=True, return_kspectrals=True)
+        # if plotting:
+            # Plot mean central meridian profiles
+            # PlotCentreToLimbProfiles(dataset=dataset, mode=mode, singles=singles, spectrals=spectrals)
 
-            if save == 1:
-                # Store calculated profiles
-                WriteMeridProfiles(files=files, singles=singles, spectrals=spectrals, ksingles=None, kspectrals=None)
+        if spx:
+            # Write mean central meridian profiles to spxfile
+            WriteCentreToLimbSpx(dataset=dataset, mode=mode, spectrals=spectrals)
 
-            if plotting == 1:
-                # Create plots
-                PlotMeridProfiles(singles, spectrals, ksingles, kspectrals, wavenumber=False)
+    if bin_region: 
+        # Execute the bi-dimensional binning scheme 
+        if 'fits' in source: 
+            singles, spectrals = BinRegional(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
+        if 'npy' in source:
+            singles, spectrals = ReadRegionalNpy(dataset=dataset, mode=mode, return_singles=True, return_spectrals=True)
 
+        if save:
+            # Store calculated maps
+            WriteRegional(dataset=dataset, files=files, singles=singles, spectrals=spectrals)
+        if plotting:
+            # Plot bi-dimensional maps
+            PlotRegionalMaps(dataset=dataset, mode=mode, spectrals=spectrals)
+        if spx:
+            # Write bi-dimensional maps to spxfile
+            WriteRegionalSpx(dataset=dataset, mode=mode, spectrals=spectrals)
+    
+    if bin_av_region: 
+        # Execute the bi-dimensional binning scheme 
+        if 'fits' in source: 
+            singles, spectrals = BinRegionalAverage(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII, DATE=DATE, per_night=True, Nnight=4)
+        if 'npy' in source:
+            singles, spectrals = ReadRegionalAverageNpy(dataset=dataset, mode=mode, return_singles=True, return_spectrals=True)
+
+        if save:
+            # Store calculated maps
+            WriteRegionalAverage(dataset=dataset, files=files, singles=singles, spectrals=spectrals, per_night=True, Nnight=4)
+        # if plotting:
+        #     # Plot bi-dimensional maps
+        #     PlotRegionalAverage(dataset=dataset, mode=mode, spectrals=spectrals)
+        if spx:
+            # Write bi-dimensional maps to spxfile
+            WriteRegionalAverageSpx(dataset=dataset, mode=mode, spectrals=spectrals, per_night=True, Nnight=4)
 
     ############################################################
     # Read in calibrated data, calculated profiles or retrieved
     # maps and and create maps (cylindrical, polar, etc.)
     ############################################################
-
     if mapping == 1:
         dataset = '2022July'
 
@@ -168,19 +213,13 @@ def main():
         # PlotCompositeTBprofile(dataset=dataset)
         
     ############################################################
-    # Read in relevant calculated profiles (bin_cmerid or bin_ctl)
-    # and generate spectral inputs for NEMESIS
+    # Read in spectral inputs for NEMESIS and plot
     ############################################################
-    if spx == 1:
 
-        if bin_cmerid == 0:
-            # Create spectra
-            WriteMeridSpx(spectrals)
-        if bin_cmerid == 1:
-            # Read in profiles
-            _, spectrals, _, _ = ReadNpy(return_singles=False, return_spectrals=True, return_ksingles=False, return_kspectrals=False)
-            # Create spectra
-            WriteMeridSpx(spectrals)
+    # if 'spx' in source:
+    #     files  = FindFiles(mode=mode+'_spx')
+    #     nfiles = len(files)
+
 
     ###############################################################
     # Read in retrieved output files from NEMESIS and create
@@ -218,7 +257,7 @@ if __name__ == '__main__':
     end = time.time()
     # Print elapsed time
     print(f"Elapsed time: {np.round(end-start, 3)} s")
-    print(f"Time per file: {np.round((end-start)/90, 3)} s")
+    # print(f"Time per file: {np.round((end-start)/90, 3)} s")
     
     # # Stop profiler
     # pr.disable()

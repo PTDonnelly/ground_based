@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import Globals
 from Read.ReadFits import ReadFits
 from Tools.SetWave import SetWave
-from Tools.VisirFilterInfo import Wavenumbers
 from Tools.ConvertBrightnessTemperature import ConvertBrightnessTemperature
 
 def GetCylandMuMaps(files):
