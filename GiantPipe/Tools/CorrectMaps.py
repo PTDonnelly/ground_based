@@ -72,10 +72,10 @@ def MuNormalization(files):
         filter_name = filter_name[0]
         # Set the power of mumaps
         if filter_name == 'J7.9':
-            mu_power = 0.1
+            mu_power = 0.005
         if filter_name == 'PAH1' or filter_name == 'ARIII':
             mu_power = 0.3
-        if filter_name =='SIV_1' or filter_name == 'SIV_2' or filter_name == 'NEII_1' or filter_name == 'NEII_2':
+        if filter_name =='SIV' or filter_name =='SIV_1' or filter_name == 'SIV_2' or filter_name == 'NEII_1' or filter_name == 'NEII_2':
             mu_power = 0.2
         if filter_name =='Q1' or filter_name == 'Q2' or filter_name =='Q3':
             mu_power = 0.18
@@ -94,7 +94,7 @@ def PolynomialAdjust(directory, files, spectrals):
     # Define local inputs
     Nfiles = len(files)
     lat = np.arange(-89.75,90,step=0.5) # Latitude range from pole-to-pole
-    mumin = [0.15, 0.15, 0.02, 0.37, 0.3, 0.2, 0.5, 0.5, 0.15, 0.3, 0.6, 0.5, 0.05]
+    mumin = [0.15, 0.15, 0.02, 0.25, 0.3, 0.2, 0.5, 0.5, 0.15, 0.3, 0.6, 0.5, 0.05]
 
     # Define local arrays to store selected latitude band spectral data
     bandcmaps   = np.empty((Globals.nfilters, Globals.ny, Globals.nx))
@@ -127,7 +127,7 @@ def PolynomialAdjust(directory, files, spectrals):
         # on the N-Band filter and a southern polynomial adjustment on the Q-Band Filters for
         # the VLT/VISIR Jupiter 2018May24-27 dataset. 
         adj_location= 'average' if ifilt < 10 else 'southern'
-        if (ifilt !=  7): # ifilt = 7 cannot be corrected
+        if (ifilt !=  7) and (ifilt != 6): # ifilt = 7 cannot be corrected
             # Get filter index for spectral profiles
             waves = spectrals[:, ifilt, 5]
             wave  = waves[(waves > 0)][0]
@@ -182,8 +182,8 @@ def PolynomialAdjust(directory, files, spectrals):
                     keep_north = ((lat < 15) & (lat > 10))
                     keep_south = ((lat < -10 ) & (lat > -15))
                 elif (ifilt == 4):
-                    keep_north = ((lat < 25) & (lat > 10))
-                    keep_south = ((lat < -10) & (lat > -25))
+                    keep_north = ((lat < 35) & (lat > 10))
+                    keep_south = ((lat < -10) & (lat > -35))
                 else:
                     keep_north  = ((lat < 30) & (lat > 5))
                     keep_south  = ((lat < -5) & (lat > -30))
@@ -279,7 +279,7 @@ def PolynomialAdjust(directory, files, spectrals):
                 p = np.poly1d(np.polyfit(bandmu[mask], bandc[mask],4))
                 coeff = np.polyfit(bandmu[mask], bandc[mask],4)
                 # Define a linear space to show the polynomial adjustment variation over all emission angle range
-                t = np.linspace(mumin[ifilt], 0.9, 100)
+                t = np.linspace(mumin[ifilt], 1, 100)
                 # Some control printing
                 print(f"{adj_location} polynome")
                 print(p)
@@ -287,22 +287,33 @@ def PolynomialAdjust(directory, files, spectrals):
                 # Correct data on the slected latitude band
                 cdata=bandc[mask]*p(1)/p(bandmu[mask])
                 # Plot figure showing limb correction using polynomial adjustment method
-                ax1 = plt.subplot2grid((1, 3), (0, 0))
-                ax1.scatter(bandmu[mask], bandc[mask])
-                ax1.plot(t, p(t), '-',color='red')
-                ax2 = plt.subplot2grid((1, 3), (0, 1))
-                ax2.plot(t, (p(1))/p(t), '-',color='red')
-                ax3 = plt.subplot2grid((1, 3), (0, 2))
-                ax3.scatter(bandmu[mask], cdata)
-            
+                fig, axes = plt.subplots(1, 3, figsize=(8,3), sharex=True, constrained_layout = True)
+                
+                axes[0].plot(bandmu[mask], bandc[mask], lw=0, marker='.', markersize=0.5, color = 'black')
+                axes[0].set_ylabel(r'Observed T$_B$ [K]', size=15)
+                axes[0].set_xlabel("Emission angle", size=15)
+                axes[0].plot(t, p(t), '-',color='red')
+                axes[0].tick_params(labelsize=12)
+                
+
+                axes[1].plot(t, (p(1))/p(t), '-',color='red')
+                axes[1].set_ylabel("Polynome adjustment", size=15)
+                axes[1].set_xlabel("Emission angle", size=15)
+                axes[1].tick_params(labelsize=12)
+                
+                axes[2].plot(bandmu[mask], cdata, lw=0, marker='.', markersize=0.5, color = 'black')
+                axes[2].set_ylabel(r'Corrected T$_B$ [K]', size=15)
+                axes[2].set_xlabel("Emission angle", size=15)
+                axes[2].tick_params(labelsize=12)
+
             # Save figure showing limb correction using polynomial adjustment method 
             filt = Wavenumbers(ifilt)
-            plt.savefig(f"{directory}calib_{filt}_polynomial_adjustment_{adj_location}.png", dpi=300)
-            plt.savefig(f"{directory}calib_{filt}_polynomial_adjustment_{adj_location}.eps", dpi=300)
+            plt.savefig(f"{directory}calib_{filt}_polynomial_adjustment_{adj_location}.png", dpi=150, bbox_inches='tight')
+            # plt.savefig(f"{directory}calib_{filt}_polynomial_adjustment_{adj_location}.eps", dpi=150, bbox_inches='tight')
             # Save polynomial coefficients
             if adj_location != 'hemispheric':
                 np.save(f"{directory}calib_{filt}_polynomial_coefficients_{adj_location}", coeff)
-                np.savetxt(f"{directory}calib_{filt}_polynomial_coefficients_{adj_location}.txt", coeff)            
+                # np.savetxt(f"{directory}calib_{filt}_polynomial_coefficients_{adj_location}.txt", coeff)            
             # Apply polynomial adjustment over individual cmaps depending of wave value
             for ifile, iwave in enumerate(wavenumber):
                 if iwave == wave:
@@ -319,7 +330,7 @@ def PolynomialAdjust(directory, files, spectrals):
                         cmaps[ifile, :, :] = cmaps[ifile, :, :] * p(1) / p(mumaps[ifile, :, :])
                         
         # Clear figure to avoid overlapping between plotting subroutines
-        plt.clf()
+        plt.close()
 
     return cmaps, mumaps, wavenumber, adj_location 
 

@@ -78,7 +78,7 @@ def PlotMaps(dataset, files, spectrals):
             waves = spectrals[:, ifilt, 5]
             if waves[(waves > 0)] != []:
                 wave  = waves[(waves > 0)][0]
-                _, _, _, ifilt = SetWave(wavelength=False, wavenumber=wave)
+                _, _, _, _, ifilt = SetWave(filename=None, wavelength=False, wavenumber=wave, ifilt=False)
                 for ifile, iwave in enumerate(wavenumber):
                     if iwave == wave:
                         # Store only the cmaps for the current ifilt 
@@ -249,7 +249,7 @@ def PlotMapsPerNight(dataset, files, spectrals):
     # cmaps, mumaps, wavenumber = ApplyPolynom(dir, files, spectrals)
     cmaps, mumaps, wavenumber = MuNormalization(files)
     mumin = np.empty(13)
-    mumin.fill(0.2)
+    mumin.fill(0.1)
 
     list_time = []
     list_ifile = []
@@ -291,7 +291,6 @@ def PlotMapsPerNight(dataset, files, spectrals):
                         if tobs_ifile[ifile, 0] > night_limits[inight] and tobs_ifile[ifile, 0] < night_limits[inight+1]:
                             if iwave == wave:
                                 TBmaps[ifile, :, :] = cmaps[ifile, :, :]                
-                            
                                 res = ma.masked_where(mumaps[ifile, :, :] < mumin[ifilt], TBmaps[ifile, :, :])
                                 res = ma.masked_where(((res > 201)), res)
                                 res = ma.masked_where(((res < 100)), res)

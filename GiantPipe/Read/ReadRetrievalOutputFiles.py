@@ -1,5 +1,6 @@
 import numpy as np
 import operator
+from scipy.io import FortranFile
 import Globals
 
 def RetrieveLatitudeFromCoreNumber(fpath):
@@ -98,6 +99,38 @@ def RetrieveLongitudeLatitudeFromCoreNumber(fpath):
 
     return lat_lon_core, latitude, longitude, ncore, nlevel, ngas
 
+def RetrieveNightFromCoreNumber(fpath):
+    """ Function to retrieve night number
+        from the .spx file of each core
+        subdirectory in case of aurora retrieval """
+    # Initialize local variables
+    ncore = int(3)                # number of core directories (), 
+                                    # which is also equivalent to the number of longitude points 
+    night_core = np.empty((ncore, 2)) # 2D array containing night ID and core directory number
+    for ifile in range(3):
+        # ifile = ifile+1 # To skip the average retrieval core
+        filename = f"{fpath}_{ifile+1}/nemesis.prf"
+        with open(filename) as f:
+            # Read header contents
+            lines = f.readlines()
+            # Save header information
+            prior_param = lines[1].split()
+            nlevel             = int(prior_param[2])
+            ngas               = int(prior_param[3])
+        filename = f"{fpath}_{ifile+1}/logfile"
+        with open(filename) as f:
+            # Read header contents
+            lines = f.readlines()
+            # Save header information
+            spx_filename = lines[1].split('night')
+            spx_filename = spx_filename[-1].split('.')
+            night_core[ifile-1, 0] = int(spx_filename[0])
+            night_core[ifile-1, 1] = ifile+1
+    night_core = sorted(night_core, key=operator.itemgetter(1)) # sorted by night
+    night_core = np.asarray(night_core, dtype='float')   
+
+    return night_core, ncore, nlevel, ngas
+
 def ReadLogFiles(filepath, over_axis):
     """ Read chisq/n from retrieval log_** files """
 
@@ -115,6 +148,7 @@ def ReadLogFiles(filepath, over_axis):
     coor_axis = np.asarray(coor_core[:,1], dtype='float')
     # Create a chisquare array
     chisquare = np.empty((ncoor))
+    chisquare.fill(np.nan)
     # Read and save retrieved profiles
     for icoor in range(ncoor):
         ifile = int(coor_core[icoor, 0])
@@ -250,12 +284,18 @@ def ReadprfFiles(filepath, over_axis):
         # Retrieve latitude-longitude-core_number correspondance
         coor_core, latitude, longitude, ncoor, nlevel, ngas = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
     
-    # Initialize output arrays
+    # Create output arrays
     height      = np.empty((nlevel, ncoor))          # height array which varies with latitude
     pressure    = np.empty((nlevel))                # pressure array 
     temperature = np.empty((nlevel, ncoor))          # temperature array with profiles for all latitude + pressure profiles ([:,0])
     gases       = np.empty((nlevel, ncoor, ngas))    # gases array with profiles for all latitude + pressure profiles ([:,0])
     gases_id    = np.empty((ngas))
+    # Initialize output arrays
+    height.fill(np.nan)          
+    pressure.fill(np.nan) 
+    temperature.fill(np.nan)
+    gases.fill(np.nan)
+    gases_id.fill(np.nan)
     # Create a latitude or longitude array for plotting
     coor_axis = np.asarray(coor_core[:,1], dtype='float')
     # Read and save retrieved profiles
@@ -314,6 +354,9 @@ def ReadaerFiles(filepath, over_axis):
     # Initialize output arrays
     aerosol = np.empty((nlevel, ncoor)) # aerosol array with profiles for all latitude
     height  = np.empty((nlevel, ncoor)) # height array with profiles for all latitude 
+    # Initialize output arrays
+    aerosol.fill(np.nan)
+    height.fill(np.nan)
     # Create a latitude or longitude array for plotting
     coor_axis = coor_core[:,1]
     # Read and save retrieved profiles
@@ -345,6 +388,64 @@ def ReadaerFiles(filepath, over_axis):
         
     if over_axis=="2D": return aerosol, height, nlevel, latitude, nlat, longitude, nlon, ncoor
     if over_axis=="latitude" or "longitude": return aerosol, height, coor_axis, nlevel, ncoor
+
+def ReadAerFromMreFiles(filepath, over_axis):
+    """ Read radiance retrieval outputs for all .mre files """
+
+    if over_axis=="latitude":
+        # Retrieve latitude-core_number correspondance
+        coor_core, ncoor, nlevel, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}/core") 
+    elif over_axis=="longitude":
+        # Retrieve longitude-core_number correspondance
+        coor_core, ncoor, nlevel, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+    elif over_axis=="2D":
+        # Retrieve latitude-longitude-core_number correspondance
+        coor_core, latitude, longitude, ncoor, nlevel, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
+
+    # Create output arrays with suitable dimensions
+    aerosol = np.empty((ncoor))
+    aer_err = np.empty((ncoor)) 
+    aer_fit = np.empty((ncoor))
+    fit_err = np.empty((ncoor))
+    # Initialize output arrays 
+    aerosol.fill(np.nan)
+    aer_err.fill(np.nan) 
+    aer_fit.fill(np.nan)
+    fit_err.fill(np.nan)
+    # Create a latitude or longitude array for plotting
+    coor_axis = np.asarray(coor_core[:,1], dtype='float')
+    # Read and save retrieved profiles
+    for icoor in range(ncoor):
+        ifile = int(coor_core[icoor, 0])
+        with open(f"{filepath}/core_{ifile}/nemesis.mre") as f:
+            # Read file
+            lines = f.readlines()
+            # Get dimensions
+            param = lines[1].split()
+            ispec = int(param[0])
+            ngeom = int(param[1])
+            nx    = int(param[3])
+            # Save aerosol's data
+            aer_ind = lines.index('          -1           0           3\n')
+            aer_param = lines[aer_ind+3].split()
+            aerosol[icoor] = float(aer_param[2])
+            aer_err[icoor] = aer_param[3]
+            aer_fit[icoor] = aer_param[4]
+            fit_err[icoor] = aer_param[5]
+               
+    if over_axis=="2D":
+        # Create suitable dimensions for output arrays
+        nlat = len(latitude)
+        nlon = len(longitude)
+        # Reshape the output arrays in case of 2D retrieval
+        aerosol = np.reshape(aerosol, (nlat, nlon))
+        aer_err  = np.reshape(aer_err, (nlat, nlon))
+        aer_fit  = np.reshape(aer_fit, (nlat, nlon))
+        fit_err = np.reshape(fit_err, (nlat, nlon))
+
+    if over_axis=="2D": return aerosol, aer_err, aer_fit, fit_err, latitude, nlat, longitude, nlon
+    if over_axis=="latitude" or "longitude": return aerosol, aer_err, aer_fit, fit_err, coor_axis, ncoor
+
 
 def ReadmreParametricTest(filepath):
 
@@ -397,3 +498,293 @@ def ReadmreParametricTest(filepath):
             coeffs[2, icore] = tmp[2]
 
     return radiance, wavenumb, rad_err, rad_fit, rad_diff, coeffs, ncores
+
+
+def ReadContributionFunctions(filepath, over_axis):
+
+    if over_axis == "latitude":
+        # Retrieve latitude-core_number correspondance
+        coor_core, ncoor, _, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+    elif over_axis =="longitude":
+        # Retrieve longitude-core_number correspondance
+        coor_core, ncoor, _, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+    elif over_axis=="2D":
+        # Retrieve latitude-longitude-core_number correspondance
+        coor_core, latitude, longitude, ncoor, _, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
+
+    # Store geometric parameters of the retrieval run
+    with open(f"{filepath}/core_1/nemesis.spx") as f:
+        # Read file
+        lines = f.readlines()
+        # Get dimensions
+        param = lines[0].split()
+        fwhm    = float(param[0])
+        ngeom   = int(param[3])
+        nconv   = int(1)
+    #with open(f"{filepath}/core_1/nemesis.cov") as f:
+    
+
+    # # Create the output arrays
+    kk =  np.empty((ncoor)) # array of conrtibution functions for all filters
+    # kk_single = np.empty((ncoor, nx, nconv))  
+    # vconv = np.empty((ncoor, nconv))
+    # # Initializing the output arrays
+    kk.fill(np.nan)
+    # kk_single.fill(np.nan)
+    # vconv.fill(np.nan)
+    # Read and save contribution function profiles
+    for icoor in range(ncoor):
+        ifile = int(coor_core[icoor, 0])       
+        # Reading the unformatted Fortran file (unformatted... What idea?!) 
+        with open(f"{filepath}/core_{ifile}/nemesis.cov") as f:
+            lines = f.readlines()
+            prout = lines[0].split()
+            nvar, npro = int(prout[1]), int(prout[0])
+
+            nx = npro * nvar 
+
+            param = lines[nvar*2+1].split()
+            ny = int(param[1])
+
+            data = lines[nvar*2+2:]
+            
+            nblock = len(data)/(nx*ny)
+            data = np.asarray(data, dtype='float')
+            data = np.reshape(data, (nx, ny, nblock))
+
+            kk_matrix = data[:, :, 6]
+           
+
+            print(np.shape(kk_matrix))
+            print(kk_matrix)
+
+    return kk
+
+def ReadAllForAuroraOverTime(filepath):
+
+    # Retrieve the number of night from the number of core subdirectories
+    night_core, nnight, nlevel, ngas = RetrieveNightFromCoreNumber(f"{filepath}/core")
+
+
+    # Create outputs arrays with suitable dimensions
+    # from log_icore files
+    chisquare = np.empty(nnight)
+    # from .mre files 
+    radiance = np.empty((Globals.nfilters, nnight))
+    rad_err = np.empty((Globals.nfilters, nnight))
+    rad_fit = np.empty((Globals.nfilters, nnight))
+    wavenumb = np.empty((Globals.nfilters, nnight))
+    temp_prior_mre = np.empty((nlevel, nnight))
+    temp_errprior_mre = np.empty((nlevel, nnight))
+    temp_fit_mre = np.empty((nlevel, nnight))
+    temp_errfit_mre = np.empty((nlevel, nnight))
+    aer_mre = np.empty((nnight))
+    aer_err = np.empty((nnight)) 
+    aer_fit = np.empty((nnight))
+    fit_err = np.empty((nnight))
+    # from .prf files
+    height      = np.empty((nlevel, nnight))          # height array which varies with latitude
+    pressure    = np.empty((nlevel))                  # pressure array 
+    temperature = np.empty((nlevel, nnight))          # temperature array with profiles for all latitude + pressure profiles ([:,0])
+    gases       = np.empty((nlevel, nnight, ngas))    # gases array with profiles for all latitude + pressure profiles ([:,0])
+    gases_id    = np.empty((ngas))
+    #from aerosol.prf files 
+    h_prf      = np.empty((nlevel, nnight))           # height array which varies with latitude
+    aer_prf      = np.empty((nlevel, nnight))         # aerosol profiles
+
+    #Initialize to avoid strange values 
+    chisquare.fill(np.nan)
+    radiance.fill(np.nan)
+    rad_err.fill(np.nan)
+    rad_fit.fill(np.nan)
+    wavenumb.fill(np.nan)
+    temp_prior_mre.fill(np.nan)
+    temp_errprior_mre.fill(np.nan)
+    temp_fit_mre.fill(np.nan)
+    temp_errfit_mre.fill(np.nan)
+    aer_mre.fill(np.nan)
+    aer_err.fill(np.nan) 
+    aer_fit.fill(np.nan)
+    fit_err.fill(np.nan)
+    height.fill(np.nan)          
+    pressure.fill(np.nan) 
+    temperature.fill(np.nan)
+    gases.fill(np.nan)
+    gases_id.fill(np.nan)
+    aer_prf.fill(np.nan)
+    h_prf.fill(np.nan)
+
+    # Create a latitude or longitude array for plotting
+    time_axis = np.asarray(night_core[:,1], dtype='float')
+    # Read and save retrieved profiles
+    for inight in range(nnight):
+        ifile = int(night_core[inight, 1])
+        ## Read ChiSquare data
+        with open(f"{filepath}/core_{ifile}/log_{ifile}") as f:
+            # Read file
+            lines = f.readlines()
+            for iline, line in enumerate(lines):
+                l = line.split()
+                # Identifying the last line of chisq/ny in the current log file
+                if 'chisq/ny' and 'equal' in l:
+                    tmp = line.split(':')
+                    chisq = tmp[-1]
+                    chisquare[inight] = chisq
+
+        ## Read radiance data
+        with open(f"{filepath}/core_{ifile}/nemesis.mre") as f:
+            # Read file
+            lines = f.readlines()
+            # Get dimensions
+            param = lines[1].split()
+            ispec = int(param[0])
+            ngeom = int(param[1])
+            nx    = int(param[3])
+
+            # Save radiance data
+            newline, filedata = [], []
+            for iline, line in enumerate(lines[5:ngeom+5]):
+                l = line.split()
+                [newline.append(il) for il in l]
+                # Store data 
+                filedata.append(newline)
+                # Reset temporary variables
+                newline = []
+            data_arr = np.asarray(filedata, dtype='float')
+            if Globals.nfilters > 11:
+                if ((time_axis[inight] < 6)):
+                    wavenumb[:, inight] = data_arr[:, 1]
+                    radiance[:, inight] = data_arr[:, 2]
+                    rad_err[:, inight]  = data_arr[:, 3]
+                    rad_fit[:, inight]  = data_arr[:, 5]
+                elif (time_axis[inight] > 6):
+                    wavenb = data_arr[:, 1]
+                    rad = data_arr[:, 2]
+                    err  = data_arr[:, 3]
+                    fit  = data_arr[:, 5]
+                    
+                    if Globals.nfilters ==12:
+                        for ifilt in range(Globals.nfilters-1):
+                            if ifilt <= 5:
+                                wavenumb[ifilt, inight] = wavenb[ifilt]
+                                radiance[ifilt, inight] = rad[ifilt]
+                                rad_err[ifilt, inight]  = err[ifilt]
+                                rad_fit[ifilt, inight]  = fit[ifilt]
+                            else:
+                                wavenumb[ifilt+1, inight] = wavenb[ifilt]
+                                radiance[ifilt+1, inight] = rad[ifilt]
+                                rad_err[ifilt+1, inight]  = err[ifilt]
+                                rad_fit[ifilt+1, inight]  = fit[ifilt]
+                    elif Globals.nfilters ==13:
+                        for ifilt in range(Globals.nfilters-2):
+                            if ifilt <= 5:
+                                wavenumb[ifilt, inight] = wavenb[ifilt]
+                                radiance[ifilt, inight] = rad[ifilt]
+                                rad_err[ifilt, inight]  = err[ifilt]
+                                rad_fit[ifilt, inight]  = fit[ifilt]
+                            else:
+                                wavenumb[ifilt+2, inight] = wavenb[ifilt]
+                                radiance[ifilt+2, inight] = rad[ifilt]
+                                rad_err[ifilt+2, inight]  = err[ifilt]
+                                rad_fit[ifilt+2, inight]  = fit[ifilt]
+            else:
+                wavenb = data_arr[:, 1]
+                rad = data_arr[:, 2]
+                err  = data_arr[:, 3]
+                fit  = data_arr[:, 5]
+                if len(wavenb) == Globals.nfilters:
+                    wavenumb[:, inight] = data_arr[:, 1]
+                    radiance[:, inight] = data_arr[:, 2]
+                    rad_err[:, inight]  = data_arr[:, 3]
+                    rad_fit[:, inight]  = data_arr[:, 5]
+                elif len(wavenb) == 9:
+                    for ifilt in range(Globals.nfilters-2):
+                        if ifilt < 8:
+                            wavenumb[ifilt, inight] = wavenb[ifilt]
+                            radiance[ifilt, inight] = rad[ifilt]
+                            rad_err[ifilt, inight]  = err[ifilt]
+                            rad_fit[ifilt, inight]  = fit[ifilt]
+                        else:
+                            wavenumb[ifilt+2, inight] = wavenb[ifilt]
+                            radiance[ifilt+2, inight] = rad[ifilt]
+                            rad_err[ifilt+2, inight]  = err[ifilt]
+                            rad_fit[ifilt+2, inight]  = fit[ifilt]
+                elif len(wavenb) == 2:
+                    idata = 0
+                    for ifilt in [1,5]:
+                        wavenumb[ifilt, inight] = wavenb[idata]
+                        radiance[ifilt, inight] = rad[idata]
+                        rad_err[ifilt, inight]  = err[idata]
+                        rad_fit[ifilt, inight]  = fit[idata]
+                        idata +=1
+            
+            # Save temperature data
+
+            newline, filedata = [], []
+            for iline, line in enumerate(lines[5+ngeom+6:5+ngeom+6+nlevel]):
+                l = line.split()
+                [newline.append(il) for il in l]
+                # Store data 
+                filedata.append(newline)
+                # Reset temporary variables
+                newline = []
+            data_arr = np.asarray(filedata, dtype='float')
+            temp_prior_mre[:, inight] = data_arr[:, 2]
+            temp_errprior_mre[:, inight] = data_arr[:, 3]
+            temp_fit_mre[:, inight] = data_arr[:, 4]
+            temp_errfit_mre[:, inight] = data_arr[:, 5]
+
+
+            # Save aerosol data
+            if '          -1           0           3\n' in lines:
+                aer_ind = lines.index('          -1           0           3\n')
+                aer_param = lines[aer_ind+3].split()
+                aer_mre[inight] = float(aer_param[2])
+                aer_err[inight] = aer_param[3]
+                aer_fit[inight] = aer_param[4]
+                fit_err[inight] = aer_param[5]
+                        
+        ## Read Temperature, Gases data
+        with open(f"{filepath}/core_{ifile}/nemesis.prf") as f:
+            # Read file
+            lines = f.readlines()
+            # Store gases id
+            for igas in range(ngas):
+                id = lines[igas+2].split()
+                gases_id[igas] = id[0]
+                gases_id = np.asarray(gases_id, dtype=int)
+            # Save file's data
+            newline, filedata = [], []
+            for iline, line in enumerate(lines[ngas+3::]):
+                l = line.split()
+                [newline.append(il) for il in l]
+                # Store data 
+                filedata.append(newline)
+                # Reset temporary variables
+                newline = []
+            data_arr = np.asarray(filedata, dtype='float')
+            # Split temperature and gases profiles in separate (dedicated) arrays
+            height[:, inight]       = data_arr[:, 0]            # height profile
+            pressure[:]             = data_arr[:, 1] * 1013.25  # pressure profile converted in mbar
+            temperature[:, inight]  = data_arr[:, 2]            # temperature profile
+            for igas in range(ngas):
+                gases[:, inight, igas] = data_arr[:,igas+3]
+        
+        ## Read aerosol from aerosol.prf files
+        with open(f"{filepath}/core_{ifile}/aerosol.prf") as f:
+            lines = f.readlines()
+            # Read and store aerosol profiles
+            newline, data = [], []
+            for iline, line in enumerate(lines[2::]):
+                l = line.split()
+                [newline.append(il) for il in l]
+                # Store data 
+                data.append(newline)
+                # Reset temporary variables
+                newline = []
+            aer = np.asarray(data, dtype='float')
+            # Split altitude and aerosol profiles in separate (dedicated) arrays
+            h_prf[:, inight] = aer[:,0]
+            aer_prf[:, inight]  = aer[:,1]
+    
+    return nnight, time_axis, chisquare, radiance, rad_err, rad_fit, wavenumb, temp_prior_mre, temp_errprior_mre, temp_fit_mre, temp_errfit_mre, aer_mre, aer_err,  aer_fit, fit_err, height, pressure, temperature, gases, gases_id, aer_prf, h_prf

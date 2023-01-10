@@ -1,3 +1,4 @@
+from re import X
 import numpy as np
 
 def ReadTemperatureGasesPriorProfile(filepath):
@@ -8,6 +9,8 @@ def ReadTemperatureGasesPriorProfile(filepath):
         lines = f.readlines()
         if '##' in lines[0]:
             line_number = 54
+        elif '1' in lines[0]:
+            line_number = 2
         else: 
             line_number = 3
         # Save header information
