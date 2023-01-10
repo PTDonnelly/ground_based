@@ -64,6 +64,7 @@ def main():
         mode = 'drm'
         dataset = '2018May'
 
+
         # Point to observations
         CalibrateGBData(dataset=dataset, mode=mode+'_files')
         exit()
@@ -83,6 +84,7 @@ def main():
     nfiles = len(files)
     
     if 'fits' in source:
+
         # Generate arrays containing spatial and spectral information of each cylindrical map
         if bin_cmerid:
             spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_cmerid')
@@ -189,18 +191,27 @@ def main():
     # Read in calibrated data, calculated profiles or retrieved
     # maps and and create maps (cylindrical, polar, etc.)
     ############################################################
+    if mapping == 1:
+        dataset = '2022July'
 
-    # if mapping == 1:
-    # ### Plot cylindrical maps
-    #     if bin_cmerid == 0:
-    #         # Create plots
-    #         PlotMaps(files, spectrals)
-    #     if bin_cmerid == 1:
-    #         # Read in individual calibration coefficients
-    #         _, spectrals, _, _ = ReadNpy(return_singles=False, return_spectrals=True, return_ksingles=True, return_kspectrals=False)
-    #         # Create plots
-    #         PlotMaps(files, spectrals)
-    
+    ### Point to location of observations
+        files       = FindFiles(dataset=dataset, mode='images_calib')
+    ## Plot cylindrical maps
+        if bin_cmerid == 0:
+            # Create plots and save global maps into npy arrays
+            PlotMaps(dataset, files, spectrals)
+        if bin_cmerid == 1:
+            # Read in individual calibration coefficients
+            _, spectrals, _, _ = ReadNpy(dataset=dataset, return_singles=False, return_spectrals=True, return_ksingles=False, return_kspectrals=False)
+            # Create plots and save global maps into npy arrays
+            PlotMaps(dataset, files, spectrals)
+    # Plot pole maps from global maps npy arrays
+        PlotZoomMaps(dataset=dataset, central_lon=180, lat_target=-20, lon_target=285, lat_window=15, lon_window=30)
+        PlotPolesFromGlobal(dataset=dataset)
+        # PlotPseudoWindShear(dataset=dataset)
+        # PlotCompositePseudoWindShear(dataset=dataset)
+        # PlotCompositeTBprofile(dataset=dataset)
+        
     ############################################################
     # Read in spectral inputs for NEMESIS and plot
     ############################################################
@@ -209,8 +220,22 @@ def main():
     #     files  = FindFiles(mode=mode+'_spx')
     #     nfiles = len(files)
 
-        # if plotting:
-        #     PlotSpx(files=files)
+
+    ###############################################################
+    # Read in retrieved output files from NEMESIS and create
+    # meridian and vertical profiles of temperature, aerosols, etc.
+    ###############################################################
+
+    if retrieval == 1:
+        # PlotTemperaturePriorProfiles()
+        # PlotAerosolPriorProfiles()
+        # PlotRetrievedTemperature()
+        # PlotRetrievedTemperatureProfile()
+        # PlotRetrievedRadiance()
+        # PlotRetrievedAerosolProfile()
+        PlotRetrievedRadianceMeridian()
+        
+
 
 if __name__ == '__main__':
     import numpy as np

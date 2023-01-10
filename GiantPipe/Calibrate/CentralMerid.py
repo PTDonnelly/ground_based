@@ -27,12 +27,14 @@ def CalCentralMerid(mode, files, singles, spectrals):
         if waves[(waves > 0)] != []:
             # Get filter index for calibration file
             filter_name, _, wave, ifilt_sc, ifilt_v = SetWave(filename=None, wavelength=None, wavenumber=None, ifilt=iwave)
+
             # Calculate averages for calibration
             if ifilt_sc < 12:
                 # Establish shared latitudes for accurate averaging
                 lmin_visir, lmax_visir = np.nanmin(spectrals[:, ifilt_v, 0]), np.nanmax(spectrals[:, ifilt_v, 0])
                 if filter_name == 'J7.9':
                     lmin_visir, lmax_visir = -5, 5
+
                 lmin_calib, lmax_calib = np.nanmin(cirs[:, ifilt_sc, 0]), np.nanmax(cirs[:, ifilt_sc, 0])
                 latmin, latmax         = np.max((lmin_visir, lmin_calib, -70)), np.min((lmax_visir, lmax_calib, 70))
                 visirkeep              = (spectrals[:, ifilt_v, 0] >= latmin) & (spectrals[:, ifilt_v, 0] <= latmax)            
@@ -48,6 +50,7 @@ def CalCentralMerid(mode, files, singles, spectrals):
                 lmin_visir, lmax_visir = np.nanmin(spectrals[:, ifilt_v, 0]), np.nanmax(spectrals[:, ifilt_v, 0])
                 lmin_calib, lmax_calib = np.nanmin(iris[:, ifilt_sc, 0]), np.nanmax(iris[:, ifilt_sc, 0])
                 latmin, latmax         = np.max((lmin_visir, lmin_calib, -70)), np.min((lmax_visir, lmax_calib, 70))
+
                 visirkeep              = (spectrals[:, ifilt_v, 0] >= latmin) & (spectrals[:, ifilt_v, 0] <= latmax)            
                 visirdata              = spectrals[visirkeep, ifilt_v, 3]
                 visirmean              = np.nanmean(spectrals[visirkeep, ifilt_v, 3])

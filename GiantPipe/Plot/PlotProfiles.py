@@ -183,6 +183,7 @@ def PlotParaProfiles(dataset, mode, files, singles, spectrals):
     # Save figure showing calibation method 
     plt.savefig(f"{dir}all_filters_parallel_profiles.png", dpi=150, bbox_inches='tight')
     #plt.savefig(f"{dir}{wave}all_filters_parallel_profiles.eps", dpi=900)
+
     # Clear figure to avoid overlapping between plotting subroutines
     plt.close()
 
@@ -247,6 +248,7 @@ def PlotGlobalSpectrals(dataset, spectrals):
 
 def PlotCentreTotLimbProfiles(mode, singles, spectrals):
     print('Plotting profiles...')
+
     
     a = 1
 

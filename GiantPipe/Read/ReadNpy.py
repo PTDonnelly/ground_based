@@ -2,11 +2,13 @@ import numpy as np
 from FindFiles import FindFiles
 
 def ReadCentralMeridNpy(dataset, mode, return_singles, return_spectrals):
+
     """Read in pre-calculated profiles and/or coefficients from local .npy files"""
 
     if return_singles:
         # Point to stored meridional profiles and calibration coefficients
         profiles  = FindFiles(dataset=dataset, mode=mode+'_singles')
+
         # Load .npy files
         singles    = np.asarray([np.load(p) for p in profiles])
         # Fix shape (numpy changes array shape when storing)
@@ -17,6 +19,7 @@ def ReadCentralMeridNpy(dataset, mode, return_singles, return_spectrals):
     if return_spectrals:
         # Point to stored meridional profiles and calibration coefficients
         profiles  = FindFiles(dataset=dataset, mode=mode+'_spectrals')
+
         # Load .npy files
         spectrals    = np.asarray([np.load(p) for p in profiles])
         # Fix shape (numpy changes array shape when storing)

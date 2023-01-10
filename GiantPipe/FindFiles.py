@@ -65,6 +65,7 @@ def FindFiles(dataset, mode):
             # If you don't have GiantPipe-calibrated data, use DRM-calibrated data
             source = 'recal_' if 'giantpipe' in mode else 'cal_'
 
+
             files = [f"{data_dir}{source}wvisir_ARIII_2018-05-25T03:45:53.1419_Jupiter_clean_withchop.fits.gz",
                     f"{data_dir}{source}wvisir_ARIII_2018-05-26T00:03:13.9569_Jupiter_clean_withchop.fits.gz",
                     f"{data_dir}{source}wvisir_ARIII_2018-05-26T05:44:15.9897_Jupiter_clean_withchop.fits.gz",
@@ -78,6 +79,7 @@ def FindFiles(dataset, mode):
                     f"{data_dir}{source}wvisir_J7.9_2018-05-25T04:08:22.2746_Jupiter_clean_withchop.fits.gz",
                     f"{data_dir}{source}wvisir_J7.9_2018-05-26T00:21:09.9792_Jupiter_clean_withchop.fits.gz",
                     f"{data_dir}{source}wvisir_J7.9_2018-05-26T06:02:47.9655_Jupiter_clean_withchop.fits.gz",#
+
                     f"{data_dir}{source}wvisir_J7.9_2018-05-26T07:38:32.1062_Jupiter_clean_withchop.fits.gz",
                     f"{data_dir}{source}wvisir_J7.9_2018-05-26T23:49:49.9432_Jupiter_clean_withchop.fits.gz",
                     f"{data_dir}{source}wvisir_NEII_1_2018-05-24T06:10:42.6362_Jupiter_clean_withchop.fits.gz",
@@ -772,5 +774,6 @@ def FindFiles(dataset, mode):
                  f"{profile_dir}lat_84.5.spx",
                  f"{profile_dir}lat_85.5.spx",
                  f"{profile_dir}lat_86.5.spx"]
+
 
     return files

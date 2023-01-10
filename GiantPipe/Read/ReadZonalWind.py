@@ -7,7 +7,6 @@ def ReadZonalWind(filename):
     # Load Jupiter zonal jets data to determine belts and zones location
     jets_lines = np.loadtxt(filename)
     latpc = jets_lines[:,1]
-    latpg = jets_lines[:,2]
     speed = jets_lines[:,4]
     cond = np.where(speed>0)
     ejets_c = latpc[cond]

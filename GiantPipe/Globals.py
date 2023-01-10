@@ -23,3 +23,4 @@ lon_target = 360                                 # Longitude target for the regi
 
 nfilters    = 13                                 # Set manually if using irregularly-sampled data
 # mu_max      = 80.0                 		       # Maximum emission angle
+
