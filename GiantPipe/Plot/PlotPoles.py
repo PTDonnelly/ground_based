@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import matplotlib.path as mpath
 import cartopy.crs as ccrs
 import Globals
-from Tools.VisirFilterInfo import Wavenumbers, Wavelengths
 from Tools.SetWave import SetWave
 from matplotlib import ticker
 
@@ -39,22 +38,22 @@ def PlotPolesFromGlobal(dataset, per_night):
         if ifilt < 6 or ifilt > 7:
             if dataset == '2018May':
                 # Retrive wavenumber corresponding to ifilt
-                filt = Wavenumbers(ifilt)
+                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                 adj_location = 'average' if ifilt < 10 else 'southern'
-                globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps_{adj_location}_adj.npy')
+                globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{wavnb}_global_maps_{adj_location}_adj.npy')
             elif dataset == '2018May_completed' and per_night==True:
                 # Retrive wavenumber corresponding to ifilt
                 for inight in range(Nnight):
-                    filt = Wavenumbers(ifilt)
-                    globalmap[inight, ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_per_night_figures/calib_{filt}_global_maps_night_{inight}.npy')
+                    _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+                    globalmap[inight, ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_per_night_figures/calib_{wavnb}_global_maps_night_{inight}.npy')
             elif dataset == '2022July' or dataset == '2022August':
                 if ifilt == 4: 
-                    filt = Wavenumbers(ifilt+1)
+                    _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt+1)
                 elif ifilt > 5: 
-                    filt = Wavenumbers(ifilt+2)
+                    _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt+2)
                 else:
-                    filt = Wavenumbers(ifilt)
-                globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps.npy')
+                    _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+                globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{wavnb}_global_maps.npy')
             
     if not per_night:
         for ifilt in range(Nfilters):
@@ -113,43 +112,43 @@ def PlotPolesFromGlobal(dataset, per_night):
                 #cbar.ax.tick_params(labelsize=15)
                 cbar.set_label("Brightness Temperature [K]")
                 # Save pole map figure of the current filter
-                filt = Wavenumbers(ifilt)
+                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                 if dataset== '2018May': 
-                    plt.savefig(f"{dir}calib_{filt}_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-                    # plt.savefig(f"{dir}calib_{filt}_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+                    plt.savefig(f"{dir}calib_{wavnb}_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
+                    # plt.savefig(f"{dir}calib_{wavnb}_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
                 else:
-                    plt.savefig(f"{dir}calib_{filt}_pole_maps.png", dpi=150, bbox_inches='tight')
-                    # plt.savefig(f"{dir}calib_{filt}_pole_maps.eps", dpi=150, bbox_inches='tight')
+                    plt.savefig(f"{dir}calib_{wavnb}_pole_maps.png", dpi=150, bbox_inches='tight')
+                    # plt.savefig(f"{dir}calib_{wavnb}_pole_maps.eps", dpi=150, bbox_inches='tight')
                 # Clear figure to avoid overlapping between plotting subroutines
                 plt.close()
             
                 # Northern pole figure
-                PlotOnePole(img=globalmap[ifilt,:,:], filter=filt, vmin=min_north, vmax=max_north, \
+                PlotOnePole(img=globalmap[ifilt,:,:], filter=wavnb, vmin=min_north, vmax=max_north, \
                     central_longitude=central_lon, central_latitude=central_lat, \
                     latitude_limit=lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
                     longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
                 # Save north pole map figure of the current filter
                 if dataset== '2018May':
-                    plt.savefig(f"{dir}calib_{filt}_north_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-                    # plt.savefig(f"{dir}calib_{filt}_north_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+                    plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
+                    # plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
                 else:
-                    plt.savefig(f"{dir}calib_{filt}_north_pole_maps.png", dpi=150, bbox_inches='tight')
-                    # plt.savefig(f"{dir}calib_{filt}_north_pole_maps.eps", dpi=150, bbox_inches='tight')
+                    plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps.png", dpi=150, bbox_inches='tight')
+                    # plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps.eps", dpi=150, bbox_inches='tight')
                 # Clear figure to avoid overlapping between plotting subroutines
                 plt.close()
         
                 # Southern pole figure
-                PlotOnePole(img=globalmap[ifilt,:,:], filter=filt, vmin=min_south, vmax=max_south, \
+                PlotOnePole(img=globalmap[ifilt,:,:], filter=wavnb, vmin=min_south, vmax=max_south, \
                     central_longitude=central_lon, central_latitude=-central_lat, \
                     latitude_limit=-lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
                     longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
                 # Save south pole map figure of the current filter 
                 if dataset == '2018May':
-                    plt.savefig(f"{dir}calib_{filt}_south_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-                    # plt.savefig(f"{dir}calib_{filt}_south_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+                    plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
+                    # plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
                 else:
-                    plt.savefig(f"{dir}calib_{filt}_south_pole_maps.png", dpi=150, bbox_inches='tight')
-                    # plt.savefig(f"{dir}calib_{filt}_south_pole_maps.eps", dpi=150, bbox_inches='tight')
+                    plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps.png", dpi=150, bbox_inches='tight')
+                    # plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps.eps", dpi=150, bbox_inches='tight')
                 # Clear figure to avoid overlapping between plotting subroutines
                 plt.close()
 
@@ -166,7 +165,7 @@ def PlotPolesFromGlobal(dataset, per_night):
         iax = 0
         for ifilt in [0,10,11,12,5,4,6,7,8,9,3,2,1]:
             if ifilt < 6 or ifilt > 7:
-                filter = Wavelengths(ifilt)
+                _, wavlg, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                 # # Set extreme values for mapping
                 max = np.nanmax(globalmap[ifilt, :, :]) 
                 min = np.nanmin(globalmap[ifilt, :, :])
@@ -196,7 +195,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                 # Draw the gridlines without the default labels        
                 ax.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
                                 xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
-                ax.set_title(ititle[iax]+f"                                 {filter}"+r" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
+                ax.set_title(ititle[iax]+f"                                 {wavlg}"+r" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
                 # Define a colorbar
                 cbar = plt.colorbar(im, ax=ax, format="%.0f", extend='both', fraction=0.046, pad=0.15)
                 cbar.ax.tick_params(labelsize=12)
@@ -224,7 +223,7 @@ def PlotPolesFromGlobal(dataset, per_night):
         iax = 0
         for ifilt in [0,10,11,12,5,4,6,7,8,9,3,2,1]:
             if ifilt < 6 or ifilt > 7:
-                filter = Wavelengths(ifilt)
+                _, wavlg, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                 # # Set extreme values for mapping
                 max = np.nanmax(globalmap[ifilt, :, :]) 
                 min = np.nanmin(globalmap[ifilt, :, :])
@@ -254,7 +253,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                 # Draw the gridlines without the default labels        
                 ax.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
                                 xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
-                ax.set_title(ititle[iax]+f"                                 {filter}"+r" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
+                ax.set_title(ititle[iax]+f"                                 {wavlg}"+r" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
                 # Define a colorbar
                 cbar = plt.colorbar(im, ax=ax, format="%.0f", extend='both', fraction=0.046, pad=0.15)
                 cbar.ax.tick_params(labelsize=12)
@@ -326,43 +325,43 @@ def PlotPolesFromGlobal(dataset, per_night):
                     #cbar.ax.tick_params(labelsize=15)
                     cbar.set_label("Brightness Temperature [K]")
                     # Save pole map figure of the current filter
-                    filt = Wavenumbers(ifilt)
+                    _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                     if dataset== '2018May': 
-                        plt.savefig(f"{dir}calib_{filt}_pole_maps_night_{inight}_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{filt}_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+                        plt.savefig(f"{dir}calib_{wavnb}_pole_maps_night_{inight}_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
+                        # plt.savefig(f"{dir}calib_{wavnb}_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
                     else:
-                        plt.savefig(f"{dir}calib_{filt}_pole_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{filt}_pole_maps.eps", dpi=150, bbox_inches='tight')
+                        plt.savefig(f"{dir}calib_{wavnb}_pole_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
+                        # plt.savefig(f"{dir}calib_{wavnb}_pole_maps.eps", dpi=150, bbox_inches='tight')
                     # Clear figure to avoid overlapping between plotting subroutines
                     plt.close()
                 
                     # Northern pole figure
-                    PlotOnePole(img=globalmap[inight, ifilt,:,:], filter=filt, vmin=min_north, vmax=max_north, \
+                    PlotOnePole(img=globalmap[inight, ifilt,:,:], filter=wavnb, vmin=min_north, vmax=max_north, \
                         central_longitude=central_lon, central_latitude=central_lat, \
                         latitude_limit=lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
                         longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
                     # Save north pole map figure of the current filter
                     if dataset== '2018May':
-                        plt.savefig(f"{dir}calib_{filt}_north_pole_maps_night_{inight}_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{filt}_north_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+                        plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps_night_{inight}_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
+                        # plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
                     else:
-                        plt.savefig(f"{dir}calib_{filt}_north_pole_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{filt}_north_pole_maps.eps", dpi=150, bbox_inches='tight')
+                        plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
+                        # plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps.eps", dpi=150, bbox_inches='tight')
                     # Clear figure to avoid overlapping between plotting subroutines
                     plt.close()
             
                     # Southern pole figure
-                    PlotOnePole(img=globalmap[inight, ifilt,:,:], filter=filt, vmin=min_south, vmax=max_south, \
+                    PlotOnePole(img=globalmap[inight, ifilt,:,:], filter=wavnb, vmin=min_south, vmax=max_south, \
                         central_longitude=central_lon, central_latitude=-central_lat, \
                         latitude_limit=-lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
                         longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
                     # Save south pole map figure of the current filter 
                     if dataset == '2018May':
-                        plt.savefig(f"{dir}calib_{filt}_south_pole_maps_night_{inight}_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{filt}_south_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+                        plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps_night_{inight}_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
+                        # plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
                     else:
-                        plt.savefig(f"{dir}calib_{filt}_south_pole_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{filt}_south_pole_maps.eps", dpi=150, bbox_inches='tight')
+                        plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
+                        # plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps.eps", dpi=150, bbox_inches='tight')
                     # Clear figure to avoid overlapping between plotting subroutines
                     plt.close()
 
@@ -379,7 +378,7 @@ def PlotPolesFromGlobal(dataset, per_night):
             iax = 0
             for ifilt in [0,10,11,12,5,4,6,7,8,9,3,2,1]:
                 if ifilt < 6 or ifilt > 7:
-                    filter = Wavelengths(ifilt)
+                    _, wavlg, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                     # # Set extreme values for mapping
                     max = np.nanmax(globalmap[:, ifilt, :, :]) 
                     min = np.nanmin(globalmap[:, ifilt, :, :])
@@ -411,7 +410,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                     # Draw the gridlines without the default labels        
                     ax.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
                                     xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
-                    ax.set_title(ititle[iax]+f"                                 {filter}"+r" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
+                    ax.set_title(ititle[iax]+f"                                 {wavlg}"+r" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
                     # Define a colorbar
                     # cax = plt.axes([0.75, 0.1, 0.02, 0.8])
                     cbar = plt.colorbar(im, ax=ax, format="%.0f", extend='both', fraction=0.046, pad=0.15)
@@ -420,7 +419,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                     # cbar.update_ticks()
                     # cbar.set_label(r" T$_{B}$ [K]", size=15)
 
-                    # ax.PlotOnePole(img=globalmap[ifilt,:,:], filter=filt, vmin=min_south, vmax=max_south, \
+                    # ax.PlotOnePole(img=globalmap[ifilt,:,:], filter=wavnb, vmin=min_south, vmax=max_south, \
                     # central_longitude=central_lon, central_latitude=-central_lat, \
                     # latitude_limit=-lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
                     # longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
