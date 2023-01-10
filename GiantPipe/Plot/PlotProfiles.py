@@ -303,8 +303,6 @@ def PlotRegionalMaps(dataset, mode, spectrals):
             
             # subplot showing the regional radiance maps
             im= ax[irow[iax]][icol[iax]].imshow(spectrals[:, :, ifilt, 3], vmin=min, vmax=max, origin='lower', extent = [360,0,-90,90],  cmap='inferno')
-            ax[irow[iax]][icol[iax]].legend(fontsize=12, loc='lower right')
-            ax[irow[iax]][icol[iax]].grid()
             ax[irow[iax]][icol[iax]].set_xlim(Globals.lon_target+Globals.merid_width, Globals.lon_target-Globals.merid_width)
             ax[irow[iax]][icol[iax]].set_xticks([]) if (iax < 9) else ax[irow[iax]][icol[iax]].set_xticks(np.arange(Globals.lon_target-Globals.merid_width, Globals.lon_target+Globals.merid_width+1,  step = Globals.merid_width/2))
             ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
