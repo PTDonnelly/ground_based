@@ -38,7 +38,7 @@ def PlotMaps(dataset, files, spectrals):
 
     print('Correcting global maps...')
     # If subdirectory does not exist, create it
-    dir = f'../outputs/{dataset}/global_maps_figures_check_rebase/'
+    dir = f'../outputs/{dataset}/global_maps_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
     

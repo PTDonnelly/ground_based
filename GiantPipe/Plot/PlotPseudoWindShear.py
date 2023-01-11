@@ -2,6 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import Globals
+from Tools.SetWave import SetWave
 from Read.ReadZonalWind import ReadZonalWind
 from Read.ReadGravity import ReadGravity
 
@@ -29,17 +30,17 @@ def PlotPseudoWindShear(dataset):
 
     for ifilt in range(Nfilters):
         if dataset == '2018May':
-            filt = Wavenumbers(ifilt)
+            _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
             adj_location = 'average' if ifilt < 10 else 'southern'
-            globalmaps[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps_{adj_location}_adj.npy')
+            globalmaps[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{wavnb}_global_maps_{adj_location}_adj.npy')
         elif dataset == '2022July' or dataset == '2022August':
             if ifilt == 4: 
-                filt = Wavenumbers(ifilt+1)
+                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt+1)
             elif ifilt > 5:
-                filt = Wavenumbers(ifilt+2)
+                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt+2)
             else:
-                filt = Wavenumbers(ifilt)
-            globalmaps[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps.npy')
+                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+            globalmaps[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{wavnb}_global_maps.npy')
         # Zonal mean of the gloal maps
         for iy in range(Globals.ny):
             zonalmean[ifilt, iy] = np.nanmean(globalmaps[ifilt, iy, :])
@@ -49,14 +50,13 @@ def PlotPseudoWindShear(dataset):
     # Create a figure per filter
     for ifilt in range(Nfilters):
         if dataset == '2018May':
-            filt = Wavenumbers(ifilt)
+            _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
         elif dataset == '2022July' or dataset == '2022August':
-            if ifilt == 4: 
-                filt = Wavenumbers(ifilt+1)
+            if ifilt == 4:  _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt+1)
             elif ifilt > 5:
-                filt = Wavenumbers(ifilt+2)
+                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt+2)
             else:
-                filt = Wavenumbers(ifilt)
+                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
         fig, axes = plt.subplots(1, 2, figsize=(10, 5), sharey=True)
         latkeep = (lat <-5)
         axes[0].plot(lat[latkeep],windshear[ifilt,latkeep],linewidth=3.0,color="black")
@@ -89,17 +89,17 @@ def PlotPseudoWindShear(dataset):
         fig.add_subplot(111, frameon=False)
         # hide tick and tick label of the big axis
         plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
-        plt.title(f"{filt}"+" (cm$^{-1}$)")
+        plt.title(f"{wavnb}"+" (cm$^{-1}$)")
         plt.xlabel("Latitude", size=15)
         plt.ylabel("Pseudo-shear (m s$^{-1}$ km$^{-1}$)", size=15)
         # Save figure
         if dataset == '2018May':
             adj_location = 'average' if ifilt < 10 else 'southern'
-            plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-            plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{dir}calib_{wavnb}_pseudo_wind_shear_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{dir}calib_{wavnb}_pseudo_wind_shear_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
         else:
-            plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear.png", dpi=150, bbox_inches='tight')
-            plt.savefig(f"{dir}calib_{filt}_pseudo_wind_shear.eps", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{dir}calib_{wavnb}_pseudo_wind_shear.png", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{dir}calib_{wavnb}_pseudo_wind_shear.eps", dpi=150, bbox_inches='tight')
 
 def PlotCompositePseudoWindShear(dataset):
     """ Plotting thermal shear using stored global maps numpy array """
@@ -126,20 +126,20 @@ def PlotCompositePseudoWindShear(dataset):
 
     for ifilt in range(Nfilters):
         if dataset == '2018May':
-            filt = Wavenumbers(ifilt)
+            _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
             adj_location = 'average' if ifilt < 10 else 'southern'
-            globalmaps[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps_{adj_location}_adj.npy')
+            globalmaps[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{wavnb}_global_maps_{adj_location}_adj.npy')
         elif dataset == '2022July' or dataset == '2022August':
             if ifilt == 4: 
-                filt = Wavenumbers(ifilt+1)
+                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt+1)
                 ifilt_up = ifilt+1
             elif ifilt > 5:
-                filt = Wavenumbers(ifilt+2)
+                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt+2)
                 ifilt_up = ifilt+2
             else:
-                filt = Wavenumbers(ifilt)
+                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                 ifilt_up = ifilt
-            globalmaps[ifilt_up, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{filt}_global_maps.npy')
+            globalmaps[ifilt_up, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{wavnb}_global_maps.npy')
     for ifilt in range(Globals.nfilters):
         # Zonal mean of the global maps
         for iy in range(Globals.ny):
@@ -153,8 +153,7 @@ def PlotCompositePseudoWindShear(dataset):
     iaxes = 0
     subplot_array = [0,10,11,12,5,4,6,7,8,9,3,2,1] if dataset == '2018May' else [0,10,11,12,5,8,9,3,2,1]
     for ifilt in subplot_array:
-        filt = Wavenumbers(ifilt)
-        wavelength, _, _, _ = SetWave(_, filt)
+        _, wavelength, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
         # Subplot for the southern hemisphere
         latkeep = (lat <-5)
         axes[iaxes,0].plot(lat[latkeep],windshear[ifilt,latkeep],linewidth=3.0,color="black")
