@@ -602,7 +602,7 @@ def PlotRetrievedTemperatureMaps(over_axis="2D"):
                 im = ax[irow[iax]][icol[iax]].imshow(temperature[ind_pres[0][-1], :, :], cmap='viridis', vmin=tmin, vmax=tmax, # levels=levels_cmap,
                                                         origin='lower', extent=[longitude[0],longitude[-1],latitude[0],latitude[-1]])
                 ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
-                ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {int(pressure[ind_pres[0][-1]])} mbar", fontfamily='serif', loc='left', fontsize=12)
+                ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {int(pressure[ind_pres[0][-1]])} mbar", fontfamily='sans-serif', loc='left', fontsize=12)
                 cbar = fig.colorbar(im, ax=ax[irow[iax]][icol[iax]], extend='both', fraction=0.04, pad=0.05, format="%.0f")#, orientation='horizontal')
                 cbar.ax.tick_params(labelsize=12)
                 cbar.ax.locator_params(nbins=6)
@@ -644,7 +644,7 @@ def PlotRetrievedTemperatureMaps(over_axis="2D"):
                 im = ax[irow[iax]][icol[iax]].imshow((temperature[ind_pres[0][-1], :, :]-temp_prior[ind_pres[0][-1]])*100/temp_prior[ind_pres[0][-1]], norm=norm, cmap='seismic', 
                                                     origin='lower', extent=[longitude[0],longitude[-1],latitude[0],latitude[-1]])
                 ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
-                ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {int(pressure[ind_pres[0][-1]])} mbar", fontfamily='serif', loc='left', fontsize=12)
+                ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {int(pressure[ind_pres[0][-1]])} mbar", fontfamily='sans-serif', loc='left', fontsize=12)
                 cbar = fig.colorbar(im, ax=ax[irow[iax]][icol[iax]], extend='both', fraction=0.04, pad=0.05)#, orientation='horizontal')
                 cbar.ax.tick_params(labelsize=11)
                 cbar.ax.locator_params(nbins=7)
@@ -919,7 +919,7 @@ def PlotRetrievedRadianceMap(over_axis="2D"):
                 im = ax[irow[iax]][icol[iax]].imshow(radiance[ifilt, :, :], vmin=radmin, vmax=radmax, cmap='inferno', 
                                                     origin='lower', extent=[longitude[0],longitude[-1],latitude[0],latitude[-1]])
                 ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
-                ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
+                ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=12)
                 cbar = fig.colorbar(im, ax=ax[irow[iax]][icol[iax]], extend='both', fraction=0.04, pad=0.05)#, orientation='horizontal')
                 cbar.ax.tick_params(labelsize=12)
                 cbar.ax.locator_params(nbins=6)
@@ -958,7 +958,7 @@ def PlotRetrievedRadianceMap(over_axis="2D"):
                 im = ax[irow[iax]][icol[iax]].imshow(rad_fit[ifilt, :, :], vmin=radmin, vmax=radmax, cmap='inferno', 
                                                     origin='lower', extent=[longitude[0],longitude[-1],latitude[0],latitude[-1]])
                 ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
-                ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
+                ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=12)
                 cbar = fig.colorbar(im, ax=ax[irow[iax]][icol[iax]], extend='both', fraction=0.04, pad=0.05)#, orientation='horizontal')
                 cbar.ax.tick_params(labelsize=12)
                 cbar.ax.locator_params(nbins=6)
@@ -1003,7 +1003,7 @@ def PlotRetrievedRadianceMap(over_axis="2D"):
                 im = ax[irow[iax]][icol[iax]].imshow((rad_fit[ifilt, :, :]-radiance[ifilt, :, :])*100/radiance[ifilt, :, :], norm=norm, cmap='seismic', 
                                                     origin='lower', extent=[longitude[0],longitude[-1],latitude[0],latitude[-1]])
                 ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
-                ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
+                ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=12)
                 cbar = fig.colorbar(im, ax=ax[irow[iax]][icol[iax]], extend='both', fraction=0.04, pad=0.05)#, orientation='horizontal')
                 cbar.ax.tick_params(labelsize=11)
                 cbar.ax.locator_params(nbins=7)
@@ -1553,7 +1553,7 @@ def PlotRetrievedGasesMaps(over_axis="2D"):
                     im = ax[irow[iax]][icol[iax]].imshow(gases[ind_pres[0][-1], :, :, igas], cmap='viridis', vmin=gmin, vmax=gmax, # levels=levels_cmap,
                                                             origin='lower', extent=[longitude[0],longitude[-1],latitude[0],latitude[-1]])
                     ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
-                    ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {ptarget[ipressure]} mbar    {RetrieveGasesNames(gases_id[igas])}", fontfamily='serif', loc='left', fontsize=12)
+                    ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {ptarget[ipressure]} mbar    {RetrieveGasesNames(gases_id[igas])}", fontfamily='sans-serif', loc='left', fontsize=12)
                     cbar = fig.colorbar(im, ax=ax[irow[iax]][icol[iax]], extend='both', fraction=0.04, pad=0.05, format='%.2e')#, orientation='horizontal')
                     cbar.ax.tick_params(labelsize=12)
                     cbar.ax.locator_params(nbins=6)
@@ -2225,7 +2225,7 @@ def PlotAllForAuroraOverTime():
                 ax[irow[iax]][icol[iax]].tick_params(axis = 'x', labelsize=12)#, rotation=60)
                 ax[irow[iax]][icol[iax]].set_xticks(ticks=np.arange(1,4,step=1), labels=['May\n24th', 'May\n25th-26th', 'May\n26th-27th'])
                 ax[irow[iax]][icol[iax]].grid()
-                ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
+                ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=12)
                 iax+=1 
             handles, labels = ax[0][0].get_legend_handles_labels()  
             fig.legend(handles, labels,fontsize=12, bbox_to_anchor=[0.875, 0.85])

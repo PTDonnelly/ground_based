@@ -105,7 +105,7 @@ def BinRegional(nfiles, spectrum, LCMIII):
                         spectral_regions[ilat, ilon, ifilt, 3] = rad
                         spectral_regions[ilat, ilon, ifilt, 4] = rad_err
                         spectral_regions[ilat, ilon, ifilt, 5] = wavenum
-                        print(spectral_regions[ilat, ilon, ifilt, 3])
+                        # print(spectral_regions[ilat, ilon, ifilt, 3])
         # Throw away zeros
         spectral_regions[spectral_regions == 0] = np.nan
 

@@ -19,7 +19,6 @@ def main():
     from Plot.PlotProfiles import PlotGlobalSpectrals
     from Plot.PlotProfiles import PlotRegionalMaps
     from Plot.PlotProfiles import PlotRegionalAverage
-    from Plot.PlotMaps import PlotMaps
     from Read.ReadNpy import ReadCentralMeridNpy
     from Read.ReadNpy import ReadCentralParallelNpy
     from Read.ReadNpy import ReadCentreToLimbNpy
@@ -44,13 +43,14 @@ def main():
     bin_cmerid  = False     # Use central meridian binning scheme
     bin_cpara   = False     # Use central parallel binning scheme
     bin_ctl     = False     # Use centre-to-limb binning scheme
-    bin_region  = False     # Use regional binning scheme (for a zoom retrieval)
+    bin_region  = False     # Use regional binning scheme (for a zoom 2D retrieval)
     bin_av_region = True   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
     save        = True      # Store calculated profiles to local files
     plotting    = True      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
     spx         = True      # Write spxfiles as spectral input for NEMESIS
+    retrieval   = False      # Plot NEMESIS outputs 
 
     ############################################################
     # Perform geometric registration and radiometric calibration
@@ -191,23 +191,29 @@ def main():
     # Read in calibrated data, calculated profiles or retrieved
     # maps and and create maps (cylindrical, polar, etc.)
     ############################################################
-    if mapping == 1:
-        dataset = '2022July'
+    if mapping:
+
+        from Plot.PlotMaps import PlotMaps, PlotZoomMaps, PlotMapsPerNight
+        from Plot.PlotPoles import PlotPolesFromGlobal
+        from Plot.PlotPseudoWindShear import PlotPseudoWindShear, PlotCompositePseudoWindShear
+        from Plot.PlotBrightnessTemperatureProf import PlotCompositeTBprofile
+
+        dataset = '2018May'
 
     ### Point to location of observations
-        files       = FindFiles(dataset=dataset, mode='images_calib')
+        files       = FindFiles(dataset=dataset, mode='_files')
     ## Plot cylindrical maps
-        if bin_cmerid == 0:
+        if bin_cmerid:
             # Create plots and save global maps into npy arrays
             PlotMaps(dataset, files, spectrals)
-        if bin_cmerid == 1:
+        if not bin_cmerid:
             # Read in individual calibration coefficients
-            _, spectrals, _, _ = ReadNpy(dataset=dataset, return_singles=False, return_spectrals=True, return_ksingles=False, return_kspectrals=False)
+            _, spectrals = ReadCentralMeridNpy(dataset=dataset, mode=mode, return_singles=False, return_spectrals=True)
             # Create plots and save global maps into npy arrays
             PlotMaps(dataset, files, spectrals)
     # Plot pole maps from global maps npy arrays
-        PlotZoomMaps(dataset=dataset, central_lon=180, lat_target=-20, lon_target=285, lat_window=15, lon_window=30)
-        PlotPolesFromGlobal(dataset=dataset)
+        # PlotZoomMaps(dataset=dataset, central_lon=180, lat_target=-20, lon_target=285, lat_window=15, lon_window=30)
+        # PlotPolesFromGlobal(dataset=dataset, per_night=False)
         # PlotPseudoWindShear(dataset=dataset)
         # PlotCompositePseudoWindShear(dataset=dataset)
         # PlotCompositeTBprofile(dataset=dataset)
@@ -226,7 +232,19 @@ def main():
     # meridian and vertical profiles of temperature, aerosols, etc.
     ###############################################################
 
-    if retrieval == 1:
+    if retrieval:
+
+        from Plot.PlotRetrievalOutputs import PlotContributionFunction
+        from Plot.PlotRetrievalOutputs import PlotChiSquareOverNy, PlotChiSquareOverNySuperpose, PlotChiSquareMap
+        from Plot.PlotRetrievalOutputs import PlotRetrievedTemperature, PlotRetrievedTemperatureProfile, PlotRetrievedTemperatureProfileSuperpose 
+        from Plot.PlotRetrievalOutputs import PlotRetrievedTemperatureMaps, PlotRetrievedTemperatureCrossSection
+        from Plot.PlotRetrievalOutputs import PlotRetrievedRadiance, PlotRetrievedRadianceMap, PlotRetrievedRadianceMeridian, PlotRetrievedRadianceMeridianSuperpose
+        from Plot.PlotRetrievalOutputs import PlotRadianceParametricTest
+        from Plot.PlotRetrievalOutputs import PlotRetrievedAerosolProfile, PlotRetrievedAerosolMaps, PlotRetrievedAerosolCrossSection
+        from Plot.PlotRetrievalOutputs import PlotRetrievedGasesProfile, PlotRetrievedGasesProfileSuperpose, PlotRetrievedGasesMaps, PlotRetrievedGasesCrossSection
+        from Plot.PlotRetrievalOutputs import PlotComparisonParametricGasesHydrocarbons, PlotComparisonParametricGasesHydrocarbonsParallel
+        from Plot.PlotRetrievalOutputs import PlotAllForAuroraOverTime
+
         # PlotTemperaturePriorProfiles()
         # PlotAerosolPriorProfiles()
         # PlotRetrievedTemperature()

@@ -90,13 +90,13 @@ def PlotMeridProfiles(dataset, mode, files, singles, spectrals):
                 iriskeep = (iris[:, ifilt_sc, 0] >= -70) & (iris[:, ifilt_sc, 0] < 70)
                 ax[irow[iax]][icol[iax]].plot(iris[iriskeep, ifilt_sc, 0], iris[iriskeep, ifilt_sc, 1]*1.e9, color='green', lw=2, label='Voyager/IRIS')
             # Plot the VLT/VISIR pole-to-pole meridian profile
-            ax[irow[iax]][icol[iax]].plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3]*1.e9, color='orange', lw=0, marker='o', markersize=2, label=f"{(wavl)}"+" $\mu$m")# at "+f"{abs(Globals.LCP)}"+"$^{\circ}$S")
+            ax[irow[iax]][icol[iax]].plot(spectrals[:, ifilt_v, 0], spectrals[:, ifilt_v, 3]*1.e9, color='orange', lw=0, marker='o', markersize=2, label='VLT/VISIR')# at "+f"{abs(Globals.LCP)}"+"$^{\circ}$S")
+            ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=12)
             ax[irow[iax]][icol[iax]].legend(fontsize=11)#, loc='lower right')
             ax[irow[iax]][icol[iax]].grid()
             ax[irow[iax]][icol[iax]].set_xlim(-90, 90)
             ax[irow[iax]][icol[iax]].set_xticks([]) if (iax < 9) else ax[irow[iax]][icol[iax]].set_xticks(ticks=np.arange(-90, 90 , 30), labels=list(np.arange(-90, 90 , 30)))
             ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
-            ax[irow[iax]][icol[iax]].set_title(ititle[iax], fontfamily='sans-serif', loc='left', fontsize=12)
             iax+=1 
     plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
     plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
@@ -165,13 +165,12 @@ def PlotParaProfiles(dataset, mode, files, singles, spectrals):
                 _, _, iwave, _, _ = SetWave(filename=fname, wavelength=None, wavenumber=None, ifilt=None)
                 if iwave == wave:
                     ax[irow[iax]][icol[iax]].plot(singles[:, ifile, 1], singles[:, ifile, 3]*1.e9, lw=0, marker='.', markersize=2, color = 'black')
-            ax[irow[iax]][icol[iax]].plot(spectrals[:, ifilt_v, 1], spectrals[:, ifilt_v, 3]*1.e9, color='orange', lw=0, marker='o', markersize=2, label=f"{(wavl)}"+" $\mu$m")# at "+f"{abs(Globals.LCP)}"+"$^{\circ}$S")
-            ax[irow[iax]][icol[iax]].legend(fontsize=12, loc='lower right')
+            ax[irow[iax]][icol[iax]].plot(spectrals[:, ifilt_v, 1], spectrals[:, ifilt_v, 3]*1.e9, color='orange', lw=0, marker='o', markersize=2)# at "+f"{abs(Globals.LCP)}"+"$^{\circ}$S")
+            ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=12)
             ax[irow[iax]][icol[iax]].grid()
             ax[irow[iax]][icol[iax]].set_xlim(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1])
             ax[irow[iax]][icol[iax]].set_xticks([]) if (iax < 9) else ax[irow[iax]][icol[iax]].set_xticks(ticks=np.arange(360,-1,-60), labels=list(np.arange(360,-1,-60)))
             ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
-            ax[irow[iax]][icol[iax]].set_title(ititle[iax], fontfamily='serif', loc='left', fontsize=12)
             iax+=1 
     plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
     plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
@@ -290,7 +289,7 @@ def PlotRegionalMaps(dataset, mode, spectrals):
         plt.clf()
 
 # Create a subplots figures with all filters
-    fig, ax = plt.subplots(6, 2, figsize=(12, 12), sharex=True, sharey=True)
+    fig, ax = plt.subplots(6, 2, figsize=(10, 12), sharex=True, sharey=True)
     iax = 0
     for ifilt in [0,10,11,12,5,4,6,7,8,9,3,2,1]:
         if ifilt < 6 or ifilt > 7:
@@ -302,22 +301,27 @@ def PlotRegionalMaps(dataset, mode, spectrals):
             ax[0][1].tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
             # Get filter index for plotting spacecraft and calibrated data
             _, wavl, wave, _, _ = SetWave(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)
-            
+            # Set extreme values for mapping
+            # spectrals[:, :, ifilt, 3] *= 1.e9 # ALREADY DONE IN THE PREVIOUS LOOP 
+            max = np.nanmax(spectrals[:, :, ifilt, 3]) 
+            min = np.nanmin(spectrals[:, :, ifilt, 3])
             # subplot showing the regional radiance maps
             im= ax[irow[iax]][icol[iax]].imshow(spectrals[:, :, ifilt, 3], vmin=min, vmax=max, origin='lower', extent = [360,0,-90,90],  cmap='inferno')
             ax[irow[iax]][icol[iax]].set_xlim(Globals.lon_target+Globals.merid_width, Globals.lon_target-Globals.merid_width)
             ax[irow[iax]][icol[iax]].set_xticks([]) if (iax < 9) else ax[irow[iax]][icol[iax]].set_xticks(np.arange(Globals.lon_target-Globals.merid_width, Globals.lon_target+Globals.merid_width+1,  step = Globals.merid_width/2))
+            ax[irow[iax]][icol[iax]].set_ylim(Globals.lat_target-Globals.para_width, Globals.lat_target+Globals.para_width)
+            ax[irow[iax]][icol[iax]].set_yticks(np.arange(Globals.lat_target-Globals.para_width, Globals.lat_target+Globals.para_width+1, step = 5))
             ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
-            ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
+            ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=12)
             cbar = fig.colorbar(im, ax=ax[irow[iax]][icol[iax]], extend='both', fraction=0.04, pad=0.05)#, orientation='horizontal')
             cbar.ax.tick_params(labelsize=12)
             cbar.ax.locator_params(nbins=6)
-            cbar.set_label("Radiance (nW cm$^{-1}$ sr$^{-1}$)", size=15)
             iax+=1 
-    plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
+    plt.axes([0.15, 0.1, 0.8, 0.8], frameon=False) 
     plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
     plt.xlabel("System III West Longitude", size=18)
     plt.ylabel("Planetocentric Latitude", size=18)
+    plt.title("Radiance (nW cm$^{-1}$ sr$^{-1}$)", size=15)
     # Save figure showing calibation method 
     plt.savefig(f"{dir}all_filters_radiance_maps.png", dpi=150, bbox_inches='tight')
     #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
@@ -354,13 +358,13 @@ def PlotRegionalAverage(dataset, mode, files, singles, spectrals):
                 _, _, iwave, _, _ = SetWave(filename=fname, wavelength=None, wavenumber=None, ifilt=None)
                 if iwave == wave:
                     ax[irow[iax]][icol[iax]].plot(singles[:, ifile, 1], singles[:, ifile, 3]*1.e9, lw=0, marker='.', markersize=2, color = 'black')
-            ax[irow[iax]][icol[iax]].plot(spectrals[:, ifilt_v, 1], spectrals[:, ifilt_v, 3]*1.e9, color='orange', lw=0, marker='o', markersize=2, label=f"{(wavl)}"+" $\mu$m")# at "+f"{abs(Globals.LCP)}"+"$^{\circ}$S")
+            ax[irow[iax]][icol[iax]].plot(spectrals[:, ifilt_v, 1], spectrals[:, ifilt_v, 3]*1.e9, color='orange', lw=0, marker='o', markersize=2)# at "+f"{abs(Globals.LCP)}"+"$^{\circ}$S")
+            ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
             ax[irow[iax]][icol[iax]].legend(fontsize=12, loc='lower right')
             ax[irow[iax]][icol[iax]].grid()
             ax[irow[iax]][icol[iax]].set_xlim(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1])
             ax[irow[iax]][icol[iax]].set_xticks([]) if (iax < 9) else ax[irow[iax]][icol[iax]].set_xticks(ticks=np.arange(360,-1,-60), labels=list(np.arange(360,-1,-60)))
             ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
-            ax[irow[iax]][icol[iax]].set_title(ititle[iax], fontfamily='serif', loc='left', fontsize=12)
             iax+=1 
     plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
     plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
