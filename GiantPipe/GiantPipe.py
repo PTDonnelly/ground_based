@@ -44,12 +44,12 @@ def main():
     bin_cpara   = False     # Use central parallel binning scheme
     bin_ctl     = False     # Use centre-to-limb binning scheme
     bin_region  = False     # Use regional binning scheme (for a zoom 2D retrieval)
-    bin_av_region = True   # Use averaged regional binning scheme (for a single profile retrieval)
+    bin_av_region = False   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
     save        = True      # Store calculated profiles to local files
     plotting    = True      # Plot calculated profiles
-    mapping     = False      # Plot maps of observations or retrieval
-    spx         = True      # Write spxfiles as spectral input for NEMESIS
+    mapping     = True      # Plot maps of observations or retrieval
+    spx         = False      # Write spxfiles as spectral input for NEMESIS
     retrieval   = False      # Plot NEMESIS outputs 
 
     ############################################################
@@ -193,16 +193,16 @@ def main():
     ############################################################
     if mapping:
 
-        from Plot.PlotMaps import PlotMaps, PlotZoomMaps, PlotMapsPerNight
+        from Plot.PlotMaps import PlotMaps, PlotZoomMaps, PlotMapsPerNight, PlotSubplotMapsPerNight
         from Plot.PlotPoles import PlotPolesFromGlobal
         from Plot.PlotPseudoWindShear import PlotPseudoWindShear, PlotCompositePseudoWindShear
-        from Plot.PlotBrightnessTemperatureProf import PlotCompositeTBprofile
+        # from Plot.PlotBrightnessTemperatureProf import PlotCompositeTBprofile
 
-        dataset = '2018May'
+        dataset = '2018May_completed'
 
     ### Point to location of observations
         files       = FindFiles(dataset=dataset, mode='_files')
-    ## Plot cylindrical maps
+    # Plot cylindrical maps
         if bin_cmerid:
             # Create plots and save global maps into npy arrays
             PlotMaps(dataset, files, spectrals)
@@ -210,10 +210,12 @@ def main():
             # Read in individual calibration coefficients
             _, spectrals = ReadCentralMeridNpy(dataset=dataset, mode=mode, return_singles=False, return_spectrals=True)
             # Create plots and save global maps into npy arrays
-            PlotMaps(dataset, files, spectrals)
+            # PlotMaps(dataset, files, spectrals)
     # Plot pole maps from global maps npy arrays
         # PlotZoomMaps(dataset=dataset, central_lon=180, lat_target=-20, lon_target=285, lat_window=15, lon_window=30)
         # PlotPolesFromGlobal(dataset=dataset, per_night=False)
+        # PlotMapsPerNight(dataset=dataset, files=files, spectrals=spectrals)
+        PlotSubplotMapsPerNight(dataset=dataset)
         # PlotPseudoWindShear(dataset=dataset)
         # PlotCompositePseudoWindShear(dataset=dataset)
         # PlotCompositeTBprofile(dataset=dataset)
@@ -236,23 +238,46 @@ def main():
 
         from Plot.PlotRetrievalOutputs import PlotContributionFunction
         from Plot.PlotRetrievalOutputs import PlotChiSquareOverNy, PlotChiSquareOverNySuperpose, PlotChiSquareMap
+        from Plot.PlotRetrievalOutputs import stat_test
+        from Plot.PlotRetrievalOutputs import PlotWindShearFromRetrievedTemperature
         from Plot.PlotRetrievalOutputs import PlotRetrievedTemperature, PlotRetrievedTemperatureProfile, PlotRetrievedTemperatureProfileSuperpose 
         from Plot.PlotRetrievalOutputs import PlotRetrievedTemperatureMaps, PlotRetrievedTemperatureCrossSection
         from Plot.PlotRetrievalOutputs import PlotRetrievedRadiance, PlotRetrievedRadianceMap, PlotRetrievedRadianceMeridian, PlotRetrievedRadianceMeridianSuperpose
         from Plot.PlotRetrievalOutputs import PlotRadianceParametricTest
         from Plot.PlotRetrievalOutputs import PlotRetrievedAerosolProfile, PlotRetrievedAerosolMaps, PlotRetrievedAerosolCrossSection
         from Plot.PlotRetrievalOutputs import PlotRetrievedGasesProfile, PlotRetrievedGasesProfileSuperpose, PlotRetrievedGasesMaps, PlotRetrievedGasesCrossSection
+        from Plot.PlotRetrievalOutputs import PlotRetrievedGasesMeridianProfiles
         from Plot.PlotRetrievalOutputs import PlotComparisonParametricGasesHydrocarbons, PlotComparisonParametricGasesHydrocarbonsParallel
         from Plot.PlotRetrievalOutputs import PlotAllForAuroraOverTime
+        from Plot.PlotRetrievalOutputs import PlotCheckPente
+        from Plot.PlotRetrievalOutputs import PlotSolarWindActivity
 
-        # PlotTemperaturePriorProfiles()
-        # PlotAerosolPriorProfiles()
-        # PlotRetrievedTemperature()
-        # PlotRetrievedTemperatureProfile()
-        # PlotRetrievedRadiance()
-        # PlotRetrievedAerosolProfile()
-        PlotRetrievedRadianceMeridian()
+
+        # # PlotTemperaturePriorProfiles()
+        # # PlotRetrievedTemperature()
+        # # PlotRetrievedTemperatureProfile()
+        # PlotRetrievedTemperatureCrossSection(over_axis="latitude")
+        # # PlotRetrievedTemperatureMaps()
+
+        # # PlotRetrievedRadianceMeridian(over_axis="latitude")
         
+        # # PlotAerosolPriorProfiles()
+        # # PlotRetrievedAerosolProfile()
+        # # PlotRetrievedAerosolMaps()
+        
+        # # PlotChiSquareOverNy(over_axis="latitude")
+        # PlotChiSquareOverNySuperpose(over_axis="latitude")
+        # # PlotChiSquareMap()
+        
+        # PlotWindShearFromRetrievedTemperature(over_axis="latitude")
+        
+        # # PlotRetrievedGasesCrossSection(over_axis="latitude")
+        # PlotRetrievedGasesMeridianProfiles(over_axis="latitude")
+        # PlotComparisonParametricGasesHydrocarbons()
+        
+        # stat_test()
+        # PlotCheckPente()
+        PlotSolarWindActivity()
 
 
 if __name__ == '__main__':

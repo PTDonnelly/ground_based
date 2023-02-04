@@ -5,6 +5,7 @@ def ReadExcelFiles(fpath):
 
     workbook = xlrd.open_workbook_xls(fpath)
 
+    tempsheet = workbook.sheet_by_index(0)
     c2h2sheet = workbook.sheet_by_index(2)
     c2h6sheet = workbook.sheet_by_index(4)
 
@@ -25,6 +26,12 @@ def ReadExcelFiles(fpath):
     for ilat in range(nlat-1):
         latitude[ilat] = c2h2sheet.cell_value(0,ilat+2)
     
+    # Fill Temperature array
+    temperature = np.empty((nlevel, nlat))
+    temperature.fill(np.nan)
+    for ilev in range (nlevel-1):
+        for ilat in range (nlat-1):
+            temperature[ilev, ilat] = tempsheet.cell_value(ilev+1,ilat+2)
     # Fill C2H2 array
     c2h2 = np.empty((nlevel, nlat))
     c2h2.fill(np.nan)
@@ -38,4 +45,4 @@ def ReadExcelFiles(fpath):
         for ilat in range (nlat-1):
             c2h6[ilev, ilat] = c2h6sheet.cell_value(ilev+1,ilat+2)
     
-    return pressure, latitude, c2h2, c2h6
+    return pressure, latitude, temperature, c2h2, c2h6

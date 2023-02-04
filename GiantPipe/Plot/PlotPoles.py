@@ -112,7 +112,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                 #cbar.ax.tick_params(labelsize=15)
                 cbar.set_label("Brightness Temperature [K]")
                 # Save pole map figure of the current filter
-                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+                _, wavlg, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                 if dataset== '2018May': 
                     plt.savefig(f"{dir}calib_{wavnb}_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
                     # plt.savefig(f"{dir}calib_{wavnb}_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
@@ -123,7 +123,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                 plt.close()
             
                 # Northern pole figure
-                PlotOnePole(img=globalmap[ifilt,:,:], filter=wavnb, vmin=min_north, vmax=max_north, \
+                PlotOnePole(img=globalmap[ifilt,:,:], filter=wavlg, vmin=min_north, vmax=max_north, \
                     central_longitude=central_lon, central_latitude=central_lat, \
                     latitude_limit=lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
                     longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
@@ -138,7 +138,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                 plt.close()
         
                 # Southern pole figure
-                PlotOnePole(img=globalmap[ifilt,:,:], filter=wavnb, vmin=min_south, vmax=max_south, \
+                PlotOnePole(img=globalmap[ifilt,:,:], filter=wavlg, vmin=min_south, vmax=max_south, \
                     central_longitude=central_lon, central_latitude=-central_lat, \
                     latitude_limit=-lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
                     longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
@@ -195,7 +195,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                 # Draw the gridlines without the default labels        
                 ax.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
                                 xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
-                ax.set_title(ititle[iax]+f"                                 {wavlg}"+r" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
+                ax.set_title(ititle[iax]+f"                                 {wavlg}"+r" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=12)
                 # Define a colorbar
                 cbar = plt.colorbar(im, ax=ax, format="%.0f", extend='both', fraction=0.046, pad=0.15)
                 cbar.ax.tick_params(labelsize=12)
@@ -253,7 +253,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                 # Draw the gridlines without the default labels        
                 ax.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
                                 xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
-                ax.set_title(ititle[iax]+f"                                 {wavlg}"+r" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
+                ax.set_title(ititle[iax]+f"                                 {wavlg}"+r" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=12)
                 # Define a colorbar
                 cbar = plt.colorbar(im, ax=ax, format="%.0f", extend='both', fraction=0.046, pad=0.15)
                 cbar.ax.tick_params(labelsize=12)
@@ -325,7 +325,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                     #cbar.ax.tick_params(labelsize=15)
                     cbar.set_label("Brightness Temperature [K]")
                     # Save pole map figure of the current filter
-                    _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+                    _, wavlg, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                     if dataset== '2018May': 
                         plt.savefig(f"{dir}calib_{wavnb}_pole_maps_night_{inight}_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
                         # plt.savefig(f"{dir}calib_{wavnb}_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
@@ -336,7 +336,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                     plt.close()
                 
                     # Northern pole figure
-                    PlotOnePole(img=globalmap[inight, ifilt,:,:], filter=wavnb, vmin=min_north, vmax=max_north, \
+                    PlotOnePole(img=globalmap[inight, ifilt,:,:], filter=wavlg, vmin=min_north, vmax=max_north, \
                         central_longitude=central_lon, central_latitude=central_lat, \
                         latitude_limit=lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
                         longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
@@ -351,7 +351,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                     plt.close()
             
                     # Southern pole figure
-                    PlotOnePole(img=globalmap[inight, ifilt,:,:], filter=wavnb, vmin=min_south, vmax=max_south, \
+                    PlotOnePole(img=globalmap[inight, ifilt,:,:], filter=wavlg, vmin=min_south, vmax=max_south, \
                         central_longitude=central_lon, central_latitude=-central_lat, \
                         latitude_limit=-lat_lim, number_meridian=num_merid, number_parrallel=num_parra, \
                         longitude_to_write=lon_to_write, delta_meridian=dmeridian, delta_parallel=dparallel)
@@ -410,7 +410,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                     # Draw the gridlines without the default labels        
                     ax.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
                                     xlocs=range(-180,180,dmeridian), ylocs=range(-90,91,dparallel),linestyle='--')
-                    ax.set_title(ititle[iax]+f"                                 {wavlg}"+r" $\mu$m", fontfamily='serif', loc='left', fontsize=12)
+                    ax.set_title(ititle[iax]+f"                                 {wavlg}"+r" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=12)
                     # Define a colorbar
                     # cax = plt.axes([0.75, 0.1, 0.02, 0.8])
                     cbar = plt.colorbar(im, ax=ax, format="%.0f", extend='both', fraction=0.046, pad=0.15)
@@ -456,13 +456,20 @@ def PlotOnePole(img, filter, vmin, vmax, central_longitude, central_latitude, la
     # Draw the gridlines without the default labels        
     ax.gridlines(draw_labels=False, crs=ccrs.PlateCarree(), color="grey", y_inline=False, \
                     xlocs=range(-180,180,delta_meridian), ylocs=range(-90,91,delta_parallel),linestyle='--')
+    # Adding filter wavelength info on the top right corner,
+    # for this, it is needed to project (again) on the Geodetic coordinates
+    if central_latitude>0:
+        filterx, filtery = ax.projection.transform_point(140, latitude_limit-25., ccrs.Geodetic())
+    if central_latitude<0:
+        filterx, filtery = ax.projection.transform_point(400, latitude_limit+25., ccrs.Geodetic())
+    ax.text(x=filterx, y=filtery, s=f"{filter}"+r" $\mu$m", size=12, fontfamily='sans-serif')
     # Define a colorbar
-    cax = plt.axes([0.75, 0.1, 0.02, 0.8])
-    cbar = plt.colorbar(im, cax=cax, format="%.0f", extend='both')#, fraction=0.046, pad=0.05)
-    cbar.ax.tick_params(labelsize=12)
-    cbar.locator = ticker.MaxNLocator(nbins=10)
-    cbar.update_ticks()
-    cbar.set_label(r" T$_{B}$ [K] at "+f"{int(filter)}"+r" cm$^{-1}$", size=15)
+    # cax = plt.axes([0.72, 0.1, 0.02, 0.8])
+    # cbar = plt.colorbar(im, cax=cax, format="%.0f", extend='both', fraction=0.046, pad=0.15)
+    # cbar.ax.tick_params(labelsize=12)
+    # cbar.locator = ticker.MaxNLocator(nbins=10)
+    # cbar.update_ticks()
+    # cbar.ax.set_title("[K]", size=12, pad=15)
 
 def CustomLongitudeLabels(axes, clat, lat_lim, num_merid):
     """ Small routine to define the longitude labels of the polar projection """

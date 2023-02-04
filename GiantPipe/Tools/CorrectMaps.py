@@ -71,7 +71,7 @@ def MuNormalization(files):
         filter_name = filter_name[0]
         # Set the power of mumaps
         if filter_name == 'J7.9':
-            mu_power = 0.005
+            mu_power = 1.e-20
         if filter_name == 'PAH1' or filter_name == 'ARIII':
             mu_power = 0.3
         if filter_name =='SIV' or filter_name =='SIV_1' or filter_name == 'SIV_2' or filter_name == 'NEII_1' or filter_name == 'NEII_2':
@@ -348,13 +348,14 @@ def ApplyPolynom(directory, files, spectrals):
         cmaps[ifile, :, :] = ConvertBrightnessTemperature(cmaps[ifile, :, :], wavelength=wavelength[ifile])
 
     for ifilt in range(Globals.nfilters):
-        adj_location= 'average' if ifilt < 10 else 'southern'
+        adj_location= 'average' if ifilt < 8 else 'southern'
         if ifilt != 6 and ifilt != 7:
             # Get filter index for spectral profiles
             waves = spectrals[:, ifilt, 5]
             wave  = waves[(waves > 0)][0]
             _, _, _, _, ifilt = SetWave(filename=None, wavelength=False, wavenumber=wave, ifilt=False)
             # Get polynome coefficient calculating for 2018May dataset 
+            
             coeff = np.load(f'../outputs/2018May/global_maps_figures/calib_{wave}_polynomial_coefficients_{adj_location}.npy')
             # Calculate polynomial adjustement for each hemisphere (using mask selections)
             p = np.poly1d(coeff)
