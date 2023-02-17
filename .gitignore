@@ -1,7 +1,6 @@
 *.pyc
 *.png
 *.eps
-<<<<<<< Updated upstream
 *.dat
 *.txt
 *.npy
@@ -11,12 +10,3 @@
 .DS_store
 outputs/
 outputs/.DS_store
-=======
-*.npy
-*.txt
-*.dat
-visir.jup.filtered-iris-cirs.10-12-15.data.v3
-jup_grav.dat
-jupiter_jets.dat
-2003porco_zonalu.dat
->>>>>>> Stashed changes
