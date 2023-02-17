@@ -257,7 +257,7 @@ def PlotRegionalMaps(dataset, mode, spectrals):
     print('Plotting radiances maps...')
 
     # If subdirectory does not exist, create it
-    dir = f'../outputs/{dataset}/maps_radiance_lat{Globals.lat_target}_lon{Globals.lon_target}_figures/'
+    dir = f'../outputs/{dataset}/maps_radiance_lat{Globals.lat_target}_lon{Globals.lon_target}_{Globals.latstep}x{Globals.lonstep}_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
    
@@ -265,12 +265,12 @@ def PlotRegionalMaps(dataset, mode, spectrals):
         # Get retrieve wavenumber value from ifilt index
         _, _, wave, _, _ = SetWave(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)  
         # Set extreme values for mapping
-        spectrals[:, :, ifilt, 3] *= 1.e9
-        max = np.nanmax(spectrals[:, :, ifilt, 3]) 
-        min = np.nanmin(spectrals[:, :, ifilt, 3])
+        # spectrals[:, :, ifilt, 3] *= 1.e9
+        max = np.nanmax(spectrals[:, :, ifilt, 3]*1.e9) 
+        min = np.nanmin(spectrals[:, :, ifilt, 3]*1.e9)
         # Create a figure per filter
         fig = plt.figure(figsize=(8, 3))
-        plt.imshow(spectrals[:, :, ifilt, 3], vmin=min, vmax=max, origin='lower', extent = [360,0,-90,90],  cmap='inferno')
+        plt.imshow(spectrals[:, :, ifilt, 3]*1.e9, vmin=min, vmax=max, origin='lower', extent = [360,0,-90,90],  cmap='inferno')
         plt.xlim(Globals.lon_target+Globals.merid_width, Globals.lon_target-Globals.merid_width)
         plt.xticks(np.arange(Globals.lon_target-Globals.merid_width, Globals.lon_target+Globals.merid_width+1,  step = Globals.merid_width/2))
         plt.xlabel('System III West Longitude', size=15)
@@ -303,10 +303,10 @@ def PlotRegionalMaps(dataset, mode, spectrals):
             _, wavl, wave, _, _ = SetWave(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)
             # Set extreme values for mapping
             # spectrals[:, :, ifilt, 3] *= 1.e9 # ALREADY DONE IN THE PREVIOUS LOOP 
-            max = np.nanmax(spectrals[:, :, ifilt, 3]) 
-            min = np.nanmin(spectrals[:, :, ifilt, 3])
+            max = np.nanmax(spectrals[:, :, ifilt, 3]*1.e9) 
+            min = np.nanmin(spectrals[:, :, ifilt, 3]*1.e9)
             # subplot showing the regional radiance maps
-            im= ax[irow[iax]][icol[iax]].imshow(spectrals[:, :, ifilt, 3], vmin=min, vmax=max, origin='lower', extent = [360,0,-90,90],  cmap='inferno')
+            im= ax[irow[iax]][icol[iax]].imshow(spectrals[:, :, ifilt, 3]*1.e9, vmin=min, vmax=max, origin='lower', extent = [360,0,-90,90],  cmap='inferno')
             ax[irow[iax]][icol[iax]].set_xlim(Globals.lon_target+Globals.merid_width, Globals.lon_target-Globals.merid_width)
             ax[irow[iax]][icol[iax]].set_xticks([]) if (iax < 9) else ax[irow[iax]][icol[iax]].set_xticks(np.arange(Globals.lon_target-Globals.merid_width, Globals.lon_target+Globals.merid_width+1,  step = Globals.merid_width/2))
             ax[irow[iax]][icol[iax]].set_ylim(Globals.lat_target-Globals.para_width, Globals.lat_target+Globals.para_width)
@@ -316,12 +316,12 @@ def PlotRegionalMaps(dataset, mode, spectrals):
             cbar = fig.colorbar(im, ax=ax[irow[iax]][icol[iax]], extend='both', fraction=0.04, pad=0.05)#, orientation='horizontal')
             cbar.ax.tick_params(labelsize=12)
             cbar.ax.locator_params(nbins=6)
+            cbar.ax.set_title(r"[nW cm$^{-1}$ sr$^{-1}$]", size=12, pad=8)
             iax+=1 
     plt.axes([0.15, 0.1, 0.8, 0.8], frameon=False) 
     plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
     plt.xlabel("System III West Longitude", size=18)
     plt.ylabel("Planetocentric Latitude", size=18)
-    plt.title("Radiance (nW cm$^{-1}$ sr$^{-1}$)", size=15)
     # Save figure showing calibation method 
     plt.savefig(f"{dir}all_filters_radiance_maps.png", dpi=150, bbox_inches='tight')
     #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)

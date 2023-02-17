@@ -95,7 +95,7 @@ def WriteRegional(dataset, files, singles, spectrals):
 
     if np.any(singles):
         # If subdirectory does not exist, create it
-        dir = f'../outputs/{dataset}/single_lat{Globals.lat_target}_lon{Globals.lon_target}_maps/'
+        dir = f'../outputs/{dataset}/single_lat{Globals.lat_target}_lon{Globals.lon_target}_{Globals.latstep}x{Globals.lonstep}_maps/'
         if not os.path.exists(dir):
             os.makedirs(dir)
         # Save individual parallel profiles
@@ -112,7 +112,7 @@ def WriteRegional(dataset, files, singles, spectrals):
         
     if np.any(spectrals):
         # If subdirectory does not exist, create it
-        dir = f'../outputs/{dataset}/spectral_lat{Globals.lat_target}_lon{Globals.lon_target}_maps/'
+        dir = f'../outputs/{dataset}/spectral_lat{Globals.lat_target}_lon{Globals.lon_target}_{Globals.latstep}x{Globals.lonstep}_maps/'
         if not os.path.exists(dir):
             os.makedirs(dir)
         # Save spectral parallel profiles

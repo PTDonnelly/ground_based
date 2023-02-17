@@ -173,7 +173,7 @@ def WriteRegionalSpx(dataset, mode, spectrals):
             f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(wave, rad, rad_err))        
     
     # If subdirectory does not exist, create it
-    dir = f'../outputs/{dataset}/spxfiles_lat{Globals.lat_target}_lon{Globals.lon_target}_no852_no887/'
+    dir = f'../outputs/{dataset}/spxfiles_lat{Globals.lat_target}_lon{Globals.lon_target}_{Globals.latstep}x{Globals.lonstep}_no852_no887/'
     if not os.path.exists(dir):
         os.makedirs(dir)
     
