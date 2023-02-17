@@ -5,7 +5,7 @@ import numpy as np
 nx, ny = 720, 360                               # Dimensions of an individual cylindrical map
 ## Central Meridian binning
 latrange    = -90, 90          			          # Latitude range for binning pixels (planetographic)
-latstep     = 1                                 # Latitude increment for binning pixels (planetographic)
+latstep     = 10                                 # Latitude increment for binning pixels (planetographic)
 latgrid     = np.arange(-89.5, 90, latstep)      # Latitude range from pole-to-pole
 nlatbins    = len(latgrid)                       # Number of latitude bins
 merid_width = 60 #20 #80 #30 #60                                 # Longitude range about the central meridian for averaging
@@ -22,6 +22,12 @@ LCP = -80                                        # Latitude Central Parallel (eq
 lat_target  = -80 #-20                                # Latitude target for the regional and regional average binning schemes (GRS=-20, S-AURORA=-80)
 lon_target = 360 #157                                 # Longitude target for the regional and regional average binning schemes (GRS=157, S-AURORA=360)
 
-nfilters    = 13                                 # Set manually if using irregularly-sampled data
+## Centre-to-limb binning
+murange    = 0, 90          			           # Emission angle range for binning pixels (planetographic)
+mustep     = 10                                 # Emission angle increment for binning pixels (planetographic)
+mugrid     = np.arange(0.5, 90, mustep)       # Emission angle range from pole-to-pole
+nmubins    = len(mugrid)                       # Number of latitude bins
+
+nfilters    = 8                                 # Set manually if using irregularly-sampled data
 # mu_max      = 80.0                 		       # Maximum emission angle
 

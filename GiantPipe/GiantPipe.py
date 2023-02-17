@@ -42,14 +42,14 @@ def main():
     # Binning
     bin_cmerid  = False     # Use central meridian binning scheme
     bin_cpara   = False     # Use central parallel binning scheme
-    bin_ctl     = False     # Use centre-to-limb binning scheme
+    bin_ctl     = True     # Use centre-to-limb binning scheme
     bin_region  = False     # Use regional binning scheme (for a zoom 2D retrieval)
-    bin_av_region = True   # Use averaged regional binning scheme (for a single profile retrieval)
+    bin_av_region = False   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
-    save        = True      # Store calculated profiles to local files
-    plotting    = True      # Plot calculated profiles
+    save        = False      # Store calculated profiles to local files
+    plotting    = False      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
-    spx         = True      # Write spxfiles as spectral input for NEMESIS
+    spx         = False      # Write spxfiles as spectral input for NEMESIS
     retrieval   = False      # Plot NEMESIS outputs 
 
     ############################################################
@@ -78,7 +78,7 @@ def main():
     
     # Define calibration mode
     mode   = 'giantpipe'
-    dataset = '2018May_completed'
+    dataset = '2018May'
     # Point to observations
     files  = FindFiles(dataset=dataset, mode=mode+'_files')
     nfiles = len(files)
@@ -94,6 +94,8 @@ def main():
             spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_region')
         if bin_av_region:
             spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_av_region')
+        if bin_ctl:
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_cmerid')
 
     if bin_cmerid:
         # Execute the central meridian binning scheme
@@ -137,7 +139,7 @@ def main():
     if bin_ctl:
         # Execute the central meridian binning scheme
         if 'fits' in source:
-            singles, spectrals = BinCentreToLimb(nfiles=nfiles, spectrum=spectrum)
+            singles, spectrals = BinCentreToLimb(mode=mode, nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
         if 'npy' in source:
             singles, spectrals = ReadCentreToLimbNpy(mode=mode, return_singles=False, return_spectrals=True)
 
