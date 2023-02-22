@@ -2,10 +2,12 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
+import matplotlib.gridspec as gridspec
 from copy import copy
 from scipy.interpolate import UnivariateSpline, interp1d
 import Globals
 from Read.ReadCal import ReadCal
+from Read.ReadFits import ReadFits
 from Tools.SetWave import SetWave
 
 # Colormap definition
@@ -186,7 +188,6 @@ def PlotParaProfiles(dataset, mode, files, singles, spectrals):
     # Clear figure to avoid overlapping between plotting subroutines
     plt.close()
 
-
 def PlotGlobalSpectrals(dataset, spectrals):
     """Basic code to plot the central meridian profiles with wavenumber
     (or spectral profiles with latitude, depending on the perspective).
@@ -245,11 +246,132 @@ def PlotGlobalSpectrals(dataset, spectrals):
     plt.savefig(f"{dir}global_spectrals_res2.png", dpi=150, bbox_inches='tight')
     plt.close()
 
-def PlotCentreTotLimbProfiles(mode, singles, spectrals):
+def PlotCentreToLimbProfiles(dataset, mode, files, singles, spectrals):
     print('Plotting profiles...')
 
-    
-    a = 1
+    # If subdirectory does not exist, create it
+    dir = f'../outputs/{dataset}/ctl_profiles_figures/'
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+        os.makedirs(f"{dir}singles/")
+        os.makedirs(f"{dir}spectrals/")
+
+    # Define common plotting parameters
+    fontsize = 5
+    symsize = 1
+    linewidth = 1
+    savepng, savepdf = True, False
+
+    def PlotGlobalCTLFigures():
+        
+        def PlotSingles():
+            for ifile, fpath in enumerate(files):
+                # Read in image and cylindrical map
+                imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filepath=f"{fpath}")
+                # Build figure area
+                fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(10, 4),
+                                        gridspec_kw={'width_ratios': [2,4,1], 'height_ratios': [1]}, dpi=300)
+                cmap = plt.get_cmap('cividis')
+                fname = fpath.split('/')
+                plt.suptitle(f"{fname[-1]}")
+                # Plot data
+                for iplot in range(3):
+                    if iplot == 0:
+                        data = imgdata
+                        title = "Image"
+                        dims = np.shape(imgdata)
+                        xmin, xmax = 0, dims[0]
+                        ymin, ymax = 0, dims[1]
+                        xlabel, ylabel = "x", "y"
+                        xticks, yticks = np.arange(xmin, xmax+1, 100), np.arange(ymin, ymax+1, 100)
+                        xticklabels, yticklabels = np.asarray(xticks, dtype=int), np.asarray(yticks, dtype=int)
+                    if iplot == 1:
+                        data = cyldata
+                        title = "Cylindrical map"
+                        xmin, xmax = 360, 0
+                        ymin, ymax = -90, 90
+                        xlabel, ylabel = r"Longitude ($^{\circ}$)", r"Latitude ($^{\circ}$)"
+                        xticks, yticks = np.flipud(np.arange(xmax, xmin+1, 60)), np.arange(ymin, ymax+1, 30)
+                        xticklabels, yticklabels = np.asarray(xticks, dtype=int), np.asarray(yticks, dtype=int)
+                    if iplot == 2:
+                        data = singles[ifile, :, :, 3]
+                        title = "Emission angle map"
+                        xmin, xmax = 0, 90
+                        ymin, ymax = -90, 90
+                        xlabel, ylabel = r"Emission Angle ($^{\circ}$)", r"Latitude ($^{\circ}$)"
+                        xticks, yticks = np.arange(xmin, xmax+1, 15), np.arange(ymin, ymax+1, 30)
+                        xticklabels, yticklabels = np.asarray(xticks, dtype=int), np.asarray(yticks, dtype=int)
+                    axes[iplot].imshow(data, origin='lower', extent=[xmin, xmax, ymin, ymax], cmap=cmap, aspect='equal')
+                    # Clean up axes
+                    axes[iplot].grid(axis='both', markevery=1, color='k', ls=':', lw=0.5*linewidth)
+                    axes[iplot].set_title(title)
+                    axes[iplot].set_xlim((xmin, xmax))
+                    axes[iplot].set_ylim((ymin, ymax))
+                    axes[iplot].set_xlabel(xlabel, fontsize=fontsize, labelpad=1)
+                    axes[iplot].set_ylabel(ylabel, fontsize=fontsize, labelpad=1)
+                    axes[iplot].set_xticks(xticks)
+                    axes[iplot].set_yticks(yticks)
+                    axes[iplot].set_xticklabels(xticklabels)
+                    axes[iplot].set_yticklabels(yticklabels)
+                    axes[iplot].tick_params(axis='both', length=1, pad=1, labelsize=fontsize)
+                
+                # Finish and close plot
+                plt.subplots_adjust(hspace=0.2, wspace=0.2)  
+                if savepng:
+                    fmt = 'png'
+                    plt.savefig(f"{dir}singles/single_global_{fname[-1]}.{fmt}", dpi=300, format=fmt, bbox_inches='tight')
+                if savepdf:
+                    fmt = 'pdf'
+                    plt.savefig(f"{dir}singles/single_global_{fname[-1]}.{fmt}", dpi=300, format=fmt, bbox_inches='tight')
+                plt.close()
+        
+        def PlotSpectrals():
+       
+            fig, axes = plt.subplots(nrows=2, ncols=4, sharex=True, sharey=True, figsize=(4, 4), dpi=300)
+            cmap = plt.get_cmap('cividis')
+            plt.suptitle("Global Centre-to-Limb Profiles")
+            xmin, xmax = 0, 90
+            ymin, ymax = -90, 90
+            xlabel, ylabel = r"Emission Angle ($^{\circ}$)", r"Latitude ($^{\circ}$)"
+            xticks, yticks = np.arange(xmin, xmax+1, 15), np.arange(ymin, ymax+1, 30)
+            xticklabels, yticklabels = np.asarray(xticks, dtype=int), np.asarray(yticks, dtype=int)
+            for iplot in range(Globals.nfilters):
+                # Sub plot panel
+                ax = axes[iplot // 4, iplot % 4]
+                ax.imshow(spectrals[iplot, :, :, 3], cmap=cmap, origin='lower', extent=[xmin, xmax, ymin, ymax])
+                # Extract wavenumber
+                findwave = ~np.isnan(spectrals[iplot, :, :, 5])
+                waves = list(spectrals[iplot, findwave, 5])
+                wave = np.int(waves[0])
+                # Clean up plot
+                ax.grid(axis='both', markevery=1, color='k', ls=':', lw=0.5*linewidth)
+                ax.set_title(wave, fontsize=fontsize, pad=2)
+                ax.set_xlim((xmin, xmax))
+                ax.set_ylim((ymin, ymax))
+                if (iplot // 4 == 1):
+                    ax.set_xlabel(xlabel, fontsize=fontsize, labelpad=1)
+                    ax.set_xticks(xticks)
+                    ax.set_xticklabels(xticklabels)
+                if (iplot % 4 == 0):
+                    ax.set_ylabel(ylabel, fontsize=fontsize, labelpad=1)
+                    ax.set_yticks(yticks)
+                    ax.set_yticklabels(yticklabels)
+                ax.tick_params(axis='both', length=1, pad=1, labelsize=fontsize-1)
+            # Finish and close plot
+            plt.subplots_adjust(hspace=0.1, wspace=0.1)  
+            if savepng:
+                fmt = 'png'
+                plt.savefig(f"{dir}spectrals/spectral_globals.{fmt}", dpi=300, format=fmt, bbox_inches='tight')
+            if savepdf:
+                fmt = 'pdf'
+                plt.savefig(f"{dir}spectrals/spectral_globals.{fmt}", dpi=300, format=fmt, bbox_inches='tight')
+            plt.close()
+
+        # Plot centre-to-limb profiles
+        # PlotSingles()
+        PlotSpectrals()
+
+    PlotGlobalCTLFigures()
 
 def PlotRegionalMaps(dataset, mode, spectrals):
     """ Plot radiance maps """

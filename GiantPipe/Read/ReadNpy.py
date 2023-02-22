@@ -54,8 +54,28 @@ def ReadCentralParallelNpy(dataset, mode, return_singles, return_spectrals):
 
     return singles, spectrals
 
-def ReadCentreToLimbNpy(mode, return_singles, return_spectrals):
-    a=1
+def ReadCentreToLimbNpy(dataset, mode, return_singles, return_spectrals):
+    if return_singles:
+        # Point to stored ctl profiles
+        profiles = FindFiles(dataset=dataset, mode=mode+'_singles')
+        # Load .npy files
+        singles = np.asarray([np.load(p) for p in profiles])
+        # Fix shape (numpy changes array shape when storing)
+        # singles = np.flip(np.rollaxis(singles, 1), 1)
+    else:
+        singles = None
+    
+    if return_spectrals:
+        # Point to stored ctl profiles
+        profiles = FindFiles(dataset=dataset, mode=mode+'_spectrals')
+        # Load .npy files
+        spectrals = np.asarray([np.load(p) for p in profiles])
+        # Fix shape (numpy changes array shape when storing)
+        # spectrals = np.flip(np.rollaxis(spectrals, 1), 1)
+    else:
+        spectrals = None
+
+    return singles, spectrals
 
 def ReadRegionalNpy(dataset, mode, return_singles, return_spectrals):
     """Read in pre-calculated maps and/or coefficients from local .npy files"""

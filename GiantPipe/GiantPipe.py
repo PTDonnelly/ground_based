@@ -16,6 +16,7 @@ def main():
     # from Calibrate.CylindricalMaps import CalCylindricalMaps
     from Plot.PlotProfiles import PlotMeridProfiles
     from Plot.PlotProfiles import PlotParaProfiles
+    from Plot.PlotProfiles import PlotCentreToLimbProfiles
     from Plot.PlotProfiles import PlotGlobalSpectrals
     from Plot.PlotProfiles import PlotRegionalMaps
     from Plot.PlotProfiles import PlotRegionalAverage
@@ -46,7 +47,7 @@ def main():
     bin_region  = False     # Use regional binning scheme (for a zoom 2D retrieval)
     bin_av_region = False   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
-    save        = False      # Store calculated profiles to local files
+    save        = False     # Store calculated profiles to local files
     plotting    = False      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
     spx         = False      # Write spxfiles as spectral input for NEMESIS
@@ -141,15 +142,15 @@ def main():
         if 'fits' in source:
             singles, spectrals = BinCentreToLimb(mode=mode, nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
         if 'npy' in source:
-            singles, spectrals = ReadCentreToLimbNpy(mode=mode, return_singles=False, return_spectrals=True)
+            singles, spectrals = ReadCentreToLimbNpy(dataset=dataset, mode=mode, return_singles=True, return_spectrals=True)
 
         if save:
             # Store calculated profiles
             WriteCentreToLimbProfiles(dataset=dataset, mode=mode, files=files, singles=singles, spectrals=spectrals)
 
-        # if plotting:
+        if plotting:
             # Plot mean central meridian profiles
-            # PlotCentreToLimbProfiles(dataset=dataset, mode=mode, singles=singles, spectrals=spectrals)
+            PlotCentreToLimbProfiles(dataset=dataset, mode=mode, files=files, singles=singles, spectrals=spectrals)
 
         if spx:
             # Write mean central meridian profiles to spxfile

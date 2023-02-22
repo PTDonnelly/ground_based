@@ -79,13 +79,47 @@ def WriteParallelProfiles(dataset, files, singles, spectrals):
                         fmt=['%4.2f', '%5.2f', '%4.2f', '%8.5e', '%8.5e', '%8.5f'],
                         header='LCP    LON    MU    RAD    ERROR    NU')
 
-def WriteCentreToLimbProfiles(mode, files, singles, spectrals):
-            """Save calibrated profiles (and optionally coefficients) as
-            numpy arrays and textfiles"""
+def WriteCentreToLimbProfiles(dataset, mode, files, singles, spectrals):
+    """Save calibrated profiles (and optionally coefficients) as
+    numpy arrays and textfiles"""
 
-            print('Saving profiles...')
-            
-            a = 1
+    print('Saving profiles...')
+    
+    if np.any(singles):
+        # If subdirectory does not exist, create it
+        dir = f'../outputs/{dataset}/single_ctl_profiles/'
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        # Save individual meridional profiles
+        for ifile, fname in enumerate(files):
+            # Extract filename
+            name = fname.split('.fits.gz')
+            name = name[0].split('/')
+            # Write individual mean profiles to np.array
+            np.save(f"{dir}{name[-1]}_ctl_profile", singles[:, :, ifile, :])
+        
+    if np.any(spectrals):
+        # If subdirectory does not exist, create it
+        dir = f'../outputs/{dataset}/spectral_ctl_profiles/'
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        # Save spectral meridional profiles
+        
+        # import Globals
+        for ifilt in range(Globals.nfilters):
+            # Write spectral mean profiles to np.array
+            findwave = ~np.isnan(spectrals[:, :, ifilt, 5])
+            waves = list(spectrals[findwave, ifilt, 5])
+            wave = waves[0]
+            np.save(f"{dir}{wave}_ctl_profile", spectrals[:, :, ifilt, :])
+
+            import matplotlib.pyplot as plt
+            print(np.shape(singles), np.shape(spectrals))
+            plt.figure()
+            cmap = plt.get_cmap('cividis')
+            plt.imshow(spectrals[:, :, ifilt, 3], origin='lower', cmap=cmap)
+            plt.title(f"Writing to numpy {ifilt}")
+            plt.show()
 
 def WriteRegional(dataset, files, singles, spectrals):
     """Save calibrated maps (and optionally coefficients) as

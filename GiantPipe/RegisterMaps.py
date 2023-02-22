@@ -1,5 +1,6 @@
 import numpy as np
 from math import acos, cos, radians, pi
+import matplotlib.pyplot as plt
 import Globals
 from Read.ReadFits import ReadFits
 from Tools.SetWave import SetWave
@@ -37,12 +38,6 @@ def RegisterMaps(files, binning):
         print(ifile, fpath)
         ## Step 1: Read img, cmap and mufiles
         imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filepath=f"{fpath}")
-        
-        # print(np.mean(cyldata))
-        # plt.figure()
-        # plt.imshow(cyldata)
-        # plt.show()
-        # exit()
 
         ## Step 2: Geometric registration of pixel information
         # Save flag depending on Northern (1) or Southern (-1) viewing

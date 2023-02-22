@@ -4,18 +4,20 @@ import warnings
 import matplotlib.pyplot as plt
 import Globals
 from Tools.SetWave import SetWave
+from collections import defaultdict
 
 def BinCentreToLimb(mode, nfiles, spectrum, LCMIII):
     print('Calculating centre-to-limb profiles...')
 
-    from collections import defaultdict
-
     def find_filters(filters):
-        tally = defaultdict(list)
+        # Define a defaultdict that returns an empty list instead of a KeyError if key is absent.
+        count = defaultdict(list)
+        # Store filter name as dictionary key and index as item
         for i, item in enumerate(filters):
-            tally[item].append(i)
-        return ((key, locs) for key, locs in tally.items() if len(locs)>1)
-
+            count[item].append(i)
+        # Store filter indices only if filter is present
+        filter_indices = ((key, item) for key, item in count.items() if ~np.isnan(key))
+        return filter_indices
     def singles(nfiles, spectrum, LCMIII):
         """Create central meridian average for each observation"""
 
@@ -81,19 +83,27 @@ def BinCentreToLimb(mode, nfiles, spectrum, LCMIII):
             print(f"LAT: {clat}")
             for imu, cmu in enumerate(Globals.mugrid):
                 # Loop over filters and create mean spectral profiles
-                print(f"MU: {cmu}")
                 filters = single_ctls[ilat, imu, :, 5]
                 filter_indices = sorted(find_filters(filters=filters))
+                print(f"LAT: {clat}", cmu)
                 for ifilt, filt in enumerate(filter_indices):
-                    print(f"FILT: {filt}")
                     filt_idx = filt[1]
                     spx = single_ctls[ilat, imu, filt_idx, :]
+                    wave = filt[0]
+                    keep = (filters == wave)
+                    spx = single_ctls[ilat, imu, keep, :]
+
+                    print(ifilt, np.shape(keep), np.shape(filt_idx))
+                    print(filters[keep])
+                    print(filters[filt_idx])
+                    print('')
                     if np.any(spx):
                         # Pull out variables
                         LCM      = bn.nanmean(spx[:, 1])
-                        mu       = bn.nanmin(spx[:, 2])
+                        mu       = cmu #bn.nanmin(spx[:, 2])
                         rad      = bn.nanmean(spx[:, 3])
                         rad_err  = bn.nanmean(spx[:, 4])
+                        # print(ifilt, filt[0] == spx[:, 5][0])
                         wavenum  = spx[:, 5][0]
                         # Store spectral CTL profiles
                         spectral_ctls[ilat, imu, ifilt, 0] = clat
@@ -102,18 +112,25 @@ def BinCentreToLimb(mode, nfiles, spectrum, LCMIII):
                         spectral_ctls[ilat, imu, ifilt, 3] = rad
                         spectral_ctls[ilat, imu, ifilt, 4] = rad_err
                         spectral_ctls[ilat, imu, ifilt, 5] = wavenum
-
+            input()
         # Throw away zeros
         spectral_ctls[spectral_ctls == 0] = np.nan
 
-        for ifilt in range(Globals.nfilters):
-            plt.figure(dpi=300)
-            cmap = plt.get_cmap('cividis')
-            plt.imshow(spectral_ctls[:, :, ifilt, 3], cmap=cmap)
-            plt.title(ifilt)
-            plt.savefig(f"/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/figures/all_{ifilt}.png", dpi=300)
-            plt.close()
+        # for ijk in range(nfiles):
+        #     plt.figure()
+        #     cmap = plt.get_cmap('cividis')
+        #     plt.imshow(single_ctls[:, :, ijk, 3], origin='lower', cmap=cmap)
+        #     plt.title(f"Binning from FITS {ijk}: single")
+        #     plt.show()
 
+        for ijk in range(Globals.nfilters):
+            plt.figure()
+            cmap = plt.get_cmap('cividis')
+            plt.imshow(spectral_ctls[:, :, ijk, 3], origin='lower', cmap=cmap)
+            plt.title(f"Binning from FITS {ijk}: spectral")
+            plt.show()
+
+        # exit()
         return spectral_ctls
 
     singles = singles(nfiles, spectrum, LCMIII)
