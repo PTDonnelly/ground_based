@@ -1,4 +1,6 @@
 def SetWave(filename, wavelength, wavenumber, ifilt):
+
+
     """Convert between filter name, wavelength, wavenumber and filter index
         for visir filters. Takes whatever value you have and outputs all 
         infomation about the filter as well as indices (with respect to the
@@ -115,6 +117,70 @@ def SetWave(filename, wavelength, wavenumber, ifilt):
     #     wavenumber = 512.821
     #    ifilt = 14
     if (filter_name == 'Q3') or (wavelength == 19.50) or (wavenumber == 511.97345) or (ifilt == 12):
+        filter_name = 'Q3'
+        wavelength = 19.50
+        wavenumber = 511.97345
+        ifilt_sc, ifilt_v = 14, 12
+
+    return filter_name, wavelength, wavenumber, ifilt_sc, ifilt_v
+
+def SetWaveReduced(filename, wavelength, wavenumber, ifilt):
+    """Convert between filter name, wavelength, wavenumber and filter index
+        for visir filters. Takes whatever value you have and outputs all 
+        infomation about the filter as well as indices (with respect to the
+        full filterset) for calibration."""
+    
+    if filename == None:
+        filter_name = None 
+    else:
+        # Consider generalising this too
+        filter_name = filename.split('visir_')
+        filter_name = filter_name[-1].split('_20')
+        filter_name = filter_name[0]
+
+    if (filter_name == 'J7.9') or (wavelength == 7.90) or (wavenumber == 1253.0625) or (ifilt == 0):
+        filter_name = 'J7.9'
+        wavelength = 7.90
+        wavenumber = 1253.0625
+        ifilt_sc, ifilt_v = 0, 0
+
+    if (filter_name == 'PAH1') or (wavelength == 8.59) or (wavenumber == 1163.0755) or (ifilt == 1):
+        filter_name = 'PAH1'
+        wavelength = 8.59
+        wavenumber = 1163.0755
+        ifilt_sc, ifilt_v = 1, 1
+
+    if (filter_name == 'SIV_2') or (wavelength == 10.77) or (wavenumber == 929.27953) or (ifilt == 2):
+        filter_name = 'SIV_2'
+        wavelength = 10.77
+        wavenumber = 929.27953
+        ifilt_sc, ifilt_v = 5, 5
+        
+    if (filter_name == 'NEII_1') or (wavelength == 12.27) or (wavenumber == 815.70010) or (ifilt == 3):
+        filter_name = 'NEII_1'
+        wavelength = 12.27
+        wavenumber = 815.70010
+        ifilt_sc, ifilt_v = 9, 8
+
+    if (filter_name == 'NEII_2') or (wavelength == 13.04) or (wavenumber == 766.75227) or (ifilt == 4):
+        filter_name = 'NEII_2'
+        wavelength = 13.04
+        wavenumber = 766.75227
+        ifilt_sc, ifilt_v = 11, 9
+
+    if (filter_name == 'Q1') or (wavelength == 17.65) or (wavenumber == 563.97095) or (ifilt == 5):
+        filter_name = 'Q1'
+        wavelength = 17.65
+        wavenumber = 563.97095
+        ifilt_sc, ifilt_v = 12, 10
+
+    if (filter_name == 'Q2') or (wavelength == 18.72) or (wavenumber == 532.73522) or (ifilt == 6):
+        filter_name = 'Q2'
+        wavelength = 18.72
+        wavenumber = 532.73522
+        ifilt_sc, ifilt_v = 13, 11
+
+    if (filter_name == 'Q3') or (wavelength == 19.50) or (wavenumber == 511.97345) or (ifilt == 7):
         filter_name = 'Q3'
         wavelength = 19.50
         wavenumber = 511.97345

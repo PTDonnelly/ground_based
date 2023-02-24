@@ -47,7 +47,7 @@ def main():
     bin_region  = False     # Use regional binning scheme (for a zoom 2D retrieval)
     bin_av_region = False   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
-    save        = False     # Store calculated profiles to local files
+    save        = True     # Store calculated profiles to local files
     plotting    = False      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
     spx         = False      # Write spxfiles as spectral input for NEMESIS

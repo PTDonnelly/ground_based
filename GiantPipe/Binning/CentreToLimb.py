@@ -3,7 +3,7 @@ import bottleneck as bn
 import warnings
 import matplotlib.pyplot as plt
 import Globals
-from Tools.SetWave import SetWave
+from Tools.SetWave import SetWaveReduced
 from collections import defaultdict
 
 def BinCentreToLimb(mode, nfiles, spectrum, LCMIII):
@@ -27,6 +27,7 @@ def BinCentreToLimb(mode, nfiles, spectrum, LCMIII):
 
         # Loop over latitudes and create CTL profiles
         print('Binning CTL profiles...')
+        
         for ilat, clat in enumerate(Globals.latgrid):
             # Define centre and edges of latitude bin
             lat1 = Globals.latrange[0] + (Globals.latstep)*ilat
@@ -54,7 +55,7 @@ def BinCentreToLimb(mode, nfiles, spectrum, LCMIII):
                             # if np.any(spx):
                             # Pull out variables
                             LCM      = bn.nanmean(spx[:, 1])
-                            mu       = cmu #bn.nanmin(spx[:, 4])
+                            mu       = cmu
                             rad      = bn.nanmean(spx[:, 5])
                             rad_err  = bn.nanmean(spx[:, 6])
                             wavenum  = spx[:, 7][0]
@@ -82,71 +83,34 @@ def BinCentreToLimb(mode, nfiles, spectrum, LCMIII):
 
         print('Binning spectrals...')
         # Loop over latitude-emission angle grid and create individual mean profiles for each filter
-        for ilat, clat in enumerate(Globals.latgrid):
-            print(f"LAT: {clat}")
-            for imu, cmu in enumerate(Globals.mugrid):
-                # print(f"LAT: {cmu}")
-                filters = single_ctls[ilat, imu, :, 5]
-                filter_indices = sorted(find_filters(filters=filters))
-                # print(filters)
-                # print(filter_indices)
-                if filter_indices: # These lines are really not great, improve this when you get time.
-                    # print(f"IF filter_indices: {cmu}")
-                    for ifilt in range(Globals.nfilters):
-                        if ifilt < len(filter_indices):
-                            filt = filter_indices[ifilt][0]
-                            filt_idx = filter_indices[ifilt][1]
-                            # if clat == 10.5:
-                            #     print(ifilt, len(filter_indices))
-                            #     print(filt, filt_idx)
-                            #     print(filters)
-                            spx = single_ctls[ilat, imu, filt_idx, :]
-                            
-                            # wave = filt
-                            # keep = (filters == wave)
-                            # spx = single_ctls[ilat, imu, keep, :]
-                            if np.any(spx):
-                                # Pull out variables
-                                LCM      = bn.nanmean(spx[:, 1])
-                                mu       = cmu #bn.nanmin(spx[:, 2])
-                                rad      = bn.nanmean(spx[:, 3])
-                                rad_err  = bn.nanmean(spx[:, 4])
-                                # print(ifilt, filt[0] == spx[:, 5][0])
-                                wavenum  = spx[:, 5][0]
-                                print(">: ", ilat, imu, ifilt)
-                                print("A: ", clat, cmu, wavenum, rad)
-                                # Store spectral CTL profiles
-                                spectral_ctls[ilat, imu, ifilt, 0] = clat
-                                spectral_ctls[ilat, imu, ifilt, 1] = LCM
-                                spectral_ctls[ilat, imu, ifilt, 2] = mu
-                                spectral_ctls[ilat, imu, ifilt, 3] = rad
-                                spectral_ctls[ilat, imu, ifilt, 4] = rad_err
-                                spectral_ctls[ilat, imu, ifilt, 5] = wavenum
-                                print("B: ", spectral_ctls[ilat, imu, ifilt, 0], spectral_ctls[ilat, imu, ifilt, 2], spectral_ctls[ilat, imu, ifilt, 5], spectral_ctls[ilat, imu, ifilt, 3])
-                input()
-            # input()
+        for ifilt in range(Globals.nfilters):
+            _, _, wave, _, _ = SetWaveReduced(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)
+            for ilat, clat in enumerate(Globals.latgrid):
+                for imu, cmu in enumerate(Globals.mugrid):
+                    print(f"LAT: {clat}   MU: {cmu}")
+                    filters = single_ctls[ilat, imu, :, 5]
+                    keep = (filters == wave)
+                    spx = single_ctls[ilat, imu, keep, :]
+                    if np.any(spx):
+                        # Pull out variables
+                        LCM      = bn.nanmean(spx[:, 1])
+                        mu       = cmu
+                        rad      = bn.nanmean(spx[:, 3])
+                        rad_err  = bn.nanmean(spx[:, 4])
+                        wavenum  = spx[:, 5][0]
+                        # Store spectral CTL profiles
+                        spectral_ctls[ilat, imu, ifilt, 0] = clat
+                        spectral_ctls[ilat, imu, ifilt, 1] = LCM
+                        spectral_ctls[ilat, imu, ifilt, 2] = mu
+                        spectral_ctls[ilat, imu, ifilt, 3] = rad
+                        spectral_ctls[ilat, imu, ifilt, 4] = rad_err
+                        spectral_ctls[ilat, imu, ifilt, 5] = wavenum
         # Throw away zeros
         spectral_ctls[spectral_ctls == 0] = np.nan
 
-        # for ijk in range(nfiles):
-        #     plt.figure()
-        #     cmap = plt.get_cmap('cividis')
-        #     plt.imshow(single_ctls[:, :, ijk, 3], origin='lower', cmap=cmap)
-        #     plt.title(f"Binning from FITS {ijk}: single")
-        #     plt.show()
-
-        for ijk in range(Globals.nfilters):
-            plt.figure()
-            cmap = plt.get_cmap('cividis')
-            plt.imshow(spectral_ctls[:, :, ijk, 3], origin='lower', cmap=cmap)
-            plt.title(f"Binning from FITS {spectral_ctls[:, :, ijk, 5][0]}: spectral")
-            plt.show()
-
-        exit()
         return spectral_ctls
 
     singles = singles(nfiles, spectrum, LCMIII)
-    # exit()
     spectrals = spectrals(nfiles, spectrum, LCMIII, singles)
 
     return singles, spectrals
