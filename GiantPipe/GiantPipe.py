@@ -78,8 +78,8 @@ def main():
     ############################################################
     
     # Define calibration mode
-    mode   = 'giantpipe'
-    dataset = '2018May'
+    mode   = 'drm'
+    dataset = '2016Feb'
     # Point to observations
     files  = FindFiles(dataset=dataset, mode=mode+'_files')
     nfiles = len(files)
