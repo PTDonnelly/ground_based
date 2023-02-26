@@ -35,28 +35,28 @@ def RegisterMaps(files, binning):
 
     # Loop over files
     for ifile, fpath in enumerate(files):
-        print(ifile, fpath)
-        ## Step 1: Read img, cmap and mufiles
-        imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filepath=f"{fpath}")
+        # print(ifile, fpath)
+        # ## Step 1: Read img, cmap and mufiles
+        # imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filepath=f"{fpath}")
 
-        ## Step 2: Geometric registration of pixel information
-        # Save flag depending on Northern (1) or Southern (-1) viewing
-        chopang = imghead['HIERARCH ESO TEL CHOP POSANG']
-        posang  = imghead['HIERARCH ESO ADA POSANG'] + 360
-        view = 1 if chopang == posang else -1
-        viewing_mode[ifile] = view
+        # ## Step 2: Geometric registration of pixel information
+        # # Save flag depending on Northern (1) or Southern (-1) viewing
+        # chopang = imghead['HIERARCH ESO TEL CHOP POSANG']
+        # posang  = imghead['HIERARCH ESO ADA POSANG'] + 360
+        # view = 1 if chopang == posang else -1
+        # viewing_mode[ifile] = view
 
-        # Store observaing date
-        DATE[ifile] = cylhead['DATE-OBS']
+        # # Store observing date
+        # DATE[ifile] = cylhead['DATE-OBS']
         
-        # Store central meridian longitude
-        LCMIII[ifile] = cylhead['LCMIII']
+        # # Store central meridian longitude
+        # LCMIII[ifile] = cylhead['LCMIII']
 
-        # Assign spatial information to pixels
-        naxis1    = cylhead['NAXIS1']
-        naxis2    = cylhead['NAXIS2']
-        naxis1_mu = muhead['NAXIS1']
-        naxis2_mu = muhead['NAXIS2']
+        # # Assign spatial information to pixels
+        # naxis1    = cylhead['NAXIS1']
+        # naxis2    = cylhead['NAXIS2']
+        # naxis1_mu = muhead['NAXIS1']
+        # naxis2_mu = muhead['NAXIS2']
 
         # Set the central wavelengths for each filter. Must be
         # identical to the central wavelength specified for the
@@ -65,8 +65,8 @@ def RegisterMaps(files, binning):
         wavelength[ifile] = wavelen
         wavenumber[ifile] = wavenum
 
-        # Calulate radiance error
-        rad_error = CalculateErrors(imgdata, view)
+        # # Calulate radiance error
+        # rad_error = CalculateErrors(imgdata, view)
         
         # Loop over each pixel to assign to the structure.
         xstart  = float(naxis1) - Globals.lonrange[0]/(360/naxis1)
