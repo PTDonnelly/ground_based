@@ -10,3 +10,5 @@
 .DS_store
 outputs/
 outputs/.DS_store
+GiantPipe/FindFiles.py
+GiantPipe/GiantPipe.py

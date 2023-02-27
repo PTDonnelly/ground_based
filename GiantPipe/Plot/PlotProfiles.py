@@ -368,8 +368,8 @@ def PlotCentreToLimbProfiles(dataset, mode, files, singles, spectrals):
             plt.close()
 
         # Plot centre-to-limb profiles
-        PlotSingles()
-        # PlotSpectrals()
+        # PlotSingles()
+        PlotSpectrals()
 
     PlotGlobalCTLFigures()
 
