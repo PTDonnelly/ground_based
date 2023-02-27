@@ -20,7 +20,9 @@ Classes are either data-focused (containing mostly/all attributes) or method-foc
 3) If multiple words, no underscore and successive words are capitalised.
 
 Examples:
+
 ```class Datamap:```
+
 ```class CalibratedDatamap:```
 
 ## Function names
@@ -31,6 +33,7 @@ Examples:
 4) Prefix establishes what the function does
 
 Examples:
+
   ```def read_thing():``` Used when reading files and their information
   
   ```def get_thing():``` Used when calculating manipulating existing variables (e.g. from data files)
