@@ -1,25 +1,57 @@
 from dataclasses import dataclass
+from pathlib import Path
 
 @dataclass
 class Config:
     """Define flags to configure the execution of the pipeline"""
     
-    # Input flags
-    calibrate = False # Read raw data and calibrate
-    datasource = 'fits' # Source of data: local cmaps ('fits') or local numpy arrays ('npy')
+    #### main() parameters
+    register_maps = True
+
+    #### Testing parameters
+    clock: bool = True            # Used for timing the execution of the code
+    profiler: bool = False        # Used for monitoring execution frequency and duration of code
+
+    #### Input flags
     
-    # Data processing flags
-    create_netcdf = False   # Create a NetCDF file from each cylindical map of radiance and emission angle, including observation metadata
+    ## Filepaths
     
-    # Binning parameters
+    # Point to data directory
+    data_directory: str = "/Users/ptdonnelly/Documents/Research/data/visir/"
+    # Point to specific epoch directory
+    epoch: str = "2016feb"
+
+    ## Source of data: "fits" | "json" | "nc" (the latter two are not currently used)
+    data_source: str = "fits"
+    
+    #### Binning parameters
+
+    ## Spatial grids
+
+    # Resolution of geographic grids (0.5 = half-degree resolution)
     grid_resolution = 0.5
+    # Maximum extent of spatial grids for construction
     latitude_range = -90, 90
     longitude_range = 0, 360
     emission_angle_range = 0, 90
 
-    # Testing parameters
-    clock = True            # Used for timing the execution of the code
-    profiler = False        # Used for monitoring execution frequency and duration of code
+
+    #### Output flags
+
+    ## File storage
+    
+    # Make a JSON file from cylindical maps and metadata
+    make_json: bool = False
+    # Create a NetCDF file from cylindical maps and metadata
+    make_netcdf: bool = False
+
+    #################### OLD
+    #         
+    # # Input flags
+    # calibrate = False # Read raw data and calibrate
+    # datasource = 'fits' # Source of data: local cmaps ('fits') or local numpy arrays ('npy')
+
+
 
 
     # nx, ny = 720, 360                               # Dimensions of an individual cylindrical map

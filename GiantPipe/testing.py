@@ -12,7 +12,7 @@ class Clock:
     def __init__(self) -> None:
         self.clock: bool = Config.clock
         self.start: float
-        self.start: float
+        self.stop: float
 
     def start(self) -> None:
         if not self.clock:

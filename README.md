@@ -7,6 +7,26 @@ The structure of GiantPipe version 2 uses a mix of Object-Oriented and Functiona
 
 This code is still currently coupled quite heavily to the overall structure of the VISIR images and NASA/DRM cylindrical map outputs.
 
+# Config class
+
+### The pathing for pointing to the observations assumes that your data is in a hierarchy like:
+    /root/data/visir/2016feb/wvisir_J7.9_2016-02-15T08:47:39.7606_Jupiter_clean_withchop.fits.gz
+
+    /root/data/visir/2016feb//wvisir_Q1_2016-02-15T05:02:43.2867_Jupiter_clean_withchop.fits.gz
+
+    ...
+
+    /root/data/visir/2018may/wvisir_NEII_1_2018-05-24T06:10:42.6362_Jupiter_clean_withchop.fits.gz
+
+    /root/data/visir/2018may/wvisir_SIV_2_2018-05-24T04:53:42.6259_Jupiter_clean_withchop.fits.gz
+
+    so for example:
+
+    data_directory = Config.data_directory = "root/data/visir/"
+    epoch = Config.epoch = "2016feb"
+    filepath = f"{data_directory}{epoch}/wvisir_J7.9_2016-02-15T08:47:39.7606_Jupiter_clean_withchop.fits.gz"
+
+
 # Code Design
 
 ## Classes

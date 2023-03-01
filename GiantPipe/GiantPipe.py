@@ -2,13 +2,16 @@
 from dataclasses import dataclass
 import icecream as ic
 
-from processing import register_maps
+from config import Config
+from processing import register_maps, binning
 from testing import Clock, Profiler
 
 def main():
 
     # Step 1: Read FITS files, geometric registration, save output files
-    register_maps()
+    dataset =  register_maps()
+
+    more_stuff = binning()
 
 if __name__ == '__main__':
         
