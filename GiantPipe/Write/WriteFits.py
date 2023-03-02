@@ -11,14 +11,14 @@ def WriteFits(filepath, imghead, imgdata, cylhead, cyldata, muhead, mudata):
     newpath = [f"{f}/" for f in fname[:-1]]
 
     # Image file and Header
-    imgname = f"re{fname[-1]}.gz"
+    imgname = f"recal_{fname[-1]}.gz"
     imgpath = ''.join(newpath) + imgname
     hdu = fits.PrimaryHDU(data=imgdata, header=imghead)
     hdul = fits.HDUList([hdu])
     hdul.writeto(imgpath, overwrite=True, output_verify='silentfix')
 
     # Cylindrical map and header
-    cylname = f"re{fname[-1]}.cmap.gz"
+    cylname = f"recal_{fname[-1]}.cmap.gz"
     cylpath = ''.join(newpath) + cylname
     hdu = fits.PrimaryHDU(data=cyldata, header=cylhead)
     hdul = fits.HDUList([hdu])
@@ -26,7 +26,7 @@ def WriteFits(filepath, imghead, imgdata, cylhead, cyldata, muhead, mudata):
 
     # Emission angle map and header (not explicitly necessary but convenient
     # to keep all data files together)
-    muname = f"re{fname[-1]}.mu.gz"
+    muname = f"recal_{fname[-1]}.mu.gz"
     mupath = ''.join(newpath) + muname
     hdu = fits.PrimaryHDU(data=mudata, header=muhead)
     hdul = fits.HDUList([hdu])

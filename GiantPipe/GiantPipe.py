@@ -38,17 +38,17 @@ def main():
     from Write.WriteSpx import WriteRegionalAverageSpx
 
     # Define flags to configure pipeline
-    calibrate   = False      # Read raw data and calibrate
-    source      = 'npy'     # Source of data: local cmaps ('fits') or local numpy arrays ('npy')
+    calibrate   = True      # Read raw data and calibrate
+    source      = 'fits'     # Source of data: local cmaps ('fits') or local numpy arrays ('npy')
     # Binning
     bin_cmerid  = False     # Use central meridian binning scheme
     bin_cpara   = False     # Use central parallel binning scheme
-    bin_ctl     = True     # Use centre-to-limb binning scheme
+    bin_ctl     = False     # Use centre-to-limb binning scheme
     bin_region  = False     # Use regional binning scheme (for a zoom 2D retrieval)
     bin_av_region = False   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
     save        = False     # Store calculated profiles to local files
-    plotting    = True      # Plot calculated profiles
+    plotting    = False      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
     spx         = False      # Write spxfiles as spectral input for NEMESIS
     retrieval   = False      # Plot NEMESIS outputs 
@@ -62,8 +62,8 @@ def main():
 
     if calibrate:
         # Define calibration mode
-        mode = 'drm'
-        dataset = '2018May'
+        mode = 'raw'
+        dataset = '2016Feb'
 
 
         # Point to observations
@@ -78,8 +78,8 @@ def main():
     ############################################################
     
     # Define calibration mode
-    mode   = 'giantpipe'
-    dataset = '2018May'
+    mode = 'raw'
+    dataset = '2016Feb'
     # Point to observations
     files  = FindFiles(dataset=dataset, mode=mode+'_files')
     nfiles = len(files)
