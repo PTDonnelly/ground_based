@@ -17,15 +17,14 @@ def BinCentralMerid(nfiles, spectrum, LCMIII):
         single_merids = np.zeros((Globals.nlatbins, nfiles, 7))
 
         # Loop over latitudes and create individual mean profiles
-        # print('Binning singles...')
+        print('Binning singles...')
         for ilat, clat in enumerate(Globals.latgrid):
-            print(f"Binning singles: {clat}")
             # Define centre and edges of latitude bin
             lat1 = Globals.latrange[0] + (Globals.latstep)*ilat
             lat2 = Globals.latrange[0] + (Globals.latstep)*(ilat+1)
             # Loop over the spectrum array of each input file
             for ifile in range(nfiles):
-                print(f"Binning file: {ifile}")
+                # print(f"Binning singles: {clat} {ifile}")
                 clon = LCMIII[ifile]
                 lon1 = LCMIII[ifile] + Globals.merid_width
                 lon2 = LCMIII[ifile] - Globals.merid_width

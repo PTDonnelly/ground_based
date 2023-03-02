@@ -38,19 +38,19 @@ def main():
     from Write.WriteSpx import WriteRegionalAverageSpx
 
     # Define flags to configure pipeline
-    calibrate   = True      # Read raw data and calibrate
+    calibrate   = False      # Read raw data and calibrate
     source      = 'fits'     # Source of data: local cmaps ('fits') or local numpy arrays ('npy')
     # Binning
     bin_cmerid  = False     # Use central meridian binning scheme
     bin_cpara   = False     # Use central parallel binning scheme
-    bin_ctl     = False     # Use centre-to-limb binning scheme
+    bin_ctl     = True     # Use centre-to-limb binning scheme
     bin_region  = False     # Use regional binning scheme (for a zoom 2D retrieval)
     bin_av_region = False   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
-    save        = False     # Store calculated profiles to local files
-    plotting    = False      # Plot calculated profiles
+    save        = True     # Store calculated profiles to local files
+    plotting    = True      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
-    spx         = False      # Write spxfiles as spectral input for NEMESIS
+    spx         = True      # Write spxfiles as spectral input for NEMESIS
     retrieval   = False      # Plot NEMESIS outputs 
 
     ############################################################
@@ -78,7 +78,7 @@ def main():
     ############################################################
     
     # Define calibration mode
-    mode = 'raw'
+    mode = 'giantpipe'
     dataset = '2016Feb'
     # Point to observations
     files  = FindFiles(dataset=dataset, mode=mode+'_files')
@@ -112,7 +112,7 @@ def main():
         if plotting:
             # Plot mean central meridian profiles
             PlotMeridProfiles(dataset=dataset, mode=mode, files=files, singles=singles, spectrals=spectrals)
-            PlotGlobalSpectrals(dataset=dataset, spectrals=spectrals)
+            # PlotGlobalSpectrals(dataset=dataset, spectrals=spectrals)
 
         if spx:
             # Write mean central meridian profiles to spxfile
@@ -261,13 +261,6 @@ def main():
 if __name__ == '__main__':
     import numpy as np
     import time
-    import cProfile
-    import io
-    import pstats
-    # # Create profiler
-    # pr = cProfile.Profile()
-    # # Start profiler
-    # pr.enable()
 
     # Start clock
     start = time.time()
@@ -278,15 +271,3 @@ if __name__ == '__main__':
     end = time.time()
     # Print elapsed time
     print(f"Elapsed time: {np.round(end-start, 3)} s")
-    # print(f"Time per file: {np.round((end-start)/90, 3)} s")
-    
-    # # Stop profiler
-    # pr.disable()
-    # # Print profiler output to file
-    # s = io.StringIO()
-    # ps = pstats.Stats(pr, stream=s).sort_stats('tottime')
-    # ps.strip_dirs()
-    # ps.print_stats()
-
-    # with open('../cProfiler_output.txt', 'w+') as f:
-    #     f.write(s.getvalue())

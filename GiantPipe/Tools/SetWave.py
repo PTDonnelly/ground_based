@@ -154,36 +154,36 @@ def SetWaveReduced(filename, wavelength, wavenumber, ifilt):
         filter_name = 'SIV_2'
         wavelength = 10.77
         wavenumber = 929.27953
-        ifilt_sc, ifilt_v = 5, 5
+        ifilt_sc, ifilt_v = 5, 2
         
     if (filter_name == 'NEII_1') or (wavelength == 12.27) or (wavenumber == 815.70010) or (ifilt == 3):
         filter_name = 'NEII_1'
         wavelength = 12.27
         wavenumber = 815.70010
-        ifilt_sc, ifilt_v = 9, 8
+        ifilt_sc, ifilt_v = 9, 3
 
     if (filter_name == 'NEII_2') or (wavelength == 13.04) or (wavenumber == 766.75227) or (ifilt == 4):
         filter_name = 'NEII_2'
         wavelength = 13.04
         wavenumber = 766.75227
-        ifilt_sc, ifilt_v = 11, 9
+        ifilt_sc, ifilt_v = 11, 4
 
     if (filter_name == 'Q1') or (wavelength == 17.65) or (wavenumber == 563.97095) or (ifilt == 5):
         filter_name = 'Q1'
         wavelength = 17.65
         wavenumber = 563.97095
-        ifilt_sc, ifilt_v = 12, 10
+        ifilt_sc, ifilt_v = 12, 5
 
     if (filter_name == 'Q2') or (wavelength == 18.72) or (wavenumber == 532.73522) or (ifilt == 6):
         filter_name = 'Q2'
         wavelength = 18.72
         wavenumber = 532.73522
-        ifilt_sc, ifilt_v = 13, 11
+        ifilt_sc, ifilt_v = 13, 6
 
     if (filter_name == 'Q3') or (wavelength == 19.50) or (wavenumber == 511.97345) or (ifilt == 7):
         filter_name = 'Q3'
         wavelength = 19.50
         wavenumber = 511.97345
-        ifilt_sc, ifilt_v = 14, 12
+        ifilt_sc, ifilt_v = 14, 7
 
     return filter_name, wavelength, wavenumber, ifilt_sc, ifilt_v

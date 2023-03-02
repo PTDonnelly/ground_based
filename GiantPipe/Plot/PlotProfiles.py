@@ -31,12 +31,12 @@ def PlotMeridProfiles(dataset, mode, files, singles, spectrals):
     for ifilt in range(Globals.nfilters):
         # Get filter index for plotting spacecraft and calibrated data
         _, _, wave, ifilt_sc, ifilt_v = SetWave(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)
-        
+        print(ifilt, wave, ifilt_sc, ifilt_v)
         # Create a figure per filter
         fig = plt.figure(figsize=(8, 3))
         # subplot showing the averaging of each singles merid profiles (ignoring negative beam)
         for ifile, fname in enumerate(files):
-            _, _, iwave, _, _ = SetWave(filename=fname, wavelength=None, wavenumber=None, ifilt=None)
+            _, _, iwave, _, ifilt_v = SetWave(filename=fname, wavelength=None, wavenumber=None, ifilt=None)
             if iwave == wave:
                 plt.plot(singles[:, ifile, 0], singles[:, ifile, 3], color='black', lw=0, marker='.', markersize=2)
         # Select the suitable spacecraft meridian profile
@@ -97,7 +97,7 @@ def PlotMeridProfiles(dataset, mode, files, singles, spectrals):
             ax[irow[iax]][icol[iax]].legend(fontsize=11)#, loc='lower right')
             ax[irow[iax]][icol[iax]].grid()
             ax[irow[iax]][icol[iax]].set_xlim(-90, 90)
-            ax[irow[iax]][icol[iax]].set_xticks([]) if (iax < 9) else ax[irow[iax]][icol[iax]].set_xticks(ticks=np.arange(-90, 90 , 30), labels=list(np.arange(-90, 90 , 30)))
+            # ax[irow[iax]][icol[iax]].set_xticks([]) if (iax < 9) else ax[irow[iax]][icol[iax]].set_xticks(ticks=np.arange(-90, 90 , 30), labels=list(np.arange(-90, 90 , 30)))
             ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
             iax+=1 
     plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
@@ -200,14 +200,16 @@ def PlotGlobalSpectrals(dataset, spectrals):
 
     lat = copy(spectrals[:, :, 0])
     wave = copy(spectrals[:, :, 5])
+    print(wave[90,:])
     rad =  copy(spectrals[:, :, 3])
+    print([90,5])
     rad_res1 = copy(spectrals[:, :, 3])
     rad_res2 = copy(spectrals[:, :, 3])
     for i in range(Globals.nfilters):
         rad_res1[:, i] = rad[:, i] - np.nanmean(rad[:, i])
         rad_res2[:, i] = (rad_res1[:, i]/np.nanmean(rad[:, i]))*100
 
-    plt.figure
+    plt.figure()
     ax1 = plt.contourf(wave, lat, rad, levels=200, cmap='nipy_spectral')
     for i in range(Globals.nfilters):
         plt.plot((wave[i], wave[i]), (-90, 90), ls=':', lw=0.7, color='white')
@@ -220,10 +222,10 @@ def PlotGlobalSpectrals(dataset, spectrals):
     plt.savefig(f"{dir}global_spectrals.png", dpi=150, bbox_inches='tight')
     plt.close()
  
-    plt.figure
+    plt.figure()
     ax2 = plt.contourf(wave, lat, rad_res1, vmin=-1*np.nanmax(rad_res1),vmax=np.nanmax(rad_res1), levels=200, cmap='seismic')
     for i in range(Globals.nfilters):
-        plt.plot((wave[i], wave[i]), (-90, 90), ls=':', lw=0.7, color='black')
+        plt.plot((wave[i], wave[i]), (-90, 90), lw=0.7, color='black')
     cbar = plt.colorbar(ax2)
     cbar.set_label('Residual radiance (W cm$^{-2}$ sr$^{-1}$ (cm$^{-1}$)$^{-1}$)', size=15)
     plt.xlabel('Wavenumber (cm$^{-1}$)', size=15)
@@ -233,10 +235,10 @@ def PlotGlobalSpectrals(dataset, spectrals):
     plt.savefig(f"{dir}global_spectrals_res1.png", dpi=150, bbox_inches='tight')
     plt.close()
 
-    plt.figure
+    plt.figure()
     ax3 = plt.contourf(wave, lat, rad_res2, vmin=-1*np.nanmax(rad_res2),vmax=np.nanmax(rad_res2), levels=200, cmap='seismic')
     for i in range(Globals.nfilters):
-        plt.plot((wave[i], wave[i]), (-90, 90), ls=':', lw=0.7, color='black')
+        plt.plot((wave[i], wave[i]), (-90, 90), lw=0.7, color='black')
     cbar = plt.colorbar(ax3)
     cbar.set_label('Difference (pourcent)', size=15)
     plt.xlabel('Wavenumber (cm$^{-1}$)', size=15)

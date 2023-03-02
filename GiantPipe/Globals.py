@@ -5,7 +5,7 @@ import numpy as np
 nx, ny = 720, 360                               # Dimensions of an individual cylindrical map
 ## Central Meridian binning
 latrange    = -90, 90          			          # Latitude range for binning pixels (planetographic)
-latstep     = 1                                # Latitude increment for binning pixels (planetographic)
+latstep     = 10                                # Latitude increment for binning pixels (planetographic)
 latgrid     = np.arange(-89.5, 90, latstep)      # Latitude range from pole-to-pole
 nlatbins    = len(latgrid)                       # Number of latitude bins
 merid_width = 30 #60                                 # Longitude range about the central meridian for averaging
