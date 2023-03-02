@@ -5,12 +5,21 @@ from pathlib import Path
 class Config:
     """Define flags to configure the execution of the pipeline"""
     
-    #### main() parameters
-    register_maps = True
+    #### Module-level parameters
+    ## Running giantpipe
+    # For calibrating mapped products (from DRM or Oliver's tool), you should only have to do this once.
+    calibrate: bool = True
+    # For binning the maps by different schemes (type: None) or (type: str = "central meridian", "centre to limb", "regional" etc.)
+    binning_scheme: str = 'central meridian'
+    if not binning_scheme:
+        binning: bool = False
+    else:
+        binning: bool = True
+
 
     #### Testing parameters
     clock: bool = True            # Used for timing the execution of the code
-    profiler: bool = False        # Used for monitoring execution frequency and duration of code
+    profiler: bool = True        # Used for monitoring execution frequency and duration of code
 
     #### Input flags
     
@@ -21,7 +30,7 @@ class Config:
     # Point to specific epoch directory
     epoch: str = "2016feb"
 
-    ## Source of data: "fits" | "json" | "nc" (the latter two are not currently used)
+    ## Source of data: "fits" or "json" or "nc" (the latter two are not currently used)
     data_source: str = "fits"
     
     #### Binning parameters

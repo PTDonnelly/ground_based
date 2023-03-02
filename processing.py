@@ -8,7 +8,6 @@ import numpy.typing as npt
 from pathlib import Path
 from typing import Tuple, List, Dict
 
-import icecream as ic
 import netCDF4 as nc4
 # from numba import jit
 # from numba.experimental import jitclass
@@ -16,14 +15,15 @@ from sorcery import dict_of
 from snoop import snoop
 
 from config import Config
+from testing import Clock, Profiler
 
-# @jitclass(jitPreprocess)
 class Preprocess:
     """Method-focused class responsible for reading FITS files
     and constructing a dictionary containing the FITS Header Data Unit (HDU)."""
 
     def __init__(self, filepath) -> None:
-        self.filepath: object = filepath      
+        self.filepath: object = filepath
+        return  
 
     @staticmethod
     def pathify(filepaths: List[str]) -> List[str]:
@@ -35,7 +35,11 @@ class Preprocess:
     def find_data(cls, data_directory: str, epoch: str) -> List[str]:        
         """Find observations based on pathing and epoch description in Config()
         and universalise pathnames with Path()."""
-        filepaths = glob.glob(f"{data_directory}{epoch}/*.fits.gz")
+        # filepaths = glob.glob(f"{data_directory}{epoch}/recal_*.fits.gz")
+        filepaths = [
+            f"{data_directory}{epoch}/recal_wvisir_J7.9_2016-02-15T05:21:59.7428_Jupiter_clean_withchop.fits.gz",
+            f"{data_directory}{epoch}/recal_wvisir_PAH1_2016-02-15T04:50:48.2300_Jupiter_clean_withchop.fits.gz"
+        ]
         return cls.pathify(filepaths)
     
     @classmethod
@@ -109,7 +113,6 @@ class Preprocess:
                 data = hdu[extension].data
             return dict_of(header, data)
 
-# @jitclass(jitProcess)
 class Process:
     """Method-focused class responsible for accessing contents of FITS files
     from the FITS Header Data Unit (HDU).
@@ -118,6 +121,7 @@ class Process:
 
     def __init__(self, header_data_unit) -> None:
         self.header_data_unit: dict = header_data_unit      
+        return
 
     @classmethod
     def process(cls, hdu_group: Dict[str, dict]) -> Dict[str, npt.ArrayLike]:
@@ -128,7 +132,7 @@ class Process:
         image_hdu, radiance_hdu, emission_angle_hdu, dopppler_velocity_hdu = cls.unpack_hdu_group(hdu_group)
 
         # Calculate instrumental measurement errors of radiance
-        error = cls.get_errors(image_hdu, type='statistical')
+        error = cls.get_errors(image_hdu, type='flat')
 
         # Construct two-dimensional grids of latitude and longitude
         spatial_grids = cls.make_spatial_grids(radiance_hdu)
@@ -349,7 +353,7 @@ class Process:
         """Add each file to an overall dictionary containing the entire dataset for a given epoch."""
         dataset[ifile]['filename'] = filepath.stem
         dataset[ifile]['data_products'] = data_products
-        
+                                       
     @staticmethod
     def save_json(filepath: object, data_products: Dict[str, npt.ArrayLike]) -> None:
         """Generate a JSON file containing geometrically-registered cylindrical maps
@@ -434,34 +438,133 @@ class NumpyEncoder(json.JSONEncoder):
             return object.tolist()
         return json.JSONEncoder.default(self, object)
 
-def register_maps():
-    """Intended to be executed for the first time to read cylindrical maps (.fits files),
-    do geometric registration, and output alternate formats."""
+class Dataset:
+    """Method-focused class responsible for constructing and containing the data products of a given epoch."""
 
-    # Point to observations
-    filepaths = Preprocess.get_data()
-
-    dataset = Process.make_data_dict(filepaths)
-
-    # Read in VISIR FITS files and construct geographic data products
-    for ifile, filepath in enumerate(filepaths):
-        print(f"Register map: {ifile+1} / {len(filepaths)}")
-
-        # Retrieve Header Data Units (HDUs) from FITS files and group into dictionary
-        hdu_group = Preprocess.preprocess(filepath)
-
-        # Construct data products from Header Data Units (HDUs)
-        data_products = Process.process(hdu_group)
-
-        # Save data products to file
-        Process.save(filepath, data_products)
-
-        # Add data_products to the dictionary containing the entire dataset for this epoch."""
-        Process.append_products_to_dataset(ifile, filepath, data_products, dataset)
+    def __init__(self) -> None:
+        return
     
-    return dataset
+    @classmethod
+    def create(cls) -> List[dict]:
+        """Reads VISIR images and cylindrical maps (.fits format), does geometric registration, and optionally outputs alternate formats."""
 
-def binning():
-    """Blah blah bla"""
+        # Point to observations
+        filepaths = Preprocess.get_data()
 
-    pass
+        dataset = Process.make_data_dict(filepaths)
+
+        # Read in VISIR FITS files and construct geographic data products
+        for ifile, filepath in enumerate(filepaths):
+            # print(f"Register map: {ifile+1} / {len(filepaths)}")
+
+            # Retrieve Header Data Units (HDUs) from FITS files and group into dictionary
+            hdu_group = Preprocess.preprocess(filepath)
+
+            # Construct data products from Header Data Units (HDUs)
+            data_products = Process.process(hdu_group)
+
+            # Save data products to file
+            Process.save(filepath, data_products)
+
+            # Add data_products to the dictionary containing the entire dataset for this epoch."""
+            Process.append_products_to_dataset(ifile, filepath, data_products, dataset)
+        
+        return dataset
+
+    @classmethod
+    def read_data_product(cls, dataset: List[dict], data_product) -> None:
+        """Unpack individual data products form the large dataset"""
+
+        # data_product = dataset['spatial_grids']['longitude_grid_1D']
+        # return data_product
+        pass
+
+    @classmethod
+    def read_products_from_dataset(cls, dataset: List[dict]) -> Dict[str, list]:
+        """Deconstruct the dataset from a list of dictionaries of length "len(filepaths)" (i.e. number of files),
+        and pull out the individual data_products. Then reform it into a dictionary of lists, where each key is
+        an individual data product (physical variable) and its corresponding value is a list of length "len(filepaths)"."""
+        
+        print(type(dataset))
+        print(np.shape(dataset))
+        return
+    
+    @classmethod
+    def calibrate(cls) -> List[dict]:
+        """Calibrates the data products returned by Dataset.create()."""
+        
+        if Config.calibrate == False:
+            return
+        else:
+            # If calibrate is desired, create dataset
+            dataset = cls.create()
+            # Get meridional profiles (calibration always uses central meridian profiles)
+            cls.binning_central_meridian(dataset)
+            return
+
+    @classmethod
+    def binning_central_meridian(cls, dataset: List[dict]) -> List[dict]:
+        
+        # Reform the dataset dictionary
+        reformed_data = cls.read_products_from_dataset(dataset)
+        
+        return
+
+    @classmethod
+    def binning_centre_to_limb(cls, dataset: List[dict]) -> List[dict]:
+        pass
+
+    @classmethod
+    def binning_regional(cls, dataset: List[dict]) -> List[dict]:
+        pass
+
+    @classmethod
+    def binning(cls) -> List[dict]:
+        """Runs the desired binning scheme on the data products returned by Dataset.create()."""
+
+        if Config.binning == False:
+            return
+        else:
+            # If binning is desired, create dataset
+            dataset = cls.create()
+            # Begin binning as desired
+            if Config.binning_scheme == 'central meridian':
+                cls.binning_central_meridian(dataset)
+            elif Config.binning_scheme == 'centre to limb':
+                cls.binning_centre_to_limb(dataset)
+            elif Config.binning_scheme == 'regional':
+                cls.binning_regional(dataset)
+            return
+
+def start_monitor() -> Tuple[object, object]:
+    profiler = Profiler()
+    profiler.start()
+    # Start clock
+    clock = Clock()
+    clock.start()
+    return profiler, clock
+
+def stop_monitor(profiler: object, clock: object):
+    # Stop clock
+    clock.stop()
+    clock.elapsed_time()
+    # Stop monitoring code and 
+    profiler.stop()
+    profiler.save_profile_report()
+
+def run_giantpipe():
+    """Run the giantpipe VISIR Data Reduction Pipeline."""
+    
+    # Start monitoring code
+    profiler, clock = start_monitor()
+
+    # For calibration of the VISIR data
+    Dataset.calibrate()
+    
+    # For binning the VISIR data
+    Dataset.binning()
+
+    completion = "\ngiantpipe is finished, have a great day."
+    print(completion)
+
+    stop_monitor(profiler, clock)

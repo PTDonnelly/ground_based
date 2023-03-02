@@ -22,7 +22,7 @@ This code is still currently coupled quite heavily to the overall structure of t
 
     so for example:
 
-    data_directory = Config.data_directory = "root/data/visir/"
+    data_directory = Config.data_directory = "/root/data/visir/"
     epoch = Config.epoch = "2016feb"
     filepath = f"{data_directory}{epoch}/wvisir_J7.9_2016-02-15T08:47:39.7606_Jupiter_clean_withchop.fits.gz"
 
@@ -56,7 +56,7 @@ Examples:
 
   ```def read_thing():``` Used when reading files and their information
   
-  ```def get_thing():``` Used when calculating manipulating existing variables (e.g. from data files)
+  ```def get_thing():``` Used when calculating from or manipulating existing variables (e.g. from data files)
   
   ```def make_thing():``` Used when generating new variables or changing existing ones
  
