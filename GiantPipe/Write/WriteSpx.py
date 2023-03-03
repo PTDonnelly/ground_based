@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import Globals
+from snoop import snoop
 
 def WriteMeridSpx(dataset, mode, spectrals):
     """Create spectral input for NEMESIS using central meridian profiles.

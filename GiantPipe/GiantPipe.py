@@ -39,7 +39,7 @@ def main():
 
     # Define flags to configure pipeline
     calibrate   = False      # Read raw data and calibrate
-    source      = 'fits'     # Source of data: local cmaps ('fits') or local numpy arrays ('npy')
+    source      = 'npy'     # Source of data: local cmaps ('fits') or local numpy arrays ('npy')
     # Binning
     bin_cmerid  = False     # Use central meridian binning scheme
     bin_cpara   = False     # Use central parallel binning scheme
@@ -47,7 +47,7 @@ def main():
     bin_region  = False     # Use regional binning scheme (for a zoom 2D retrieval)
     bin_av_region = False   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
-    save        = True     # Store calculated profiles to local files
+    save        = False     # Store calculated profiles to local files
     plotting    = True      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
     spx         = True      # Write spxfiles as spectral input for NEMESIS
