@@ -1,10 +1,11 @@
 
 from astropy.io import fits
+from copy import deepcopy
 import glob
 import json
-from os.path import exists
 import numpy as np
 import numpy.typing as npt
+from os.path import exists
 from pathlib import Path
 from typing import Tuple, List, Dict
 
@@ -39,11 +40,11 @@ class Preprocess:
         filepaths = [
             f"{data_directory}{epoch}/recal_wvisir_J7.9_2016-02-15T05:21:59.7428_Jupiter_clean_withchop.fits.gz",
             f"{data_directory}{epoch}/recal_wvisir_PAH1_2016-02-15T04:50:48.2300_Jupiter_clean_withchop.fits.gz"
-        ]
+            ]
         return cls.pathify(filepaths)
     
     @classmethod
-    def get_data(cls) -> List[str]: 
+    def get_data_files(cls) -> List[str]: 
         """Find and gather all files for a given epoch of VISIR observations.
             Make sure file hierarchy (defined in config.py) is pointing to the right place."""
 
@@ -135,7 +136,7 @@ class Process:
         error = cls.get_errors(image_hdu, type='flat')
 
         # Construct two-dimensional grids of latitude and longitude
-        spatial_grids = cls.make_spatial_grids(radiance_hdu)
+        longitude_grid_1D, latitude_grid_1D, longitude_grid_2D, latitude_grid_2D = cls.make_spatial_grids(radiance_hdu)
 
         # Construct data maps from cylindrical maps
         radiance = cls.make_radiance_map(radiance_hdu)
@@ -147,7 +148,7 @@ class Process:
         metadata = cls.make_metadata(radiance_hdu)
 
         # Pack data into a dictionary
-        return dict_of(spatial_grids, radiance, radiance_error, emission_angle, doppler_velocity, metadata)
+        return dict_of(longitude_grid_1D, latitude_grid_1D, longitude_grid_2D, latitude_grid_2D, radiance, radiance_error, emission_angle, doppler_velocity, metadata)
     
     staticmethod
     def unpack_hdu_group(hdu_group: Dict[str, dict]) -> List[dict]:
@@ -158,11 +159,11 @@ class Process:
         return header[header_parameter]
 
     @staticmethod
-    def get_header(header_data_unit: Dict[str, dict]) -> object:
+    def get_fits_header(header_data_unit: Dict[str, dict]) -> object:
         return header_data_unit['header']
     
     @staticmethod
-    def get_data(header_data_unit: Dict[str, dict]) -> npt.NDArray[np.float64]:
+    def get_fits_data(header_data_unit: Dict[str, dict]) -> npt.NDArray[np.float64]:
         return header_data_unit['data']
 
     @classmethod
@@ -189,8 +190,8 @@ class Process:
         standard deviation of the background sky flux."""
         
         # Access FITS header and data
-        header = cls.get_header(header_data_unit)
-        data = cls.get_data(header_data_unit)
+        header = cls.get_fits_header(header_data_unit)
+        data = cls.get_fits_data(header_data_unit)
 
         # Determine Northern (1) or Southern (-1) viewing
         viewing = cls.get_viewing(header)
@@ -264,7 +265,7 @@ class Process:
         "Read in raw cylindrical maps and perform geometric registration"
 
         # Access FITS header information
-        header = cls.get_header(header_data_unit)
+        header = cls.get_fits_header(header_data_unit)
 
         # Get image dimensions from FITS header
         x_parameter = "NAXIS1"
@@ -282,7 +283,7 @@ class Process:
         # Construct two-dimensional spatial grids
         longitude_grid_2D = cls.make_grid_2D('longitude', x_size, y_size, image_resolution)
         latitude_grid_2D = cls.make_grid_2D('latitude', x_size, y_size, image_resolution)
-        return dict_of(longitude_grid_1D, latitude_grid_1D, longitude_grid_2D, latitude_grid_2D)
+        return longitude_grid_1D, latitude_grid_1D, longitude_grid_2D, latitude_grid_2D
 
     @classmethod
     def make_radiance_map(cls, header_data_unit: Dict[str, object]) -> npt.NDArray[np.float64]:
@@ -291,7 +292,7 @@ class Process:
 
         # Coefficient needed to convert DRM units
         unit_conversion = 1e-7
-        return cls.get_data(header_data_unit) * unit_conversion
+        return cls.get_fits_data(header_data_unit) * unit_conversion
     
     @classmethod
     def make_radiance_error_map(cls, header_data_unit: Dict[str, object], error: float) -> npt.NDArray[np.float64]:
@@ -305,7 +306,7 @@ class Process:
         from cosine(mu) to mu (in degrees)."""
         
         # Get cosine(emission angle) map from FITS data
-        cosine_emission_angle = cls.get_data(header_data_unit)
+        cosine_emission_angle = cls.get_fits_data(header_data_unit)
 
         # Calculate arc cosine of the map data
         emission_angle_radians = np.arccos(cosine_emission_angle)
@@ -315,7 +316,7 @@ class Process:
     @classmethod
     def make_doppler_velocity_map(cls, header_data_unit: Dict[str, object]) -> npt.NDArray[np.float64]:
         """Read in Doppler velocity values from cylindrical map."""
-        return cls.get_data(header_data_unit)
+        return cls.get_fits_data(header_data_unit)
 
     @classmethod
     def make_metadata(cls, header_data_unit: Dict[str, object]) -> Dict[str, str]:
@@ -323,17 +324,17 @@ class Process:
         and pack into dictionary to pass to the final data products (FITS and NetCDF)."""
 
         # Access FITS header information
-        header = cls.get_header(header_data_unit)
+        header = cls.get_fits_header(header_data_unit)
 
         # Get obervation ephemeris from FITS header
         date_time_parameter = "DATE-OBS"
         LCMIII_parameter = "LCMIII"
-        wavenumber_parameter = "lambda"
+        wavelength_parameter = "lambda"
         date_time = cls.get_header_contents(header, date_time_parameter) # Date and time of observation (YYYY-MM-DDTHH:MM:SS:ssss)
         LCMIII = cls.get_header_contents(header, LCMIII_parameter) # Longitude of the Central Meridian (System III West)
-        wavenumber = cls.get_header_contents(header, wavenumber_parameter) # Filter wavenumber (in units of cm^-1)
+        wavelength = cls.get_header_contents(header, wavelength_parameter) # Filter wavelength (in units of microns)
         viewing = cls.get_viewing(header) # Observation viewing (1: North or -1: South)
-        return dict_of(date_time, LCMIII, wavenumber, viewing)
+        return dict_of(date_time, LCMIII, wavelength, viewing)
         
     @staticmethod
     def make_data_dict(filepaths: List[str]) -> List[dict]:
@@ -345,7 +346,7 @@ class Process:
             "data_products": []  
             }
         # Build a list of this dictionary to contain all files in filepaths
-        data_dict = [dict_template for _ in filepaths]
+        data_dict = [deepcopy(dict_template) for _ in filepaths]
         return data_dict
 
     @classmethod
@@ -353,7 +354,8 @@ class Process:
         """Add each file to an overall dictionary containing the entire dataset for a given epoch."""
         dataset[ifile]['filename'] = filepath.stem
         dataset[ifile]['data_products'] = data_products
-                                       
+        return
+    
     @staticmethod
     def save_json(filepath: object, data_products: Dict[str, npt.ArrayLike]) -> None:
         """Generate a JSON file containing geometrically-registered cylindrical maps
@@ -449,8 +451,9 @@ class Dataset:
         """Reads VISIR images and cylindrical maps (.fits format), does geometric registration, and optionally outputs alternate formats."""
 
         # Point to observations
-        filepaths = Preprocess.get_data()
+        filepaths = Preprocess.get_data_files()
 
+        # Create dictionary to store metadata and data products
         dataset = Process.make_data_dict(filepaths)
 
         # Read in VISIR FITS files and construct geographic data products
@@ -468,26 +471,92 @@ class Dataset:
 
             # Add data_products to the dictionary containing the entire dataset for this epoch."""
             Process.append_products_to_dataset(ifile, filepath, data_products, dataset)
-        
+
         return dataset
 
+    @staticmethod
+    def read_data_products(data: Dict[str, npt.ArrayLike], reformed_data: Dict[str, npt.ArrayLike]) -> List:
+        """Unpack individual data products form the large dataset. Specifically, convert 
+        a dictionary of lists to a list of dictionaries."""   
+        for key1, key2 in zip(reformed_data.keys(), data.keys()):
+            if key1 != key2:
+                raise ValueError("Data dictionaries do not contain the same entries.")
+            else:
+                reformed_data[key1].append(data[key2]) 
+        return reformed_data
+    
     @classmethod
-    def read_data_product(cls, dataset: List[dict], data_product) -> None:
-        """Unpack individual data products form the large dataset"""
+    def read_data_products_from_dataset(cls) -> Dict[str, list]:
+        """Create the dataset from the reduced data files then immediately deconstruct it 
+        from a list of dictionaries of length "len(filepaths)" (i.e. number of files), and pull out the individual data_products. 
+        Then reform it into a dictionary of lists, where each key is an individual data product (physical variable)
+        and its corresponding value is a list of length "len(filepaths)"."""
+        
+        # Create dataset
+        dataset = cls.create()
+        
+        # Create template dictionary for the reformed data (e.g. List[dict] -> Dict[list])
+        reformed_data = {"longitude_grid_1D": [],
+                         "latitude_grid_1D": [],
+                         "longitude_grid_2D": [],
+                         "latitude_grid_2D": [],
+                         "radiance": [],
+                         "radiance_error": [],
+                         "emission_angle": [],
+                         "doppler_velocity": [],
+                         "metadata": []
+        }
 
-        # data_product = dataset['spatial_grids']['longitude_grid_1D']
-        # return data_product
+        # Upack each file from dataset
+        for data in dataset:
+            data_products = data["data_products"]
+            cls.read_data_products(data_products, reformed_data)
+        return reformed_data
+
+    @classmethod
+    def bin_central_meridian(cls) -> List[dict]:
+        """Returns the meridional profiles from the data products returned by Dataset.create()."""
+
+        # Reform the dataset dictionary
+        reformed_data = cls.read_data_products_from_dataset()
+        
+        # Pull out variables
+        metadata = reformed_data['metadata']
+        print(np.shape(metadata))
+        latitude = reformed_data['latitude_grid_2D']
+        radiance = reformed_data['radiance']
+        print(np.shape(radiance))
+
+        # Isolate latitude grids along the central meridian (nlat x nfiles)
+        
+        profiles = reformed_data['latitude_grid_1D']
+        return profiles
+
+    @classmethod
+    def bin_centre_to_limb(cls) -> List[dict]:
         pass
 
     @classmethod
-    def read_products_from_dataset(cls, dataset: List[dict]) -> Dict[str, list]:
-        """Deconstruct the dataset from a list of dictionaries of length "len(filepaths)" (i.e. number of files),
-        and pull out the individual data_products. Then reform it into a dictionary of lists, where each key is
-        an individual data product (physical variable) and its corresponding value is a list of length "len(filepaths)"."""
-        
-        print(type(dataset))
-        print(np.shape(dataset))
-        return
+    def bin_regional(cls) -> List[dict]:
+        pass
+
+    @classmethod
+    def bin(cls) -> List[dict]:
+        """Runs the desired binning scheme on the data products returned by Dataset.create()."""
+
+        # Begin binning as desired
+        if Config.binning_scheme == 'central meridian':
+            profiles = cls.bin_central_meridian()
+        elif Config.binning_scheme == 'centre to limb':
+            profiles = cls.bin_centre_to_limb()
+        elif Config.binning_scheme == 'regional':
+            profiles = cls.bin_regional()
+        return profiles
+
+    @classmethod
+    def make_calibration(cls, profiles: npt.ArrayLike) -> List[dict]:
+        """Calibrates the data products returned by Dataset.create()."""
+        pass 
     
     @classmethod
     def calibrate(cls) -> List[dict]:
@@ -496,46 +565,59 @@ class Dataset:
         if Config.calibrate == False:
             return
         else:
-            # If calibrate is desired, create dataset
-            dataset = cls.create()
             # Get meridional profiles (calibration always uses central meridian profiles)
-            cls.binning_central_meridian(dataset)
+            profiles = cls.bin_central_meridian()
+            cls.make_calibration(profiles)
             return
-
+    
     @classmethod
-    def binning_central_meridian(cls, dataset: List[dict]) -> List[dict]:
+    def make_plots(cls, profiles: npt.ArrayLike) -> List[dict]:
+        """Plots the data products returned by Dataset.create()."""
+
+        # Begin plotting as desired
+        if Config.binning_scheme == 'central meridian':
+            cls.plot_central_meridian(profiles)
+        elif Config.binning_scheme == 'centre to limb':
+            cls.plot_centre_to_limb(profiles)
+        elif Config.binning_scheme == 'regional':
+            cls.plot_regional(profiles)
+        return profiles
         
-        # Reform the dataset dictionary
-        reformed_data = cls.read_products_from_dataset(dataset)
+    @classmethod
+    def plot(cls) -> List[dict]:
+        """Plots the data products returned by Dataset.create()."""
         
-        return
-
-    @classmethod
-    def binning_centre_to_limb(cls, dataset: List[dict]) -> List[dict]:
-        pass
-
-    @classmethod
-    def binning_regional(cls, dataset: List[dict]) -> List[dict]:
-        pass
-
-    @classmethod
-    def binning(cls) -> List[dict]:
-        """Runs the desired binning scheme on the data products returned by Dataset.create()."""
-
-        if Config.binning == False:
+        if Config.plot == False:
             return
         else:
-            # If binning is desired, create dataset
-            dataset = cls.create()
-            # Begin binning as desired
-            if Config.binning_scheme == 'central meridian':
-                cls.binning_central_meridian(dataset)
-            elif Config.binning_scheme == 'centre to limb':
-                cls.binning_centre_to_limb(dataset)
-            elif Config.binning_scheme == 'regional':
-                cls.binning_regional(dataset)
+            profiles = cls.bin()
+            cls.make_plots(profiles)
             return
-
+    
+    @classmethod
+    def make_spx(cls, profiles: npt.ArrayLike) -> List[dict]:
+        """Plots the data products returned by Dataset.create()."""
+    
+        # Begin binning as desired
+        if Config.binning_scheme == 'central meridian':
+            cls.bin_central_meridian(profiles)
+        elif Config.binning_scheme == 'centre to limb':
+            cls.bin_centre_to_limb(profiles)
+        elif Config.binning_scheme == 'regional':
+            cls.bin_regional(profiles)
+        return profiles
+    
+    @classmethod
+    def spx(cls) -> List[dict]:
+        """Plots the data products returned by Dataset.create()."""
+        
+        if Config.plot == False:
+            return
+        else:
+            profiles = cls.bin()
+            cls.make_spx(profiles)
+            return
+        
 def start_monitor() -> Tuple[object, object]:
     profiler = Profiler()
     profiler.start()
@@ -560,9 +642,12 @@ def run_giantpipe():
 
     # For calibration of the VISIR data
     Dataset.calibrate()
-    
-    # For binning the VISIR data
-    Dataset.binning()
+
+    # For plotting the VISIR data
+    Dataset.plot()
+
+    # For generating spectral files from the VISIR data
+    Dataset.spx()
 
     completion = "\ngiantpipe is finished, have a great day."
     print(completion)

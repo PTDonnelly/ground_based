@@ -11,10 +11,10 @@ class Config:
     calibrate: bool = True
     # For binning the maps by different schemes (type: None) or (type: str = "central meridian", "centre to limb", "regional" etc.)
     binning_scheme: str = 'central meridian'
-    if not binning_scheme:
-        binning: bool = False
-    else:
-        binning: bool = True
+    # For generating plots of the dataset
+    plot: bool = False
+    # For generating spectra of the dataset (.spx files for NEMESIS input)
+    spx: bool = False
 
 
     #### Testing parameters
