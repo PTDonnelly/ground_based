@@ -1,3 +1,35 @@
+# @staticmethod
+# def make_data_dict(filepaths: List[str]) -> List[dict]:
+#     """Create dictionary to store metadata and data products"""
+
+#     # Build dictionary template for each observation
+#     dict_template = {
+#         "filename": [],
+#         "data_products": []  
+#         }
+#     # Build a list of this dictionary to contain all files in filepaths
+#     data_dict = [deepcopy(dict_template) for _ in filepaths]
+#     return data_dict
+
+# @classmethod
+# def append_products_to_dataset(cls, ifile: int, filepath: object, data_products: Dict[str, npt.ArrayLike], dataset: List[dict]) -> List[dict]:
+#     """Add each file to an overall dictionary containing the entire dataset for a given epoch."""
+#     dataset[ifile]['filename'] = filepath.stem
+#     dataset[ifile]['data_products'] = data_products
+#     return
+
+# Dataset.create():
+
+#     # Create dictionary to store metadata and data products
+#     dataset = Process.make_data_dict(filepaths)
+
+#     for ifile, filepath in enumerate(filepaths):
+#         # Add data_products to the dictionary containing the entire dataset for this epoch."""
+#         Process.append_products_to_dataset(ifile, filepath, data_products, dataset)
+
+
+#############################################
+
 
 
 def get_map_extent(self, x_size: int, y_size: int) ->  Tuple[int, int, int, int]:

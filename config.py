@@ -5,54 +5,44 @@ from pathlib import Path
 class Config:
     """Define flags to configure the execution of the pipeline"""
     
-    #### Module-level parameters
-    ## Running giantpipe
+    ########## Module-level parameters
+    ##### Running giantpipe
     # For calibrating mapped products (from DRM or Oliver's tool), you should only have to do this once.
     calibrate: bool = True
-    # For binning the maps by different schemes (type: None) or (type: str = "central meridian", "centre to limb", "regional" etc.)
-    binning_scheme: str = 'central meridian'
     # For generating plots of the dataset
     plot: bool = False
     # For generating spectra of the dataset (.spx files for NEMESIS input)
     spx: bool = False
-
-
-    #### Testing parameters
+    
+    ########## Testing parameters
     clock: bool = True            # Used for timing the execution of the code
     profiler: bool = True        # Used for monitoring execution frequency and duration of code
 
-    #### Input flags
-    
-    ## Filepaths
-    
+    ########## Input flags
+    ##### Filepaths
     # Point to data directory
-    data_directory: str = "/Users/ptdonnelly/Documents/Research/data/visir/"
+    # data_directory: str = "/Users/ptdonnelly/Documents/Research/data/visir/"
+    data_directory: str = "C:/Users/padra/Documents/Research/data/visir/"
     # Point to specific epoch directory
     epoch: str = "2016feb"
-
-    ## Source of data: "fits" or "json" or "nc" (the latter two are not currently used)
+    ##### Source of data: "fits" or "json" or "nc" (the latter two are not currently used)
     data_source: str = "fits"
     
-    #### Binning parameters
-
-    ## Spatial grids
-
+    ########## Spatial parameters
+    ##### Spatial grids
     # Resolution of geographic grids (0.5 = half-degree resolution)
     grid_resolution = 0.5
     # Maximum extent of spatial grids for construction
     latitude_range = -90, 90
     longitude_range = 0, 360
     emission_angle_range = 0, 90
-
+    ##### Binning-specific parameters
+    # For binning the maps by different schemes (type: None) or (type: str = "central meridian", "centre to limb", "regional" etc.)
+    binning_scheme: str = 'central meridian'
+    # Central meridian binning width (in plus-minus degrees longitude around the LCMIII)
+    merid_width = 20
 
     #### Output flags
-
-    ## File storage
-    
-    # Make a JSON file from cylindical maps and metadata
-    make_json: bool = False
-    # Create a NetCDF file from cylindical maps and metadata
-    make_netcdf: bool = False
 
     #################### OLD
     #         

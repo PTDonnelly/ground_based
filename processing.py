@@ -3,6 +3,7 @@ from astropy.io import fits
 from copy import deepcopy
 import glob
 import json
+import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 from os.path import exists
@@ -14,6 +15,7 @@ import netCDF4 as nc4
 # from numba.experimental import jitclass
 from sorcery import dict_of
 from snoop import snoop
+import xarray as xr
 
 from config import Config
 from testing import Clock, Profiler
@@ -28,30 +30,77 @@ class Preprocess:
 
     @staticmethod
     def pathify(filepaths: List[str]) -> List[str]:
-        """Use pathlib.Path() to avoid problems with pathing between Windows (backslash)
-        and Unix systems (forwardslash)."""
+        """Use the object-oriented pathlib.Path() to avoid problems with pathing between 
+        Windows (backslash) and Unix systems (forwardslash)."""
         return [Path(filepath) for filepath in filepaths]
 
     @classmethod
-    def find_data(cls, data_directory: str, epoch: str) -> List[str]:        
+    def find_data(cls, data_directory: str, epoch: str, mode: str) -> List[str]:        
         """Find observations based on pathing and epoch description in Config()
         and universalise pathnames with Path()."""
-        # filepaths = glob.glob(f"{data_directory}{epoch}/recal_*.fits.gz")
-        filepaths = [
-            f"{data_directory}{epoch}/recal_wvisir_J7.9_2016-02-15T05:21:59.7428_Jupiter_clean_withchop.fits.gz",
-            f"{data_directory}{epoch}/recal_wvisir_PAH1_2016-02-15T04:50:48.2300_Jupiter_clean_withchop.fits.gz"
-            ]
+        
+        if mode == 'fits':
+            # filepaths = glob.glob(f"{data_directory}{epoch}/recal_*.fits.gz")
+            filepaths = [
+                f"{data_directory}{epoch}/recal_wvisir_J7.9_2016-02-15T05 21 59.7428_Jupiter_clean_withchop.fits.gz",
+                f"{data_directory}{epoch}/recal_wvisir_NEII_1_2016-02-15T08 42 53.5568_Jupiter_clean_withchop.fits.gz",
+                f"{data_directory}{epoch}/recal_wvisir_PAH1_2016-02-15T04 50 48.2300_Jupiter_clean_withchop.fits.gz"
+                ]
+        if mode == 'nc':
+           filepaths = glob.glob(f"{data_directory}{epoch}/netcdf/recal_*.nc")
         return cls.pathify(filepaths)
     
     @classmethod
-    def get_data_files(cls) -> List[str]: 
+    def get_data_files(cls, mode: str) -> List[object]: 
         """Find and gather all files for a given epoch of VISIR observations.
             Make sure file hierarchy (defined in config.py) is pointing to the right place."""
 
         # Specify location of data and observing epoch
         data_directory = Config.data_directory
         epoch = Config.epoch
-        return cls.find_data(data_directory, epoch)
+        return cls.find_data(data_directory, epoch, mode)
+
+    @staticmethod
+    def fitsname_to_ncname(filepath: object) -> str:
+        # Construct filename from filepath
+        file_stem = filepath.stem
+        filename = file_stem.split('_clean_withchop.fits')[0]
+        return Path(f"{Config.data_directory}{Config.epoch}/netcdf/{filename}.nc")
+    
+    @staticmethod
+    def find_missing_netcdf_files(check: List[bool], filepaths: List[object]) -> List[object]:
+        return  [file for file, file_check in zip(list(filepaths), check) if file_check == False]
+
+    @classmethod
+    def check_netcdf_exists(cls, filepaths: List[object]) -> bool:
+        """Check if the dataset exists in NetCDF format. If not, pass False so that it can be created by Dataset.create()"""
+
+        # Check if the same files exist in NetCDF format
+        check = []
+        for filepath in filepaths:
+            ncfile = cls.fitsname_to_ncname(filepath)
+            if ncfile.exists():
+                check.append(True)
+            else:
+                check.append(False)
+        return check
+    
+    @classmethod
+    def check_netcdf(cls)-> List[object]:
+        """Checks for netCDF dataset, if there are any missing (i.e. there are .fits versions but not .nc), creates the missing files.
+        Only returns the list of objects if necessary."""
+
+        # Point to .fits files
+        filepaths = Preprocess.get_data_files(mode='fits')
+
+        # Compare to .nc files
+        check = cls.check_netcdf_exists(filepaths)
+        if all(check):
+            # If all .nc files are there, continue
+            return None
+        else:
+            # If any files are missing, make them
+            return cls.find_missing_netcdf_files(check, filepaths)
 
     @classmethod
     def preprocess(cls, filepath: object) -> Dict[str, object]:
@@ -336,110 +385,44 @@ class Process:
         viewing = cls.get_viewing(header) # Observation viewing (1: North or -1: South)
         return dict_of(date_time, LCMIII, wavelength, viewing)
         
-    @staticmethod
-    def make_data_dict(filepaths: List[str]) -> List[dict]:
-        """Create dictionary to store metadata and data products"""
-
-        # Build dictionary template for each observation
-        dict_template = {
-            "filename": [],
-            "data_products": []  
-            }
-        # Build a list of this dictionary to contain all files in filepaths
-        data_dict = [deepcopy(dict_template) for _ in filepaths]
-        return data_dict
-
-    @classmethod
-    def append_products_to_dataset(cls, ifile: int, filepath: object, data_products: Dict[str, npt.ArrayLike], dataset: List[dict]) -> List[dict]:
-        """Add each file to an overall dictionary containing the entire dataset for a given epoch."""
-        dataset[ifile]['filename'] = filepath.stem
-        dataset[ifile]['data_products'] = data_products
-        return
-    
-    @staticmethod
-    def save_json(filepath: object, data_products: Dict[str, npt.ArrayLike]) -> None:
-        """Generate a JSON file containing geometrically-registered cylindrical maps
-        and metadata."""
-        
-        if Config.make_json == False:
-            return
-        else:
-            file_stem = filepath.stem
-            filename = file_stem.split('_clean_withchop.fits')[0]
-            jsonfile = f"{Config.data_directory}{Config.epoch}/json/{filename}"
-            print(jsonfile)
-            with open(f"{jsonfile}.json", 'w') as f:
-                json.dump(data_products, f, cls=NumpyEncoder)
-            return
-
     @classmethod
     def save_netcdf(cls, filepath: object, data_products: Dict[str, npt.ArrayLike]) -> None:
-        """Generate a NetCDF file containing geometrically-registered cylindrical maps
-        and metadata."""
-        if Config.make_netcdf == False:
-            return
-        else:
-            # Construct filename from filepath
-            file_stem = filepath.stem
-            filename = file_stem.split('_clean_withchop.fits')[0]
-            ncfile = f"{Config.data_directory}{Config.epoch}/netcdf/{filename}"
+        """Generate a NetCDF file containing geometrically-registered cylindrical maps and metadata."""
+        
+        # Construct the filename of the netCDF file
+        ncfile = Preprocess.fitsname_to_ncname(filepath)
+        
+        # Instantiate a NetCDF4 Dataset object in write mode
+        netcdf_object = nc4.Dataset(f"{ncfile}", 'w', format='NETCDF4')
+        netcdf_object.set_fill_off()
 
-            # Instantiate a NetCDF4 Dataset object in write mode
-            netcdf_object = nc4.Dataset(f"{ncfile}.nc", 'w', format='NETCDF4')
-            netcdf_object.set_fill_off()
+        # Add dimension (these objects are used in the dimension arguments to createVariable below, the names do not clash)
+        _ = netcdf_object.createDimension('longitude', len(data_products['longitude_grid_1D']))
+        _ = netcdf_object.createDimension('latitude', len(data_products['latitude_grid_1D']))
+        
+        # Add variables (prefix "a" refers to "variable")
+        latitudes = netcdf_object.createVariable('latitudes', 'f4', ('latitude',))
+        longitudes = netcdf_object.createVariable('longitudes', 'f4', ('longitude',))
+        radiance = netcdf_object.createVariable('radiance', 'f4', ('latitude', 'longitude',))
+        radiance_error = netcdf_object.createVariable('radiance error', 'f4', ('latitude', 'longitude',))
+        emission_angle = netcdf_object.createVariable('emission angle', 'f4', ('latitude', 'longitude',))
+        doppler_velocity = netcdf_object.createVariable('doppler velocity', 'f4', ('latitude', 'longitude',))
+        
+        # Assign values to variables
+        longitudes[:] = data_products['longitude_grid_1D']
+        latitudes[:] = data_products['latitude_grid_1D']
+        radiance[:] = data_products['radiance']
+        radiance_error[:] = data_products['radiance_error']
+        emission_angle[:] = data_products['emission_angle']
+        doppler_velocity[:] = data_products['doppler_velocity']
 
-            # Add dimensions (prefix "d" refers to "dimension")
-            dlongitude = netcdf_object.createDimension('dlongitude', len(data_products['spatial_grids']['longitude_grid_1D']))
-            dlatitude = netcdf_object.createDimension('dlatitude', len(data_products['spatial_grids']['latitude_grid_1D']))
-            
-            # Add variables (prefix "a" refers to "variable")
-            alatitude = netcdf_object.createVariable('alatitude', 'f4', ('dlatitude',))
-            alongitude = netcdf_object.createVariable('alongitude', 'f4', ('dlongitude',))
-            radiance = netcdf_object.createVariable('Radiance', 'f4', ('dlatitude', 'dlongitude',))
-            radiance_error = netcdf_object.createVariable('Radiance error', 'f4', ('dlatitude', 'dlongitude',))
-            emission_angle = netcdf_object.createVariable('Emission angle', 'f4', ('dlatitude', 'dlongitude',))
-            doppler_velocity = netcdf_object.createVariable('Doppler velocity', 'f4', ('dlatitude', 'dlongitude',))
-            
-            # Assign values to variables
-            alongitude[:] = data_products['spatial_grids']['longitude_grid_1D']
-            alatitude[:] = data_products['spatial_grids']['latitude_grid_1D']
-            radiance[:] = data_products['radiance']
-            radiance_error[:] = data_products['radiance_error']
-            emission_angle[:] = data_products['emission_angle']
-            doppler_velocity[:] = data_products['doppler_velocity']
-            
-            # Close the object (and write the file)
-            netcdf_object.close()
+        # Set global NetCDF attributes
+        netcdf_object.setncatts(data_products['metadata'])
 
-
-
-
-
-
-
-
-
-            return
-    
-    @classmethod
-    def save(cls, filepath: object, data_products: Dict[str, npt.ArrayLike]) -> None:
-        """Save the mapped data products to different file formats."""
-        # Store data products in JSON format
-        cls.save_json(filepath, data_products)
-        # Store data products in NetCDF format
-        cls.save_netcdf(filepath, data_products)
+        # Close the object (and write the file)
+        netcdf_object.close()
         return
-
-class NumpyEncoder(json.JSONEncoder):
-    """Needed for encoding numpy arrays within Python dictionaries
-    for storage in json file. Pass this class name as a value to 
-    the 'cls' parameter of json.dump()"""
-
-    def default(self, object: npt.NDArray[np.float64]):
-        if isinstance(object, np.ndarray):
-            return object.tolist()
-        return json.JSONEncoder.default(self, object)
-
+    
 class Dataset:
     """Method-focused class responsible for constructing and containing the data products of a given epoch."""
 
@@ -447,18 +430,12 @@ class Dataset:
         return
     
     @classmethod
-    def create(cls) -> List[dict]:
-        """Reads VISIR images and cylindrical maps (.fits format), does geometric registration, and optionally outputs alternate formats."""
-
-        # Point to observations
-        filepaths = Preprocess.get_data_files()
-
-        # Create dictionary to store metadata and data products
-        dataset = Process.make_data_dict(filepaths)
+    def create(cls, filepaths: List[object]) -> List[dict]:
+        """Reads VISIR images and cylindrical maps (.fits format), does geometric registration, and saves in NetCDF format."""
 
         # Read in VISIR FITS files and construct geographic data products
         for ifile, filepath in enumerate(filepaths):
-            # print(f"Register map: {ifile+1} / {len(filepaths)}")
+            print(f"Register map: {ifile+1} / {len(filepaths)}")
 
             # Retrieve Header Data Units (HDUs) from FITS files and group into dictionary
             hdu_group = Preprocess.preprocess(filepath)
@@ -467,69 +444,87 @@ class Dataset:
             data_products = Process.process(hdu_group)
 
             # Save data products to file
-            Process.save(filepath, data_products)
+            Process.save_netcdf(filepath, data_products)
+        return
 
-            # Add data_products to the dictionary containing the entire dataset for this epoch."""
-            Process.append_products_to_dataset(ifile, filepath, data_products, dataset)
-
-        return dataset
+    @classmethod
+    def ensure_no_missing_netcdf_files(cls) -> None:
+        """Checks for netCDF dataset, if there are any missing (i.e. there are .fits versions but not .nc), creates the missing files."""
+        
+        missing_files = Preprocess.check_netcdf()
+        if missing_files == None:
+            print('All NetCDF files are here - going on to do some work...')
+            pass
+        else:
+            print('Some NetCDF files are missing - going off to make some...')
+            cls.create(missing_files)
+            print('All NetCDf files present and accounted for.')
 
     @staticmethod
-    def read_data_products(data: Dict[str, npt.ArrayLike], reformed_data: Dict[str, npt.ArrayLike]) -> List:
-        """Unpack individual data products form the large dataset. Specifically, convert 
-        a dictionary of lists to a list of dictionaries."""   
-        for key1, key2 in zip(reformed_data.keys(), data.keys()):
-            if key1 != key2:
-                raise ValueError("Data dictionaries do not contain the same entries.")
-            else:
-                reformed_data[key1].append(data[key2]) 
-        return reformed_data
+    def get_nbins_in_grid() -> None:
+        grid_resolution = Config.grid_resolution
+        latitude_range = Config.latitude_range
+        return int((np.diff(latitude_range) / grid_resolution))
+
+    @staticmethod
+    def get_binning_extent(data: object):
+        
+        # Get longitudinal extent in degrees
+        min_longitude = data.attrs['LCMIII'] - Config.merid_width
+        max_longitude = data.attrs['LCMIII'] + Config.merid_width
+        
+        # Get latitudinal extent in degrees
+        min_latitude, max_latitude = Config.latitude_range
+        if data.attrs['viewing'] == 1:
+            min_latitude = -5
+        elif data.attrs['viewing'] == -1:
+            max_latitude = 5
+
+        # Convert extents from degrees to indices
+        min_latitude = (min_latitude + 90) * 2
+        max_latitude = (max_latitude + 90) * 2
+        min_longitude = (min_longitude * 2)
+        max_longitude = (max_longitude * 2)
+
+        # Ensure new index bounds conform to NetCDF grid
+        if (min_latitude < 0) or (max_latitude > data.dims['latitude']) or (min_longitude < 0) or (max_longitude > data.dims['longitude']):
+            raise ValueError("Array indices outside range of spatial grids in NetCDF file.")
+        return int(min_longitude), int(max_longitude), min_latitude, max_latitude
     
     @classmethod
-    def read_data_products_from_dataset(cls) -> Dict[str, list]:
-        """Create the dataset from the reduced data files then immediately deconstruct it 
-        from a list of dictionaries of length "len(filepaths)" (i.e. number of files), and pull out the individual data_products. 
-        Then reform it into a dictionary of lists, where each key is an individual data product (physical variable)
-        and its corresponding value is a list of length "len(filepaths)"."""
-        
-        # Create dataset
-        dataset = cls.create()
-        
-        # Create template dictionary for the reformed data (e.g. List[dict] -> Dict[list])
-        reformed_data = {"longitude_grid_1D": [],
-                         "latitude_grid_1D": [],
-                         "longitude_grid_2D": [],
-                         "latitude_grid_2D": [],
-                         "radiance": [],
-                         "radiance_error": [],
-                         "emission_angle": [],
-                         "doppler_velocity": [],
-                         "metadata": []
-        }
-
-        # Upack each file from dataset
-        for data in dataset:
-            data_products = data["data_products"]
-            cls.read_data_products(data_products, reformed_data)
-        return reformed_data
-
-    @classmethod
     def bin_central_meridian(cls) -> List[dict]:
-        """Returns the meridional profiles from the data products returned by Dataset.create()."""
+        """Returns the meridional profiles from the data products contained in the NetCDF files."""
 
-        # Reform the dataset dictionary
-        reformed_data = cls.read_data_products_from_dataset()
-        
-        # Pull out variables
-        metadata = reformed_data['metadata']
-        print(np.shape(metadata))
-        latitude = reformed_data['latitude_grid_2D']
-        radiance = reformed_data['radiance']
-        print(np.shape(radiance))
+        # Point to NetCDF files
+        filepaths = Preprocess.get_data_files(mode='nc')
 
-        # Isolate latitude grids along the central meridian (nlat x nfiles)
+        # Calculate number of bins in spatial grids
+        number_of_bins = cls.get_nbins_in_grid()
         
-        profiles = reformed_data['latitude_grid_1D']
+        # Allocate memory for central meridian profiles (number of latitudes x number of files)
+        profiles = np.empty((number_of_bins, len(filepaths), 4))
+        profiles.fill(np.nan)
+
+        # Open each file and extract data
+        for ifile, filepath in enumerate(filepaths):
+            with xr.open_dataset(filepath) as data:
+                if data.dims['latitude'] != number_of_bins:
+                    raise ValueError('NetCDF file has different grid to Config() definitions')
+
+                # Get spatial extents of binning region
+                min_longitude, max_longitude, min_latitude, max_latitude = cls.get_binning_extent(data)
+                
+                # Extract each data array
+                radiance = data['radiance'].sel(longitude=slice(min_longitude, max_longitude), latitude=slice(min_latitude, max_latitude)).values
+                radiance_error = data['radiance error'].sel(longitude=slice(min_longitude, max_longitude), latitude=slice(min_latitude, max_latitude)).values
+                emission_angle = data['emission angle'].sel(longitude=slice(min_longitude, max_longitude), latitude=slice(min_latitude, max_latitude)).values
+                doppler_velocity = data['doppler velocity'].sel(longitude=slice(min_longitude, max_longitude), latitude=slice(min_latitude, max_latitude)).values
+
+                # Store each 
+                profiles[min_latitude:max_latitude, ifile, 0] = np.nanmean(radiance, axis=1)
+                profiles[min_latitude:max_latitude, ifile, 1] = np.nanmean(radiance_error, axis=1)
+                profiles[min_latitude:max_latitude, ifile, 2] = np.nanmean(emission_angle, axis=1)
+                profiles[min_latitude:max_latitude, ifile, 3] = np.nanmean(doppler_velocity, axis=1) 
         return profiles
 
     @classmethod
@@ -556,7 +551,7 @@ class Dataset:
     @classmethod
     def make_calibration(cls, profiles: npt.ArrayLike) -> List[dict]:
         """Calibrates the data products returned by Dataset.create()."""
-        pass 
+        print(f"Show me the profiles!")
     
     @classmethod
     def calibrate(cls) -> List[dict]:
@@ -565,8 +560,13 @@ class Dataset:
         if Config.calibrate == False:
             return
         else:
+            # Make sure all .fits files are present in .nc format
+            cls.ensure_no_missing_netcdf_files()
+        
             # Get meridional profiles (calibration always uses central meridian profiles)
             profiles = cls.bin_central_meridian()
+            
+            # Calibrate all observations
             cls.make_calibration(profiles)
             return
     
@@ -590,7 +590,13 @@ class Dataset:
         if Config.plot == False:
             return
         else:
+            # Make sure all .fits files are present in .nc format
+            cls.ensure_no_missing_netcdf_files()
+
+            # Get profiles (determined by your desired binning scheme)
             profiles = cls.bin()
+            
+            # Create plots based on these binned observations
             cls.make_plots(profiles)
             return
     
@@ -611,10 +617,16 @@ class Dataset:
     def spx(cls) -> List[dict]:
         """Plots the data products returned by Dataset.create()."""
         
-        if Config.plot == False:
+        if Config.spx == False:
             return
         else:
+             # Make sure all .fits files are present in .nc format
+            cls.create_missing_netcdf_files()
+
+            # Get profiles (determined by your desired binning scheme)
             profiles = cls.bin()
+            
+            # Create plots based on these binned observations
             cls.make_spx(profiles)
             return
         
