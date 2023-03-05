@@ -541,12 +541,11 @@ class Dataset:
 
         # Begin binning as desired
         if Config.binning_scheme == 'central meridian':
-            profiles = cls.bin_central_meridian()
+            return cls.bin_central_meridian()
         elif Config.binning_scheme == 'centre to limb':
-            profiles = cls.bin_centre_to_limb()
+            return cls.bin_centre_to_limb()
         elif Config.binning_scheme == 'regional':
-            profiles = cls.bin_regional()
-        return profiles
+            return cls.bin_regional()
 
     @classmethod
     def make_calibration(cls, profiles: npt.ArrayLike) -> List[dict]:
