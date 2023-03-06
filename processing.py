@@ -453,15 +453,15 @@ class Dataset:
         
         missing_files = Preprocess.check_netcdf()
         if missing_files == None:
-            print('All NetCDF files are here - going on to do some work...')
+            print("All NetCDf files present and accounted for.")
             pass
         else:
-            print('Some NetCDF files are missing - going off to make some...')
+            print("Some NetCDF files are missing - going off to make some...")
             cls.create(missing_files)
-            print('All NetCDf files present and accounted for.')
+            print("All NetCDf files present and accounted for.")
 
     @staticmethod
-    def get_nbins_in_grid() -> None:
+    def get_number_of_latitude_bins() -> int:
         grid_resolution = Config.grid_resolution
         latitude_range = Config.latitude_range
         return int((np.diff(latitude_range) / grid_resolution))
@@ -499,16 +499,16 @@ class Dataset:
         filepaths = Preprocess.get_data_files(mode='nc')
 
         # Calculate number of bins in spatial grids
-        number_of_bins = cls.get_nbins_in_grid()
+        number_of_latitude_bins = cls.get_number_of_latitude_bins()
         
         # Allocate memory for central meridian profiles (number of latitudes x number of files)
-        profiles = np.empty((number_of_bins, len(filepaths), 4))
+        profiles = np.empty((number_of_latitude_bins, len(filepaths), 3))
         profiles.fill(np.nan)
 
         # Open each file and extract data
         for ifile, filepath in enumerate(filepaths):
             with xr.open_dataset(filepath) as data:
-                if data.dims['latitude'] != number_of_bins:
+                if data.dims['latitude'] != number_of_latitude_bins:
                     raise ValueError('NetCDF file has different grid to Config() definitions')
 
                 # Get spatial extents of binning region
@@ -518,13 +518,11 @@ class Dataset:
                 radiance = data['radiance'].sel(longitude=slice(min_longitude, max_longitude), latitude=slice(min_latitude, max_latitude)).values
                 radiance_error = data['radiance error'].sel(longitude=slice(min_longitude, max_longitude), latitude=slice(min_latitude, max_latitude)).values
                 emission_angle = data['emission angle'].sel(longitude=slice(min_longitude, max_longitude), latitude=slice(min_latitude, max_latitude)).values
-                doppler_velocity = data['doppler velocity'].sel(longitude=slice(min_longitude, max_longitude), latitude=slice(min_latitude, max_latitude)).values
 
                 # Store each 
                 profiles[min_latitude:max_latitude, ifile, 0] = np.nanmean(radiance, axis=1)
                 profiles[min_latitude:max_latitude, ifile, 1] = np.nanmean(radiance_error, axis=1)
                 profiles[min_latitude:max_latitude, ifile, 2] = np.nanmean(emission_angle, axis=1)
-                profiles[min_latitude:max_latitude, ifile, 3] = np.nanmean(doppler_velocity, axis=1) 
         return profiles
 
     @classmethod
@@ -548,30 +546,51 @@ class Dataset:
             return cls.bin_regional()
 
     @classmethod
-    def make_calibration(cls, profiles: npt.ArrayLike) -> List[dict]:
-        """Calibrates the data products returned by Dataset.create()."""
-        print(f"Show me the profiles!")
+    def radiometric_scaling(cls, profiles: npt.NDArray[np.float64]) -> None:
+        """Calibrate ground-based data to published spacraft radiance profiles:
+        Cassini/CIRS in the N-band and Voyager/ISS in the Q-band."""
+
+        # Read calibration data
+
+
+        # Scaling meridional profiles
+
+        return
     
     @classmethod
-    def calibrate(cls) -> List[dict]:
+    def calibrate(cls) -> None:
         """Calibrates the data products returned by Dataset.create()."""
+        
+        print("Calibrating dataset:")
+
+        # Get meridional profiles (calibration always uses central meridian profiles)
+        profiles = cls.bin_central_meridian()
+        
+        # Perform radiometric scaling
+        cls.radiometric_scaling(profiles)
+    
+    @classmethod
+    def run_calibration(cls) -> None:
+        """Checks that all NetCDF files are present and runs calibration function."""
         
         if Config.calibrate == False:
             return
         else:
             # Make sure all .fits files are present in .nc format
             cls.ensure_no_missing_netcdf_files()
-        
-            # Get meridional profiles (calibration always uses central meridian profiles)
-            profiles = cls.bin_central_meridian()
             
             # Calibrate all observations
-            cls.make_calibration(profiles)
+            cls.calibrate()
             return
     
     @classmethod
-    def make_plots(cls, profiles: npt.ArrayLike) -> List[dict]:
+    def make_plots(cls, profiles: npt.ArrayLike) -> None:
         """Plots the data products returned by Dataset.create()."""
+        
+        print("Plotting dataset:")
+
+        # Get profiles
+        profiles = cls.bin()
 
         # Begin plotting as desired
         if Config.binning_scheme == 'central meridian':
@@ -583,50 +602,49 @@ class Dataset:
         return profiles
         
     @classmethod
-    def plot(cls) -> List[dict]:
-        """Plots the data products returned by Dataset.create()."""
+    def run_plotting(cls) -> None:
+        """Checks that all NetCDF files are present and runs plotting functions."""
         
         if Config.plot == False:
             return
         else:
             # Make sure all .fits files are present in .nc format
             cls.ensure_no_missing_netcdf_files()
-
-            # Get profiles (determined by your desired binning scheme)
-            profiles = cls.bin()
             
-            # Create plots based on these binned observations
-            cls.make_plots(profiles)
+            # Calibrate all observations
+            cls.make_plots()
             return
     
     @classmethod
-    def make_spx(cls, profiles: npt.ArrayLike) -> List[dict]:
+    def make_spx(cls, profiles: npt.ArrayLike) -> None:
         """Plots the data products returned by Dataset.create()."""
-    
+
+        print("Writing dataset to spectrum:")
+
+        # Get profiles
+        profiles = cls.bin()
+
         # Begin binning as desired
         if Config.binning_scheme == 'central meridian':
-            cls.bin_central_meridian(profiles)
+            cls.spx_central_meridian(profiles)
         elif Config.binning_scheme == 'centre to limb':
-            cls.bin_centre_to_limb(profiles)
+            cls.spx_centre_to_limb(profiles)
         elif Config.binning_scheme == 'regional':
-            cls.bin_regional(profiles)
+            cls.spx_regional(profiles)
         return profiles
     
     @classmethod
-    def spx(cls) -> List[dict]:
-        """Plots the data products returned by Dataset.create()."""
+    def run_spxing(cls) -> None:
+        """Checks that all NetCDF files are present and runs spectral writing function."""
         
         if Config.spx == False:
             return
         else:
-             # Make sure all .fits files are present in .nc format
-            cls.create_missing_netcdf_files()
-
-            # Get profiles (determined by your desired binning scheme)
-            profiles = cls.bin()
+            # Make sure all .fits files are present in .nc format
+            cls.ensure_no_missing_netcdf_files()
             
-            # Create plots based on these binned observations
-            cls.make_spx(profiles)
+            # Calibrate all observations
+            cls.make_spx()
             return
         
 def start_monitor() -> Tuple[object, object]:
@@ -652,13 +670,13 @@ def run_giantpipe():
     profiler, clock = start_monitor()
 
     # For calibration of the VISIR data
-    Dataset.calibrate()
+    Dataset.run_calibration()
 
     # For plotting the VISIR data
-    Dataset.plot()
+    Dataset.run_plotting()
 
-    # For generating spectral files from the VISIR data
-    Dataset.spx()
+    # For generating spectral files (.spx) from the VISIR data
+    Dataset.run_spxing()
 
     completion = "\ngiantpipe is finished, have a great day."
     print(completion)
