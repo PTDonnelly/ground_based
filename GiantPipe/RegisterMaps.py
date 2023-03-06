@@ -1,10 +1,19 @@
 import numpy as np
 from math import acos, cos, radians, pi
 import matplotlib.pyplot as plt
+from scipy import interpolate
+from snoop import snoop
 import Globals
 from Read.ReadFits import ReadFits
 from Tools.SetWave import SetWave
 from Tools.CalculateErrors import CalculateErrors
+
+def interpolate_doppler_profile() -> object:
+    # Read in Doppler velocity look-up table to get correction factor
+    f = np.loadtxt("C:/Users/padra/Documents/Research/github/ground_based/inputs/doppler_shift_correction_profile.txt", dtype=float)
+    correction_factor, doppler_velocity = f[:, 0], f[:, 1]
+    # Interpolate Radiance Doppler profile
+    return interpolate.interp1d(doppler_velocity, correction_factor)
 
 def RegisterMaps(files, binning):
     """ Step 1: Read img, cmap and mufiles
@@ -33,11 +42,14 @@ def RegisterMaps(files, binning):
     # Define flags
     pg2pc = 0                   # Optional conversion of latitudes from planetographic to planetocentric
 
+    # Doppler correction interpolation function
+    f = interpolate_doppler_profile()
+
     # Loop over files
     for ifile, fpath in enumerate(files):
         print(ifile, fpath)
         ## Step 1: Read img, cmap and mufiles
-        imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filepath=f"{fpath}")
+        imghead, imgdata, cylhead, cyldata, muhead, mudata, vdophead, vdopdata = ReadFits(filepath=f"{fpath}")
 
         ## Step 2: Geometric registration of pixel information
         # Save flag depending on Northern (1) or Southern (-1) viewing
@@ -88,14 +100,16 @@ def RegisterMaps(files, binning):
                     # Convert from planetographic to planetocentric latitudes
                     mu_ang = mudata[y, x]
                     mu  = 180/pi * acos(mu_ang)
-                    # Calculate pxel radiance and error
+                    # Calculate pixel radiance and error
                     rad = cyldata[y, x] * 1e-7
-                    
-                    ## Step 3: Gather pxel information for all files
+                    # Correct 7.9 micron radiances by removing Doppler effects
+                    if wavenum == 1253.0625:
+                        vdop = vdopdata[y, x]
+                        rad = rad / f(vdop)
+                    else:
+                        pass
+                    ## Step 3: Gather pixel information for all files
                     # Store spectral information in spectrum array
-                    # print(y, x, ifile)
-                    # print(LCP, lat, lon, mu, rad, wavenum, view)
-                    # input()
                     spectrum[y, x, ifile, 0] = lat
                     spectrum[y, x, ifile, 1] = lon
                     spectrum[y, x, ifile, 2] = Globals.LCP if binning == 'bin_cpara' else np.nan

@@ -17,8 +17,7 @@ def BinCentreToLimb(mode, nfiles, spectrum, LCMIII):
         for i, item in enumerate(filters):
             count[item].append(i)
         # Store filter indices only if filter is present
-        filter_indices = ((key, item) for key, item in count.items() if ~np.isnan(key))
-        return filter_indices
+        return ((key, item) for key, item in count.items() if ~np.isnan(key))
 
     def singles(nfiles, spectrum, LCMIII):
         """Create central meridian average for each observation"""
@@ -87,7 +86,7 @@ def BinCentreToLimb(mode, nfiles, spectrum, LCMIII):
             _, _, wave, _, _ = SetWaveReduced(filename=None, wavelength=None, wavenumber=None, ifilt=ifilt)
             for ilat, clat in enumerate(Globals.latgrid):
                 for imu, cmu in enumerate(Globals.mugrid):
-                    print(f"LAT: {clat}   MU: {cmu}")
+                    # print(f"LAT: {clat}   MU: {cmu}")
                     filters = single_ctls[ilat, imu, :, 5]
                     keep = (filters == wave)
                     spx = single_ctls[ilat, imu, keep, :]

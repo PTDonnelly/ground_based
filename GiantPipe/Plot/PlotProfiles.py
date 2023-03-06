@@ -269,7 +269,7 @@ def PlotCentreToLimbProfiles(dataset, mode, files, singles, spectrals):
         def PlotSingles():
             for ifile, fpath in enumerate(files):
                 # Read in image and cylindrical map
-                imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filepath=f"{fpath}")
+                imghead, imgdata, cylhead, cyldata, muhead, mudata, _, _ = ReadFits(filepath=f"{fpath}")
                 # Build figure area
                 fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(10, 4),
                                         gridspec_kw={'width_ratios': [2,4,1], 'height_ratios': [1]}, dpi=300)
@@ -344,7 +344,7 @@ def PlotCentreToLimbProfiles(dataset, mode, files, singles, spectrals):
                 # Extract wavenumber
                 findwave = ~np.isnan(spectrals[iplot, :, :, 5])
                 waves = list(spectrals[iplot, findwave, 5])
-                wave = np.int(waves[0])
+                wave = int(waves[0])
                 # Clean up plot
                 ax.grid(axis='both', markevery=1, color='k', ls=':', lw=0.5*linewidth)
                 ax.set_title(wave, fontsize=fontsize, pad=2)
@@ -370,7 +370,7 @@ def PlotCentreToLimbProfiles(dataset, mode, files, singles, spectrals):
             plt.close()
 
         # Plot centre-to-limb profiles
-        # PlotSingles()
+        PlotSingles()
         PlotSpectrals()
 
     PlotGlobalCTLFigures()

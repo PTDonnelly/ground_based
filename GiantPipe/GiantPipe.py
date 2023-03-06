@@ -18,7 +18,7 @@ def main():
     from Plot.PlotProfiles import PlotParaProfiles
     from Plot.PlotProfiles import PlotCentreToLimbProfiles
     from Plot.PlotProfiles import PlotGlobalSpectrals
-    from Plot.PlotProfiles import PlotRegionalMaps
+    # from Plot.PlotProfiles import PlotRegionalMaps
     from Plot.PlotProfiles import PlotRegionalAverage
     from Read.ReadNpy import ReadCentralMeridNpy
     from Read.ReadNpy import ReadCentralParallelNpy
