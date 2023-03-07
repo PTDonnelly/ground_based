@@ -8,6 +8,7 @@ import numpy as np
 import numpy.typing as npt
 from os.path import exists
 from pathlib import Path
+from scipy import interpolate
 from typing import Tuple, List, Dict
 
 import netCDF4 as nc4
@@ -42,9 +43,9 @@ class Preprocess:
         if mode == 'fits':
             # filepaths = glob.glob(f"{data_directory}{epoch}/recal_*.fits.gz")
             filepaths = [
-                f"{data_directory}{epoch}/recal_wvisir_J7.9_2016-02-15T05 21 59.7428_Jupiter_clean_withchop.fits.gz",
-                f"{data_directory}{epoch}/recal_wvisir_NEII_1_2016-02-15T08 42 53.5568_Jupiter_clean_withchop.fits.gz",
-                f"{data_directory}{epoch}/recal_wvisir_PAH1_2016-02-15T04 50 48.2300_Jupiter_clean_withchop.fits.gz"
+                f"{data_directory}{epoch}/recal_wvisir_J7.9_2016-02-15T05:21:59.7428_Jupiter_clean_withchop.fits.gz",
+                f"{data_directory}{epoch}/recal_wvisir_NEII_1_2016-02-15T08:42:53.5568_Jupiter_clean_withchop.fits.gz",
+                f"{data_directory}{epoch}/recal_wvisir_PAH1_2016-02-15T04:50:48.2300_Jupiter_clean_withchop.fits.gz"
                 ]
         if mode == 'nc':
            filepaths = glob.glob(f"{data_directory}{epoch}/netcdf/recal_*.nc")
@@ -170,7 +171,7 @@ class Process:
     header_data_unit: dict = {"header": header, "data": data}"""
 
     def __init__(self, header_data_unit) -> None:
-        self.header_data_unit: dict = header_data_unit      
+        self.header_data_unit: dict = header_data_unit
         return
 
     @classmethod
@@ -179,7 +180,7 @@ class Process:
         geographic metadata and data products, then pack these into a dictionary
         for file storage."""
 
-        image_hdu, radiance_hdu, emission_angle_hdu, dopppler_velocity_hdu = cls.unpack_hdu_group(hdu_group)
+        image_hdu, radiance_hdu, emission_angle_hdu, doppler_velocity_hdu = cls.unpack_hdu_group(hdu_group)
 
         # Calculate instrumental measurement errors of radiance
         error = cls.get_errors(image_hdu, type='flat')
@@ -188,10 +189,10 @@ class Process:
         longitude_grid_1D, latitude_grid_1D, longitude_grid_2D, latitude_grid_2D = cls.make_spatial_grids(radiance_hdu)
 
         # Construct data maps from cylindrical maps
-        radiance = cls.make_radiance_map(radiance_hdu)
-        radiance_error = cls.make_radiance_error_map(radiance_hdu, error)
+        radiance = cls.make_radiance_map(radiance_hdu, doppler_velocity_hdu)
+        radiance_error = cls.make_radiance_error_map(radiance, error)
         emission_angle = cls.make_emission_angle_map(emission_angle_hdu)
-        doppler_velocity = cls.make_doppler_velocity_map(dopppler_velocity_hdu)
+        doppler_velocity = cls.get_fits_data(doppler_velocity_hdu)
 
         # Construct metadata about observation
         metadata = cls.make_metadata(radiance_hdu)
@@ -310,7 +311,7 @@ class Process:
             return (360 / x_size)
 
     @classmethod
-    def make_spatial_grids(cls, header_data_unit: Dict[str, object]) -> Dict[str, npt.NDArray[np.float64]]:
+    def make_spatial_grids(cls, header_data_unit: Dict[str, npt.NDArray[np.float64]]) -> Dict[str, npt.NDArray[np.float64]]:
         "Read in raw cylindrical maps and perform geometric registration"
 
         # Access FITS header information
@@ -335,22 +336,58 @@ class Process:
         return longitude_grid_1D, latitude_grid_1D, longitude_grid_2D, latitude_grid_2D
 
     @classmethod
-    def make_radiance_map(cls, header_data_unit: Dict[str, object]) -> npt.NDArray[np.float64]:
+    def is_filter_7_microns(cls, header_data_unit: Dict[str, npt.NDArray[np.float64]]) -> bool:
+        """Returns a boolean value indicating whether or not the file is 7.9-micron data."""
+        
+        # Access FITS header information
+        header = cls.get_fits_header(header_data_unit)
+        # Read filter wavelength
+        wavelength = cls.get_header_contents(header, 'lambda')
+        return wavelength == float(7.9)
+   
+    @staticmethod
+    def interpolate_doppler_profile():
+        """Read in Doppler velocity look-up table to get correction factor and create interpolate object for the Radiance-Doppler profile."""
+        f = np.loadtxt(f"{Config.input_directory}doppler_shift_correction_profile.txt", dtype=float)
+        correction_factor, doppler_velocity = f[:, 0], f[:, 1]
+        return interpolate.interp1d(doppler_velocity, correction_factor)
+    
+    @classmethod
+    def doppler_correction_of_radiance(cls, radiance_hdu: Dict[str, npt.NDArray[np.float64]], doppler_velocity_hdu: Dict[str, npt.NDArray[np.float64]]) -> npt.NDArray[np.float64]:
+        
+        # Read in radiance and Doppler velocity map
+        radiance = cls.get_fits_data(radiance_hdu)
+        doppler_velocity = cls.get_fits_data(doppler_velocity_hdu)
+
+        # Get Doppler velocity interpolation function
+        interpolation_f = cls.interpolate_doppler_profile()
+        return radiance / interpolation_f(doppler_velocity)
+
+    @classmethod
+    def make_radiance_map(cls, radiance_hdu: Dict[str, npt.NDArray[np.float64]], doppler_velocity_hdu: Dict[str, npt.NDArray[np.float64]]) -> npt.NDArray[np.float64]:
         """Read in radiance values from cylindrical map and do unit conversion
         from native DRM units () into standard VISIR units ()"""
 
+        check = cls.is_filter_7_microns(radiance_hdu)
+        if check == False:
+            # Read in raw radiance map
+            radiance = cls.get_fits_data(radiance_hdu)
+        else:
+            # Do Doppler correction of 7.9-micron radiances
+            radiance = cls.doppler_correction_of_radiance(radiance_hdu, doppler_velocity_hdu)
+        
         # Coefficient needed to convert DRM units
         unit_conversion = 1e-7
-        return cls.get_fits_data(header_data_unit) * unit_conversion
+        return radiance * unit_conversion
     
-    @classmethod
-    def make_radiance_error_map(cls, header_data_unit: Dict[str, object], error: float) -> npt.NDArray[np.float64]:
+    @staticmethod
+    def make_radiance_error_map(radiance: npt.NDArray[np.float64], error: float) -> npt.NDArray[np.float64]:
         """Read in radiance values from cylindrical map and construct a new cylindrical map
         with values radiance * error for each pixel"""
-        return cls.make_radiance_map(header_data_unit) * error
+        return radiance * error
 
     @classmethod
-    def make_emission_angle_map(cls, header_data_unit: Dict[str, object]) -> npt.NDArray[np.float64]:
+    def make_emission_angle_map(cls, header_data_unit: Dict[str, npt.NDArray[np.float64]]) -> npt.NDArray[np.float64]:
         """Read in cosine(emission angle) values from cylindrical map and do trignometric conversion
         from cosine(mu) to mu (in degrees)."""
         
@@ -361,12 +398,7 @@ class Process:
         emission_angle_radians = np.arccos(cosine_emission_angle)
         emission_angle_degrees = np.degrees(emission_angle_radians)
         return emission_angle_degrees
-
-    @classmethod
-    def make_doppler_velocity_map(cls, header_data_unit: Dict[str, object]) -> npt.NDArray[np.float64]:
-        """Read in Doppler velocity values from cylindrical map."""
-        return cls.get_fits_data(header_data_unit)
-
+    
     @classmethod
     def make_metadata(cls, header_data_unit: Dict[str, object]) -> Dict[str, str]:
         """Pull important information about the observation from the FITS header
@@ -432,7 +464,7 @@ class Dataset:
     @classmethod
     def create(cls, filepaths: List[object]) -> List[dict]:
         """Reads VISIR images and cylindrical maps (.fits format), does geometric registration, and saves in NetCDF format."""
-
+      
         # Read in VISIR FITS files and construct geographic data products
         for ifile, filepath in enumerate(filepaths):
             print(f"Register map: {ifile+1} / {len(filepaths)}")
@@ -453,12 +485,12 @@ class Dataset:
         
         missing_files = Preprocess.check_netcdf()
         if missing_files == None:
-            print("All NetCDf files present and accounted for.")
+            print("\nAll NetCDF files present and accounted for.")
             pass
         else:
-            print("Some NetCDF files are missing - going off to make some...")
+            print("\nSome NetCDF files are missing - going off to make some...")
             cls.create(missing_files)
-            print("All NetCDf files present and accounted for.")
+            print("All NetCDF files present and accounted for.")
 
     @staticmethod
     def get_number_of_latitude_bins() -> int:
@@ -468,10 +500,11 @@ class Dataset:
 
     @staticmethod
     def get_binning_extent(data: object):
-        
+        """Converts spatial extent in degrees to index positions"""
+
         # Get longitudinal extent in degrees
-        min_longitude = data.attrs['LCMIII'] - Config.merid_width
-        max_longitude = data.attrs['LCMIII'] + Config.merid_width
+        min_longitude = int(data.attrs['LCMIII']) - Config.merid_width
+        max_longitude = int(data.attrs['LCMIII']) + Config.merid_width
         
         # Get latitudinal extent in degrees
         min_latitude, max_latitude = Config.latitude_range
@@ -489,7 +522,7 @@ class Dataset:
         # Ensure new index bounds conform to NetCDF grid
         if (min_latitude < 0) or (max_latitude > data.dims['latitude']) or (min_longitude < 0) or (max_longitude > data.dims['longitude']):
             raise ValueError("Array indices outside range of spatial grids in NetCDF file.")
-        return int(min_longitude), int(max_longitude), min_latitude, max_latitude
+        return min_longitude, max_longitude, min_latitude, max_latitude
     
     @classmethod
     def bin_central_meridian(cls) -> List[dict]:
@@ -561,7 +594,7 @@ class Dataset:
     def calibrate(cls) -> None:
         """Calibrates the data products returned by Dataset.create()."""
         
-        print("Calibrating dataset:")
+        print("\nCalibrating dataset:")
 
         # Get meridional profiles (calibration always uses central meridian profiles)
         profiles = cls.bin_central_meridian()
@@ -646,7 +679,7 @@ class Dataset:
             # Calibrate all observations
             cls.make_spx()
             return
-        
+    
 def start_monitor() -> Tuple[object, object]:
     profiler = Profiler()
     profiler.start()
