@@ -34,6 +34,7 @@ def main():
     from Write.WriteSpx import WriteMeridSpx
     from Write.WriteSpx import WriteParaSpx
     from Write.WriteSpx import WriteCentreToLimbSpx
+    from Write.WriteSpx import WriteLimbSpx
     from Write.WriteSpx import WriteRegionalSpx
     from Write.WriteSpx import WriteRegionalAverageSpx
 
@@ -48,7 +49,7 @@ def main():
     bin_av_region = False   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
     save        = False     # Store calculated profiles to local files
-    plotting    = True      # Plot calculated profiles
+    plotting    = False      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
     spx         = True      # Write spxfiles as spectral input for NEMESIS
     retrieval   = False      # Plot NEMESIS outputs 
@@ -154,7 +155,8 @@ def main():
 
         if spx:
             # Write mean central meridian profiles to spxfile
-            WriteCentreToLimbSpx(dataset=dataset, mode=mode, spectrals=spectrals)
+            # WriteCentreToLimbSpx(dataset=dataset, mode=mode, spectrals=spectrals)
+            WriteLimbSpx(dataset=dataset, mode=mode, spectrals=spectrals)
 
     if bin_region: 
         # Execute the bi-dimensional binning scheme 
