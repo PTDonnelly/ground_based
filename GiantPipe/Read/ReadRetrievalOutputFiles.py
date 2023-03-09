@@ -6,7 +6,7 @@ import Globals
 def RetrieveLatitudeFromCoreNumber(fpath):
 
     # Initialize local variables
-    ncore = int(176)                     # number of core directories (177-1), 
+    ncore = int(179)                     # number of core directories (177-1), 
                                     # which is also equivalent to the number of latitude points 
     lat_core = np.empty((ncore, 2)) # 2D array containing latitude and core directory number
     # Read all .prf files through all core directories

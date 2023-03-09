@@ -122,7 +122,7 @@ def PlotChiSquareOverNy(over_axis):
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
-def PlotChiSquareOverNySuperpose(over_axis):
+def PlotChiSquareOverNySuperpose(over_axis='latitude'):
 
     print('Plotting NEMESIS ChiSquare over latitude (superpose figure of several tests) ...')
      # If subdirectory does not exist, create it
@@ -130,26 +130,38 @@ def PlotChiSquareOverNySuperpose(over_axis):
     if not os.path.exists(dir):
         os.makedirs(dir)
     # Retrieval outputs directory path
-    fpath = "/Users/db496/Documents/Research/Observations/NEMESIS_outputs/"
+    fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_1_initial_tests/"
+    
     # Array of prior file names
     prior = ['jupiter_v2021']#, 'jupiter_v2016']
+    
     # Loop over each prior used for retrievals tests
     for iprior in prior:
-        # If retrieval test comparison subdirectory does not exist, create it
-        # subdir = f"{dir}/{iprior}_temp_aerosol1-10mu_greycloud_70-300mbar/chisquare_comparison/"
-        # subdir = f"{dir}/{iprior}_temp_aerosol1-10mu_paraH2_greycloud_70-300mbar/chisquare_comparison/"
-        subdir = f"{dir}/{iprior}_temp_aerosol1-10mu_C2H2p-C2H4-C2H6p_NH3-PH3-parametric_lat80S_no852_no887_reduce/chisquare_comparison/"
-        # subdir = f"{dir}/{iprior}_temp_aerosol1-10or1mu_nospecies/chisquare_comparison/"
-        # subdir = f"{dir}/{iprior}_temp_aerosol1-10mu_scale05or075or1/chisquare_comparison/"
-        if not os.path.exists(subdir):
-                os.makedirs(subdir)
-        # List of retrieval tests for comparison...
-        retrieval_test = [f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2p-C2H4-C2H6p_NH3pt_PH3pt_lat80S_no852_no887_reduce", 
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2p-C2H4-C2H6p_NH3pt_PH3_lat80S_no852_no887_reduce", 
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2p-C2H4-C2H6p_NH3_PH3pt_lat80S_no852_no887_reduce", 
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2p-C2H4-C2H6p_NH3pt_lat80S_no852_no887_reduce", 
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2p-C2H4-C2H6p_NH3_lat80S_no852_no887_reduce", 
-                        # f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2p-C2H4-C2H6p_NH3_lat80S_no852_no887_reduce"
+        retrieval_test = [
+                        # "cmerid_flat5_jupiter2021_greycloud_0",
+                        "cmerid_flat5_jupiter2021_greycloud_0_1p",
+                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s",
+                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+                        "ctl_flat5_jupiter2021_greycloud_0",
+                        "ctl_flat5_jupiter2021_greycloud_0_1p",
+                        "ctl_flat5_jupiter2021_greycloud_0_1p_27s",
+                        "ctl_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        "ctl_flat5_jupiter2021_nh3cloud_0",
+                        "ctl_flat5_jupiter2021_nh3cloud_0_1p",
+                        "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+                        "limb_flat5_jupiter2021_greycloud_0",
+                        "limb_flat5_jupiter2021_greycloud_0_1p",
+                        "limb_flat5_jupiter2021_greycloud_0_1p_27s",
+                        "limb_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        "limb_flat5_jupiter2021_nh3cloud_0",
+                        "limb_flat5_jupiter2021_nh3cloud_0_1p",
+                        "limb_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
                         ]
         ntest = len(retrieval_test)
         # Create the array to store chisquare over latitude for each test 
@@ -241,39 +253,70 @@ def PlotChiSquareMap(over_axis="2D"):
 
 
 ####### Temperature plotting and mapping routines ####### 
-def PlotRetrievedTemperature(over_axis):
+def PlotRetrievedTemperature(over_axis='latitude'):
 
     print('Plotting NEMESIS retrieved temperature over latitude...')
      # If subdirectory does not exist, create it
     dir = '../retrievals/retrieved_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
+    
     # Retrieval outputs directory path
-    fpath = "/Users/db496/Documents/Research/Observations/NEMESIS_outputs/"
+    fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_1_initial_tests/"
+    
     # Array of prior file names
     prior = ['jupiter_v2021']#, 'jupiter_v2016']
+    
     # Loop over each prior used for retrievals tests
     for iprior in prior:
         retrieval_test = [
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_NH3p_fshfix_no852_no887_aprmodif"
+                        # "cmerid_flat5_jupiter2021_greycloud_0",
+                        "cmerid_flat5_jupiter2021_greycloud_0_1p",
+                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s",
+                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+                        "ctl_flat5_jupiter2021_greycloud_0",
+                        "ctl_flat5_jupiter2021_greycloud_0_1p",
+                        "ctl_flat5_jupiter2021_greycloud_0_1p_27s",
+                        "ctl_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        "ctl_flat5_jupiter2021_nh3cloud_0",
+                        "ctl_flat5_jupiter2021_nh3cloud_0_1p",
+                        "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+                        "limb_flat5_jupiter2021_greycloud_0",
+                        "limb_flat5_jupiter2021_greycloud_0_1p",
+                        "limb_flat5_jupiter2021_greycloud_0_1p_27s",
+                        "limb_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        "limb_flat5_jupiter2021_nh3cloud_0",
+                        "limb_flat5_jupiter2021_nh3cloud_0_1p",
+                        "limb_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
                         ]
         ntest = len(retrieval_test)
+        
         # Loop over each prior used for retrievals tests
         for itest in retrieval_test:
+            
             # If retrieval test subdirectory does not exist, create it
             subdir = f"{dir}{itest}/meridians/"
             if not os.path.exists(subdir):
                 os.makedirs(subdir)
+            
             # # Read profile data from NEMESIS prior file 
             # _, prior_p, prior_temperature, prior_error, _, _, nlevel, _ = ReadTemperatureGasesPriorProfile(f"{fpath}{itest}/core_1/")
             # Read retrieved profiles from .prf outputs files
             temperature, _, latitude, _, pressure, _, nlevel, _, _= ReadprfFiles(filepath=f"{fpath}{itest}", over_axis=over_axis)
+            
             # Fill an 2D arrays with the prior temperature and temperature error profiles
             # prior_temp = np.empty((nlevel, nlat))
             # prior_err = np.empty((nlevel, nlat))
             # for ilat in range(nlat):
             #     prior_temp[:, ilat] = prior_temperature[:]
             #     prior_err[:, ilat] = prior_error[:]
+            
             for ilev in range(nlevel):
                 fig, axes = plt.subplots(1, 1, figsize=(10, 6), sharex=True, sharey=True)
                 # axes.plot(latitude, prior_temp[ilev, :], lw=2, label=f"{iprior}", color='orange')
@@ -296,7 +339,7 @@ def PlotRetrievedTemperature(over_axis):
                 # Close figure to avoid overlapping between plotting subroutines
                 plt.close()
 
-def PlotRetrievedTemperatureProfile(over_axis):
+def PlotRetrievedTemperatureProfile(over_axis='latitude'):
 
     print('Plotting NEMESIS retrieved temperature profiles...')
     # If subdirectory does not exist, create it
@@ -304,13 +347,38 @@ def PlotRetrievedTemperatureProfile(over_axis):
     if not os.path.exists(dir):
         os.makedirs(dir)
     # Retrieval outputs directory path
-    fpath = "/Users/db496/Documents/Research/Observations/NEMESIS_outputs/"
+    fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_1_initial_tests/"
+    
     # Array of prior file names
     prior = ['jupiter_v2021']#, 'jupiter_v2016']
+    
     # Loop over each prior used for retrievals tests
     for iprior in prior:
         retrieval_test = [
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_NH3p_fshfix_no852_no887_aprmodif"
+                        # "cmerid_flat5_jupiter2021_greycloud_0",
+                        "cmerid_flat5_jupiter2021_greycloud_0_1p",
+                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s",
+                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+                        "ctl_flat5_jupiter2021_greycloud_0",
+                        "ctl_flat5_jupiter2021_greycloud_0_1p",
+                        "ctl_flat5_jupiter2021_greycloud_0_1p_27s",
+                        "ctl_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        "ctl_flat5_jupiter2021_nh3cloud_0",
+                        "ctl_flat5_jupiter2021_nh3cloud_0_1p",
+                        "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+                        "limb_flat5_jupiter2021_greycloud_0",
+                        "limb_flat5_jupiter2021_greycloud_0_1p",
+                        "limb_flat5_jupiter2021_greycloud_0_1p_27s",
+                        "limb_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        "limb_flat5_jupiter2021_nh3cloud_0",
+                        "limb_flat5_jupiter2021_nh3cloud_0_1p",
+                        "limb_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
                         ]
         ntest = len(retrieval_test)
         # Loop over each retrieval tests for the current prior file
@@ -408,7 +476,7 @@ def PlotRetrievedTemperatureProfileSuperpose(over_axis):
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
-def PlotRetrievedTemperatureCrossSection(over_axis):
+def PlotRetrievedTemperatureCrossSection(over_axis='latitude'):
 
     print('Plotting NEMESIS retrieved temperature cross-section...')
     # If subdirectory does not exist, create it
@@ -418,13 +486,39 @@ def PlotRetrievedTemperatureCrossSection(over_axis):
     #  Load Jupiter zonal jets data to determine belts and zones location
     ejets_c, wjets_c, nejet, nwjet = ReadZonalWind("../inputs/jupiter_jets.dat")
     # Retrieval outputs directory path
-    fpath = "/Users/db496/Documents/Research/Observations/NEMESIS_outputs/"
+    fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_1_initial_tests/"
+    
     # Array of prior file names
     prior = ['jupiter_v2021']#, 'jupiter_v2016']
+    
     # Loop over each prior used for retrievals tests
     for iprior in prior:
-        retrieval_test = [f"{iprior}_temp_aerosol1-1mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_no852_no887",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_no852_no887"]
+        retrieval_test = [
+                        # "cmerid_flat5_jupiter2021_greycloud_0",
+                        "cmerid_flat5_jupiter2021_greycloud_0_1p",
+                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s",
+                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
+                        # "ctl_flat5_jupiter2021_greycloud_0",
+                        # "ctl_flat5_jupiter2021_greycloud_0_1p",
+                        # "ctl_flat5_jupiter2021_greycloud_0_1p_27s",
+                        # "ctl_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        # "ctl_flat5_jupiter2021_nh3cloud_0",
+                        # "ctl_flat5_jupiter2021_nh3cloud_0_1p",
+                        # "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        # "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+                        # "limb_flat5_jupiter2021_greycloud_0",
+                        # "limb_flat5_jupiter2021_greycloud_0_1p",
+                        # "limb_flat5_jupiter2021_greycloud_0_1p_27s",
+                        # "limb_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        # "limb_flat5_jupiter2021_nh3cloud_0",
+                        # "limb_flat5_jupiter2021_nh3cloud_0_1p",
+                        # "limb_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        # "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
+                        ]
         ntest = len(retrieval_test)
         # Loop over each retrieval tests for the current prior file
         for itest in retrieval_test:

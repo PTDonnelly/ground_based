@@ -139,7 +139,7 @@ def WriteCentreToLimbSpx(dataset, mode, spectrals):
         clat = lats[0]
         LCM  = np.mean(LCMs)
         nmu  = len(mus)
-        f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:12.5f}\n".format(0, clat, LCM, nmu))
+        f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:d}\n".format(0, clat, LCM, nmu))
 
         # Loop over NGEOM geometries (no. of geometries = no. of emission angle points)
         for imu, mu in enumerate(mus):
@@ -209,7 +209,7 @@ def WriteLimbSpx(dataset, mode, spectrals):
         clat = lats[0]
         LCM  = np.mean(LCMs)
         nmu  = len(mus)
-        f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:12.5f}\n".format(0, clat, LCM, nmu))
+        f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:d}\n".format(0, clat, LCM, nmu))
 
         # Loop over NGEOM geometries (no. of geometries = no. of emission angle points)
         for imu, mu in enumerate(mus):
@@ -234,11 +234,11 @@ def WriteLimbSpx(dataset, mode, spectrals):
                 f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(spec[0], spec[1], spec[2]))
 
     # If subdirectory does not exist, create it
-    dir = f'../outputs/{dataset}/spxfiles_limb/'
+    dir = f'../outputs/{dataset}/spxfiles_limb_90/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-    mubins = np.arange(60, 70, 1)
+    mubins = np.arange(89, 90, 1)
     nmubins = len(mubins)
 
     # Loop over latitudes to create one .spxfile per latitude
@@ -263,7 +263,6 @@ def WriteLimbSpx(dataset, mode, spectrals):
                 waves.append(wave)
         # Only write spxfile for latitudes with spectral information
         if lats:
-            print(f"{dir}lat_{lats[0]}.txt")
             # Open textfile
             with open(f"{dir}lat_{lats[0]}.txt", 'w') as f:
                 create_ctl_spx(f, lats, LCMs, mus, rads, rad_errs, waves)

@@ -44,15 +44,15 @@ def main():
     # Binning
     bin_cmerid  = False     # Use central meridian binning scheme
     bin_cpara   = False     # Use central parallel binning scheme
-    bin_ctl     = True     # Use centre-to-limb binning scheme
+    bin_ctl     = False     # Use centre-to-limb binning scheme
     bin_region  = False     # Use regional binning scheme (for a zoom 2D retrieval)
     bin_av_region = False   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
     save        = False     # Store calculated profiles to local files
     plotting    = False      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
-    spx         = True      # Write spxfiles as spectral input for NEMESIS
-    retrieval   = False      # Plot NEMESIS outputs 
+    spx         = False      # Write spxfiles as spectral input for NEMESIS
+    retrieval   = True      # Plot NEMESIS outputs 
 
     ############################################################
     # Perform geometric registration and radiometric calibration
@@ -256,7 +256,9 @@ def main():
         # PlotRetrievedTemperatureProfile()
         # PlotRetrievedRadiance()
         # PlotRetrievedAerosolProfile()
-        PlotRetrievedRadianceMeridian()
+        # PlotRetrievedRadianceMeridian()
+        PlotRetrievedTemperatureCrossSection()
+        # PlotChiSquareOverNySuperpose()
         
 
 
