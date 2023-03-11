@@ -32,16 +32,10 @@ These calibrated profiles (and associated calibration coefficients) can then be 
 
 ### UNDER CONSTRUCTION ###
 
-<<<<<<< Updated upstream
 # Functions #
 1. Add in a CTL binning scheme  as a test for whether the removal of the bulk CTL profile from each observation can create pretty global maps. To do this you also need 7-um vdop maps from DRM and the vdop correction. This is a rather time-expensive experiment so perhaps it should be lower prioriy.
 2. Polar plotting of cylmaps
 3. Optimise plotting codes?
-=======
-1. Writing spxfiles in WriteSpx
-2. Plotting global maps in PlotMaps
-3. Special calibraiton for 7-um filter: calibrate only to the equator of CIRS measurements
->>>>>>> Stashed changes
 
 # Filestructure #
 Implemented the above approach with subdirectories first rather than submodules first. Submodules can come later as and when we need more diverse applications to the code.

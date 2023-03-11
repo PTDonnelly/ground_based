@@ -1,20 +1,11 @@
 import numpy as np
 from math import acos, cos, radians, pi
-<<<<<<< Updated upstream:GiantPipe/RegisterMaps.py
 import Globals
 from Read.ReadFits import ReadFits
 from Tools.SetWave import SetWave
 from Tools.CalculateErrors import CalculateErrors
 
 def RegisterMaps(files, binning):
-=======
-from BinningInputs import BinningInputs
-from ReadFits import ReadFits
-from SetWave import SetWave
-from CalculateErrors import CalculateErrors
-
-def RegisterMaps(files):
->>>>>>> Stashed changes:visir_process/RegisterMaps.py
     """ Step 1: Read img, cmap and mufiles
         Step 2: Geometric registration of pixel information
         Step 3: Gather pixel information for all files"""
@@ -45,11 +36,7 @@ def RegisterMaps(files):
     for ifile, fpath in enumerate(files):
         print(ifile, fpath)
         ## Step 1: Read img, cmap and mufiles
-<<<<<<< Updated upstream:GiantPipe/RegisterMaps.py
         imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filepath=f"{fpath}")
-=======
-        imghead, imgdata, cylhead, cyldata, muhead, mudata = ReadFits(filename=fname)
->>>>>>> Stashed changes:visir_process/RegisterMaps.py
 
         ## Step 2: Geometric registration of pixel information
         # Save flag depending on Northern (1) or Southern (-1) viewing
