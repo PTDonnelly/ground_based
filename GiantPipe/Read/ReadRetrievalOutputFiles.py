@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import operator
 from scipy.io import FortranFile
 import Globals
@@ -7,13 +8,15 @@ from Tools.RetrieveGasesNames import RetrieveGasesNames
 def RetrieveLatitudeFromCoreNumber(fpath):
 
     # Initialize local variables
-    ncore = int(176)                     # number of core directories (177-1), 
-                                    # which is also equivalent to the number of latitude points 
+    dirs = list(os.walk(f"{fpath}"))
+    ncore = len(dirs[:-1]) # number of core directories, 
+                                    # which is also equivalent to the number of latitude points  
     lat_core = np.empty((ncore, 2)) # 2D array containing latitude and core directory number
     # Read all .prf files through all core directories
     for ifile in range(ncore):
-        filename = f"{fpath}_{ifile+1}/nemesis.prf"
+        filename = f"{fpath}/core_{ifile+1}/nemesis.prf"
         with open(filename) as f:
+            # print(ifile+1)
             # Read header contents
             lines = f.readlines()
             # Save header information
@@ -32,12 +35,13 @@ def RetrieveLongitudeFromCoreNumber(fpath):
     """ Function to retrieve longitude value from the 
         .mre file of each core subdirectory """
     # Initialize local variables
-    ncore = int(359)                     # number of core directories (360-1), 
+    dirs = list(os.walk(f"{fpath}"))
+    ncore = len(dirs[:-1]) # number of core directories, 
                                     # which is also equivalent to the number of longitude points 
     lon_core = np.empty((ncore, 2)) # 2D array containing longitude and core directory number
     # Read all .prf files through all core directories
     for ifile in range(ncore):
-        filename = f"{fpath}_{ifile+1}/nemesis.prf"
+        filename = f"{fpath}/core_{ifile+1}/nemesis.prf"
         with open(filename) as f:
             # Read header contents
             lines = f.readlines()
@@ -45,7 +49,7 @@ def RetrieveLongitudeFromCoreNumber(fpath):
             prior_param = lines[1].split()
             nlevel             = int(prior_param[2])
             ngas               = int(prior_param[3])
-        filename = f"{fpath}_{ifile+1}/nemesis.mre"
+        filename = f"{fpath}/core__{ifile+1}/nemesis.mre"
         with open(filename) as f:
             # Read header contents
             lines = f.readlines()
@@ -64,12 +68,13 @@ def RetrieveLongitudeLatitudeFromCoreNumber(fpath):
         value from the .mre file of each core
         subdirectory in case of 2D retrieval """
     # Initialize local variables
-    ncore = int(800)                # number of core directories (800-1), 
-                                    # which is also equivalent to the number of longitude points 
+    dirs = list(os.walk(f"{fpath}"))
+    ncore = len(dirs[:-1]) # number of core directories, 
+                                    # which is also equivalent to the number of latitude/longitude points 
     lat_lon_core = np.empty((ncore, 3)) # 3D array containing latitude, longitude and core directory number
     # Read all .prf files through all core directories
     for ifile in range(ncore):
-        filename = f"{fpath}_{ifile+1}/nemesis.prf"
+        filename = f"{fpath}/core_{ifile+1}/nemesis.prf"
         with open(filename) as f:
             # Read header contents
             lines = f.readlines()
@@ -77,7 +82,7 @@ def RetrieveLongitudeLatitudeFromCoreNumber(fpath):
             prior_param = lines[1].split()
             nlevel             = int(prior_param[2])
             ngas               = int(prior_param[3])
-        filename = f"{fpath}_{ifile+1}/nemesis.mre"
+        filename = f"{fpath}/core_{ifile+1}/nemesis.mre"
         with open(filename) as f:
             # Read header contents
             lines = f.readlines()
@@ -137,13 +142,13 @@ def ReadLogFiles(filepath, over_axis):
 
     if over_axis == "latitude":
         # Retrieve latitude-core_number correspondance
-        coor_core, ncoor, _, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, _, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}")
     elif over_axis =="longitude":
         # Retrieve longitude-core_number correspondance
-        coor_core, ncoor, _, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, _, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}")
     elif over_axis=="2D":
         # Retrieve latitude-longitude-core_number correspondance
-        coor_core, latitude, longitude, ncoor, _, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, latitude, longitude, ncoor, _, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}")
     
     # Create a latitude or longitude array for plotting
     coor_axis = np.asarray(coor_core[:,1], dtype='float')
@@ -178,13 +183,13 @@ def ReadmreFiles(filepath, over_axis, gas_name):
 
     if over_axis=="latitude":
         # Retrieve latitude-core_number correspondance
-        coor_core, ncoor, nlevel, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}/core") 
+        coor_core, ncoor, nlevel, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}") 
     elif over_axis=="longitude":
         # Retrieve longitude-core_number correspondance
-        coor_core, ncoor, nlevel, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, nlevel, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}")
     elif over_axis=="2D":
         # Retrieve latitude-longitude-core_number correspondance
-        coor_core, latitude, longitude, ncoor, nlevel, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, latitude, longitude, ncoor, nlevel, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}")
 
     # Create outputs arrays with suitable dimensions
     radiance = np.empty((Globals.nfilters, ncoor))
@@ -273,8 +278,11 @@ def ReadmreFiles(filepath, over_axis, gas_name):
     gas_abunerr.fill(np.nan)
     
     ppo.fill(np.nan)
-    # Read pressure array in the nemesis.prf files 
-    _, gases, _, _, pressure, _, _, _, _ = ReadprfFiles(filepath, over_axis)
+    # Read pressure array in the nemesis.prf files
+    if over_axis=='latitude' or over_axis=='longitude': 
+        _, gases, _, _, pressure, _, _, _, _ = ReadprfFiles(filepath, over_axis)
+    elif over_axis=='2D':
+        _, gases, _, _, _, pressure, _, _, _, _, _, _ = ReadprfFiles(filepath, over_axis)
     pressure = pressure / 1013.25
     # Create a latitude or longitude array for plotting
     coor_axis = np.asarray(coor_core[:,1], dtype='float')
@@ -285,170 +293,172 @@ def ReadmreFiles(filepath, over_axis, gas_name):
             # Read file
             lines = f.readlines()
             # Get dimensions
-            param = lines[1].split()
-            ispec = int(param[0])
-            ngeom = int(param[1])
-            nx    = int(param[3])
-            # Save file's data
-            newline, filedata = [], []
-            for iline, line in enumerate(lines[5:ngeom+5]):
-                l = line.split()
-                [newline.append(il) for il in l]
-                # Store data 
-                filedata.append(newline)
-                # Reset temporary variables
-                newline = []
-            data_arr = np.asarray(filedata, dtype='float')
-            if Globals.nfilters > 11:
-                if ((coor_axis[icoor] < 6)):
+            if len(lines) > 1:
+                param = lines[1].split()
+                ispec = int(param[0])
+                ngeom = int(param[1])
+                nx    = int(param[3])
+                # Save file's data
+                newline, filedata = [], []
+                for iline, line in enumerate(lines[5:ngeom+5]):
+                    l = line.split()
+                    [newline.append(il) for il in l]
+                    # Store data 
+                    filedata.append(newline)
+                    # Reset temporary variables
+                    newline = []
+                data_arr = np.asarray(filedata, dtype='float')
+                if Globals.nfilters > 11:
+                    if ((coor_axis[icoor] < 6)):
+                        wavenumb[:, icoor] = data_arr[:, 1]
+                        radiance[:, icoor] = data_arr[:, 2]
+                        rad_err[:, icoor]  = data_arr[:, 3]
+                        rad_fit[:, icoor]  = data_arr[:, 5]
+                    elif (coor_axis[icoor] > 6):
+                        wavenb = data_arr[:, 1]
+                        rad = data_arr[:, 2]
+                        err  = data_arr[:, 3]
+                        fit  = data_arr[:, 5]
+                        if Globals.nfilters ==12:
+                            for ifilt in range(Globals.nfilters-1):
+                                if ifilt <= 5:
+                                    wavenumb[ifilt, icoor] = wavenb[ifilt]
+                                    radiance[ifilt, icoor] = rad[ifilt]
+                                    rad_err[ifilt, icoor]  = err[ifilt]
+                                    rad_fit[ifilt, icoor]  = fit[ifilt]
+                                else:
+                                    wavenumb[ifilt+1, icoor] = wavenb[ifilt]
+                                    radiance[ifilt+1, icoor] = rad[ifilt]
+                                    rad_err[ifilt+1, icoor]  = err[ifilt]
+                                    rad_fit[ifilt+1, icoor]  = fit[ifilt]
+                        elif Globals.nfilters ==13:
+                            for ifilt in range(Globals.nfilters-2):
+                                if ifilt <= 5:
+                                    wavenumb[ifilt, icoor] = wavenb[ifilt]
+                                    radiance[ifilt, icoor] = rad[ifilt]
+                                    rad_err[ifilt, icoor]  = err[ifilt]
+                                    rad_fit[ifilt, icoor]  = fit[ifilt]
+                                else:
+                                    wavenumb[ifilt+2, icoor] = wavenb[ifilt]
+                                    radiance[ifilt+2, icoor] = rad[ifilt]
+                                    rad_err[ifilt+2, icoor]  = err[ifilt]
+                                    rad_fit[ifilt+2, icoor]  = fit[ifilt]
+                else:
                     wavenumb[:, icoor] = data_arr[:, 1]
                     radiance[:, icoor] = data_arr[:, 2]
                     rad_err[:, icoor]  = data_arr[:, 3]
                     rad_fit[:, icoor]  = data_arr[:, 5]
-                elif (coor_axis[icoor] > 6):
-                    wavenb = data_arr[:, 1]
-                    rad = data_arr[:, 2]
-                    err  = data_arr[:, 3]
-                    fit  = data_arr[:, 5]
-                    if Globals.nfilters ==12:
-                        for ifilt in range(Globals.nfilters-1):
-                            if ifilt <= 5:
-                                wavenumb[ifilt, icoor] = wavenb[ifilt]
-                                radiance[ifilt, icoor] = rad[ifilt]
-                                rad_err[ifilt, icoor]  = err[ifilt]
-                                rad_fit[ifilt, icoor]  = fit[ifilt]
-                            else:
-                                wavenumb[ifilt+1, icoor] = wavenb[ifilt]
-                                radiance[ifilt+1, icoor] = rad[ifilt]
-                                rad_err[ifilt+1, icoor]  = err[ifilt]
-                                rad_fit[ifilt+1, icoor]  = fit[ifilt]
-                    elif Globals.nfilters ==13:
-                        for ifilt in range(Globals.nfilters-2):
-                            if ifilt <= 5:
-                                wavenumb[ifilt, icoor] = wavenb[ifilt]
-                                radiance[ifilt, icoor] = rad[ifilt]
-                                rad_err[ifilt, icoor]  = err[ifilt]
-                                rad_fit[ifilt, icoor]  = fit[ifilt]
-                            else:
-                                wavenumb[ifilt+2, icoor] = wavenb[ifilt]
-                                radiance[ifilt+2, icoor] = rad[ifilt]
-                                rad_err[ifilt+2, icoor]  = err[ifilt]
-                                rad_fit[ifilt+2, icoor]  = fit[ifilt]
-            else:
-                wavenumb[:, icoor] = data_arr[:, 1]
-                radiance[:, icoor] = data_arr[:, 2]
-                rad_err[:, icoor]  = data_arr[:, 3]
-                rad_fit[:, icoor]  = data_arr[:, 5]
 
         # Save temperature data
 
-            newline, filedata = [], []
-            for iline, line in enumerate(lines[5+ngeom+6:5+ngeom+6+nlevel]):
-                l = line.split()
-                [newline.append(il) for il in l]
-                # Store data 
-                filedata.append(newline)
-                # Reset temporary variables
-                newline = []
-            data_arr = np.asarray(filedata, dtype='float')
-            temp_prior_mre[:, icoor] = data_arr[:, 2]
-            temp_errprior_mre[:, icoor] = data_arr[:, 3]
-            temp_fit_mre[:, icoor] = data_arr[:, 4]
-            temp_errfit_mre[:, icoor] = data_arr[:, 5]
+                newline, filedata = [], []
+                for iline, line in enumerate(lines[5+ngeom+6:5+ngeom+6+nlevel]):
+                    l = line.split()
+                    [newline.append(il) for il in l]
+                    # Store data 
+                    filedata.append(newline)
+                    # Reset temporary variables
+                    newline = []
+                data_arr = np.asarray(filedata, dtype='float')
+                temp_prior_mre[:, icoor] = data_arr[:, 2]
+                temp_errprior_mre[:, icoor] = data_arr[:, 3]
+                temp_fit_mre[:, icoor] = data_arr[:, 4]
+                temp_errfit_mre[:, icoor] = data_arr[:, 5]
 
 
-            # Save aerosol data
-            if '          -1           0           3\n' in lines:
-                aer_ind = lines.index('          -1           0           3\n')
-                aer_param = lines[aer_ind+3].split()
-                aer_mre[icoor] = float(aer_param[2])
-                aer_err[icoor] = aer_param[3]
-                aer_fit[icoor] = aer_param[4]
-                fit_err[icoor] = aer_param[5]
-            
-            # Save gases data
-            if ngas > 1:
-                for igas in range(ngas):
-                    _, gas_id = RetrieveGasesNames(gas_name=gas_name[igas], gas_id=False)
+                # Save aerosol data
+                if '          -1           0           3\n' in lines:
+                    aer_ind = lines.index('          -1           0           3\n')
+                    aer_param = lines[aer_ind+3].split()
+                    aer_mre[icoor] = float(aer_param[2])
+                    aer_err[icoor] = aer_param[3]
+                    aer_fit[icoor] = aer_param[4]
+                    fit_err[icoor] = aer_param[5]
+                
+                # Save gases data
+                if ngas > 1:
+                    for igas in range(ngas):
+                        _, gas_id = RetrieveGasesNames(gas_name=gas_name[igas], gas_id=False)
+                        # Scaling retrieval case:
+                        if f"          {gas_id}           0           3\n" in lines:
+                            gas_ind = lines.index(f"          {gas_id}           0           3\n")
+                            gas_param = lines[gas_ind+3].split()
+                            gas_scale[igas, icoor] = float(gas_param[2])
+                            gas_scaleerr[igas, icoor] = float(gas_param[3])
+                            gas_scalefit[igas, icoor] = float(gas_param[4])
+                            gas_errscalefit[igas, icoor] = float(gas_param[5])
+                            # print(igas, gas_id, gas_errscalefit[igas, icoor])
+                        # Parametric retrieval case:
+                        if f"          {gas_id}           0          18\n" in lines:
+                            gas_ind = lines.index(f"          {gas_id}           0          18\n")
+                            # VMR info
+                            gas_param = lines[gas_ind+3].split()
+                            gas_vmr[igas, icoor] = float(gas_param[2])
+                            gas_vmrerr[igas, icoor] = float(gas_param[3])
+                            gas_vmrfit[igas, icoor] = float(gas_param[4])
+                            gas_errvmrfit[igas, icoor] = float(gas_param[5])
+                            # Fractional scale heigth info
+                            gas_param = lines[gas_ind+4].split()
+                            gas_fsh[igas, icoor] = float(gas_param[2])
+                            gas_fsherr[igas, icoor] = float(gas_param[3])
+                            gas_fshfit[igas, icoor] = float(gas_param[4])
+                            gas_errfshfit[igas, icoor] = float(gas_param[5])
+                            # Retrieve the value of the knee pressure for each parametric retrieval 
+                            with open(f"{filepath}/core_1/nemesis.apr") as f:
+                                # Read file
+                                aprlines = f.readlines()
+                                #find the right chemical specie
+                                if f"{gas_id} 0 18 - {gas_name[igas]} Parameterised\n" in aprlines:
+                                    param_ind = aprlines.index(f"{gas_id} 0 18 - {gas_name[igas]} Parameterised\n")
+                                    pkn = float(aprlines[param_ind+1])
+                            # Calculate the pressure axis of the parametric retrieved profile
+                            pknee = pkn * np.ones(nlevel)
+                            ppo = np.divide(pressure, pknee)
+                            # Calculate the actual error on the abundance using vmr and fsh parameters.
+                            for ilev in range(nlevel):
+                                gas_abunerr[igas, ilev, icoor] = ppo[ilev]**((1.-gas_fshfit[igas, icoor])/gas_fshfit[igas, icoor]) * gas_errvmrfit[igas, icoor] \
+                                            - ppo[ilev]**(1./gas_fshfit[igas, icoor])*np.log(ppo[ilev]) / (gas_fshfit[igas, icoor] * gas_fshfit[igas, icoor] * ppo[ilev]) \
+                                            * gas_vmrfit[igas, icoor] * gas_errfshfit[igas, icoor]
+
+                else:
+                    _, gas_id = RetrieveGasesNames(gas_name=gas_name, gas_id=False)
                     # Scaling retrieval case:
                     if f"          {gas_id}           0           3\n" in lines:
                         gas_ind = lines.index(f"          {gas_id}           0           3\n")
                         gas_param = lines[gas_ind+3].split()
-                        gas_scale[igas, icoor] = float(gas_param[2])
-                        gas_scaleerr[igas, icoor] = float(gas_param[3])
-                        gas_scalefit[igas, icoor] = float(gas_param[4])
-                        gas_errscalefit[igas, icoor] = float(gas_param[5])
+                        gas_scale[icoor] = float(gas_param[2])
+                        gas_scaleerr[icoor] = gas_param[3]
+                        gas_scalefit[icoor] = gas_param[4]
+                        gas_errscalefit[icoor] = gas_param[5]
                     # Parametric retrieval case:
                     if f"          {gas_id}           0          18\n" in lines:
                         gas_ind = lines.index(f"          {gas_id}           0          18\n")
                         # VMR info
                         gas_param = lines[gas_ind+3].split()
-                        gas_vmr[igas, icoor] = float(gas_param[2])
-                        gas_vmrerr[igas, icoor] = float(gas_param[3])
-                        gas_vmrfit[igas, icoor] = float(gas_param[4])
-                        gas_errvmrfit[igas, icoor] = float(gas_param[5])
+                        gas_vmr[icoor] = float(gas_param[2])
+                        gas_vmrerr[icoor] = gas_param[3]
+                        gas_vmrfit[icoor] = gas_param[4]
+                        gas_errvmrfit[icoor] = gas_param[5]
                         # Fractional scale heigth info
                         gas_param = lines[gas_ind+4].split()
-                        gas_fsh[igas, icoor] = float(gas_param[2])
-                        gas_fsherr[igas, icoor] = float(gas_param[3])
-                        gas_fshfit[igas, icoor] = float(gas_param[4])
-                        gas_errfshfit[igas, icoor] = float(gas_param[5])
+                        gas_fsh[icoor] = float(gas_param[2])
+                        gas_fsherr[icoor] = gas_param[3]
+                        gas_fshfit[icoor] = gas_param[4]
+                        gas_errfshfit[icoor] = gas_param[5]
                         # Retrieve the value of the knee pressure for each parametric retrieval 
                         with open(f"{filepath}/core_1/nemesis.apr") as f:
                             # Read file
                             aprlines = f.readlines()
                             #find the right chemical specie
-                            if f"{gas_id} 0 18 - {gas_name[igas]} Parameterised\n" in aprlines:
-                                param_ind = aprlines.index(f"{gas_id} 0 18 - {gas_name[igas]} Parameterised\n")
-                                pkn = float(aprlines[param_ind+1])
+                            if f"{gas_id} 0 18 - {gas_name} Parameterised\n" in aprlines:
+                                param_ind = aprlines.index(f"{gas_id} 0 18 - {gas_name} Parameterised\n")
+                                pknee = aprlines[param_ind+1]
                         # Calculate the pressure axis of the parametric retrieved profile
-                        pknee = pkn * np.ones(nlevel)
-                        ppo = np.divide(pressure, pknee)
+                        ppo = pressure / pknee
                         # Calculate the actual error on the abundance using vmr and fsh parameters.
-                        for ilev in range(nlevel):
-                            gas_abunerr[igas, ilev, icoor] = ppo[ilev]**((1.-gas_fshfit[igas, icoor])/gas_fshfit[igas, icoor]) * gas_errvmrfit[igas, icoor] \
-                                        - ppo[ilev]**(1./gas_fshfit[igas, icoor])*np.log(ppo[ilev]) / (gas_fshfit[igas, icoor] * gas_fshfit[igas, icoor] * ppo[ilev]) \
-                                        * gas_vmrfit[igas, icoor] * gas_errfshfit[igas, icoor]
-
-            else:
-                _, gas_id = RetrieveGasesNames(gas_name=gas_name, gas_id=False)
-                # Scaling retrieval case:
-                if f"          {gas_id}           0           3\n" in lines:
-                    gas_ind = lines.index(f"          {gas_id}           0           3\n")
-                    gas_param = lines[gas_ind+3].split()
-                    gas_scale[icoor] = float(gas_param[2])
-                    gas_scaleerr[icoor] = gas_param[3]
-                    gas_scalefit[icoor] = gas_param[4]
-                    gas_errscalefit[icoor] = gas_param[5]
-                # Parametric retrieval case:
-                if f"          {gas_id}           0          18\n" in lines:
-                    gas_ind = lines.index(f"          {gas_id}           0          18\n")
-                    # VMR info
-                    gas_param = lines[gas_ind+3].split()
-                    gas_vmr[icoor] = float(gas_param[2])
-                    gas_vmrerr[icoor] = gas_param[3]
-                    gas_vmrfit[icoor] = gas_param[4]
-                    gas_errvmrfit[icoor] = gas_param[5]
-                    # Fractional scale heigth info
-                    gas_param = lines[gas_ind+4].split()
-                    gas_fsh[icoor] = float(gas_param[2])
-                    gas_fsherr[icoor] = gas_param[3]
-                    gas_fshfit[icoor] = gas_param[4]
-                    gas_errfshfit[icoor] = gas_param[5]
-                    # Retrieve the value of the knee pressure for each parametric retrieval 
-                    with open(f"{filepath}/core_1/nemesis.apr") as f:
-                        # Read file
-                        aprlines = f.readlines()
-                        #find the right chemical specie
-                        if f"{gas_id} 0 18 - {gas_name} Parameterised\n" in aprlines:
-                            param_ind = aprlines.index(f"{gas_id} 0 18 - {gas_name} Parameterised\n")
-                            pknee = aprlines[param_ind+1]
-                    # Calculate the pressure axis of the parametric retrieved profile
-                    ppo = pressure / pknee
-                    # Calculate the actual error on the abundance using vmr and fsh parameters.
-                    gas_abunerr[ :, icoor] = ppo**((1.-gas_fshfit[icoor])/gas_fshfit[icoor]) * gas_errvmrfit[icoor] \
-                                        - ppo**(1./gas_fshfit[icoor])*np.log10(ppo) / (gas_fshfit[icoor] * gas_fshfit[icoor] * ppo) \
-                                        * gas_vmrfit[icoor] * gas_errfshfit[icoor]
+                        gas_abunerr[ :, icoor] = ppo**((1.-gas_fshfit[icoor])/gas_fshfit[icoor]) * gas_errvmrfit[icoor] \
+                                            - ppo**(1./gas_fshfit[icoor])*np.log10(ppo) / (gas_fshfit[icoor] * gas_fshfit[icoor] * ppo) \
+                                            * gas_vmrfit[icoor] * gas_errfshfit[icoor]
 
     if over_axis=="2D":
         # Create suitable dimensions for output arrays
@@ -527,13 +537,13 @@ def ReadprfFiles(filepath, over_axis):
 
     if over_axis=="latitude":
         # Retrieve latitude-core_number correspondance
-        coor_core, ncoor, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}")
     elif over_axis=="longitude":
         # Retrieve longitude-core_number correspondance
-        coor_core, ncoor, nlevel, ngas = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, nlevel, ngas = RetrieveLongitudeFromCoreNumber(f"{filepath}")
     elif over_axis=="2D":
         # Retrieve latitude-longitude-core_number correspondance
-        coor_core, latitude, longitude, ncoor, nlevel, ngas = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, latitude, longitude, ncoor, nlevel, ngas = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}")
     
     # Create output arrays
     height      = np.empty((nlevel, ncoor))          # height array which varies with latitude
@@ -594,13 +604,13 @@ def ReadaerFiles(filepath, over_axis):
 
     if over_axis=="latitude":
         # Retrieve latitude-core_number correspondance
-        coor_core, ncoor, nlevel, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, nlevel, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}")
     elif over_axis=="longitude":
         # Retrieve longitude-core_number correspondance
-        coor_core, ncoor, nlevel, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, nlevel, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}")
     elif over_axis=="2D":
         # Retrieve latitude-longitude-core_number correspondance
-        coor_core, latitude, longitude, ncoor, nlevel, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, latitude, longitude, ncoor, nlevel, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}")
 
     # Initialize output arrays
     aerosol = np.empty((nlevel, ncoor)) # aerosol array with profiles for all latitude
@@ -645,13 +655,13 @@ def ReadAerFromMreFiles(filepath, over_axis):
 
     if over_axis=="latitude":
         # Retrieve latitude-core_number correspondance
-        coor_core, ncoor, nlevel, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}/core") 
+        coor_core, ncoor, nlevel, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}") 
     elif over_axis=="longitude":
         # Retrieve longitude-core_number correspondance
-        coor_core, ncoor, nlevel, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, nlevel, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}")
     elif over_axis=="2D":
         # Retrieve latitude-longitude-core_number correspondance
-        coor_core, latitude, longitude, ncoor, nlevel, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, latitude, longitude, ncoor, nlevel, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}")
 
     # Create output arrays with suitable dimensions
     aerosol = np.empty((ncoor))
@@ -753,65 +763,117 @@ def ReadmreParametricTest(filepath):
 
 def ReadContributionFunctions(filepath, over_axis):
 
+    def read_s_matrices(f, nlines):
+        lines = []
+        for _ in range(nlines):
+            line = f.readline()
+            split_line = line.split()
+            lines.append(split_line)
+        return lines
+
+    def kk_matrix(f, nlines):
+        lines = []
+        for _ in range(nlines):
+            line = f.readline()
+            split_line = line.split()
+            lines.append(split_line)
+            if len(lines) == ny:
+                return lines
+
     if over_axis == "latitude":
         # Retrieve latitude-core_number correspondance
-        coor_core, ncoor, _, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, nlevel, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}")
     elif over_axis =="longitude":
         # Retrieve longitude-core_number correspondance
-        coor_core, ncoor, _, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, nlevel, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}")
     elif over_axis=="2D":
         # Retrieve latitude-longitude-core_number correspondance
-        coor_core, latitude, longitude, ncoor, _, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}/core")
-
-    # Store geometric parameters of the retrieval run
-    with open(f"{filepath}/core_1/nemesis.spx") as f:
-        # Read file
-        lines = f.readlines()
-        # Get dimensions
-        param = lines[0].split()
-        fwhm    = float(param[0])
-        ngeom   = int(param[3])
-        nconv   = int(1)
-    #with open(f"{filepath}/core_1/nemesis.cov") as f:
+        coor_core, latitude, longitude, ncoor, nlevel, _ = RetrieveLongitudeLatitudeFromCoreNumber(f"{filepath}")
     
-
-    # # Create the output arrays
-    kk =  np.empty((ncoor)) # array of conrtibution functions for all filters
-    # kk_single = np.empty((ncoor, nx, nconv))  
-    # vconv = np.empty((ncoor, nconv))
-    # # Initializing the output arrays
-    kk.fill(np.nan)
-    # kk_single.fill(np.nan)
-    # vconv.fill(np.nan)
+    # Create a latitude or longitude array for plotting
+    coor_axis = np.asarray(coor_core[:,1], dtype='float')
+    weighting_function = np.empty((ncoor, nlevel, 11))
+    # Read pressure array in the nemesis.prf files
+    if over_axis=='latitude' or over_axis=='longitude': 
+        _, _, _, _, pressure, _, _, _, _ = ReadprfFiles(filepath, over_axis)
+    elif over_axis=='2D':
+        _, _, _, _, _, pressure, _, _, _, _, _, _ = ReadprfFiles(filepath, over_axis)
+    # pressure = pressure / 1013.25
     # Read and save contribution function profiles
     for icoor in range(ncoor):
         ifile = int(coor_core[icoor, 0])       
         # Reading the unformatted Fortran file (unformatted... What idea?!) 
-        with open(f"{filepath}/core_{ifile}/nemesis.cov") as f:
-            lines = f.readlines()
-            prout = lines[0].split()
-            nvar, npro = int(prout[1]), int(prout[0])
+        with open(f"{filepath}/core_{ifile}/nemesis.cov", 'r') as f:
+            #  Read no. of levels (NPRO) and number of variables (NVAR)
+            line = f.readline()
+            npro, nvar = line.split()
+            npro, nvar = int(npro), int(nvar)
 
-            nx = npro * nvar 
+            # Read variable IDs and parameters
+            varident = np.empty((nvar, 3))
+            varparam = np.empty((nvar, 5))
 
-            param = lines[nvar*2+1].split()
-            ny = int(param[1])
+            for ivar in range(nvar):
+                line = f.readline()
+                varident[ivar, :] = line.split()
+                line = f.readline()
+                varparam[ivar, :] = line.split()
 
-            data = lines[nvar*2+2:]
+            # Read in number of ??? (NX) and number of ??? (NY) 
+            line = f.readline()
+            nx, ny = line.split()
+            nx, ny = int(nx), int(ny)
+
+            # Read covariance matrices
+            sa, sm, sn, st = [np.empty((nx, nx)) for _ in range(4)]
+            nlines = int(nx / 5) # Look I'm sorry okay, this is not my fault
+            for ix in range(nx):       
+                lines = read_s_matrices(f=f, nlines=nlines)
+                sa[ix, :] = [element for line in lines for element in line]
+                lines = read_s_matrices(f=f, nlines=nlines)
+                sm[ix, :] = [element for line in lines for element in line]
+                lines = read_s_matrices(f=f, nlines=nlines)
+                sn[ix, :] = [element for line in lines for element in line]
+                lines = read_s_matrices(f=f, nlines=nlines)
+                st[ix, :] = [element for line in lines for element in line]
             
-            nblock = len(data)/(nx*ny)
-            data = np.asarray(data, dtype='float')
-            data = np.reshape(data, (nx, ny, nblock))
+            # Read ??? matrices
+            aa = np.empty((nx, nx))
+            nlines = int(nx / 5) # Look I'm sorry okay, this is not my fault
+            for ix in range(nx):       
+                lines = read_s_matrices(f=f, nlines=nlines)
+                aa[ix, :] = [element for line in lines for element in line]
+            
+            dd = np.empty((nx, ny))
+            for iy in range(ny):  
+                lines = read_s_matrices(f=f, nlines=nlines)
+                dd[:, iy] = [element for line in lines for element in line]
+            
+            kk = np.empty((ny, nx))
+            nlines = 3 # Look I'm sorry okay, this is not my fault
+            for ix in range(nx):
+                lines = read_s_matrices(f=f, nlines=nlines)
+                kk[:, ix] = [element for line in lines for element in line] 
+            
+            kt = np.transpose(kk)
 
-            kk_matrix = data[:, :, 6]
-           
+            se = np.empty(ny)
+            nlines = 3 # Look I'm sorry okay, this is not my fault
+            lines = read_s_matrices(f=f, nlines=nlines)
+            se[:] = [element for line in lines for element in line]
 
-            print(np.shape(kk_matrix))
-            print(kk_matrix)
+        # Plot weighting functions
+        wf = np.empty((npro, ny))
 
-    return kk
+        for iy in range(ny):
+            wf[:npro, iy] = abs(kt[:npro, iy]) / max(kt[:npro, iy])
+        
+            weighting_function[icoor, :, iy] = wf[:npro, iy]
 
-def ReadAllForAuroraOverTime(filepath):
+
+    return weighting_function, ny, coor_axis, nlevel, pressure
+
+def ReadAllForAuroraOverTime(filepath, gas_name):
 
     # Retrieve the number of night from the number of core subdirectories
     night_core, nnight, nlevel, ngas = RetrieveNightFromCoreNumber(f"{filepath}/core")
@@ -833,6 +895,19 @@ def ReadAllForAuroraOverTime(filepath):
     aer_err = np.empty((nnight)) 
     aer_fit = np.empty((nnight))
     fit_err = np.empty((nnight))
+    ngases = len(gas_name)
+    if ngases > 1:
+        gas_scale = np.empty((ngases, nnight))
+        gas_scaleerr = np.empty((ngases, nnight)) 
+        gas_scalefit = np.empty((ngases, nnight))
+        gas_errscalefit = np.empty((ngases, nnight))
+
+    else:
+        gas_scale = np.empty((nnight))
+        gas_scaleerr = np.empty((nnight)) 
+        gas_scalefit = np.empty((nnight))
+        gas_errscalefit = np.empty((nnight))
+
     # from .prf files
     height      = np.empty((nlevel, nnight))          # height array which varies with latitude
     pressure    = np.empty((nlevel))                  # pressure array 
@@ -857,6 +932,10 @@ def ReadAllForAuroraOverTime(filepath):
     aer_err.fill(np.nan) 
     aer_fit.fill(np.nan)
     fit_err.fill(np.nan)
+    gas_scale.fill(np.nan)
+    gas_scaleerr.fill(np.nan) 
+    gas_scalefit.fill(np.nan)
+    gas_errscalefit.fill(np.nan)
     height.fill(np.nan)          
     pressure.fill(np.nan) 
     temperature.fill(np.nan)
@@ -994,7 +1073,30 @@ def ReadAllForAuroraOverTime(filepath):
                 aer_err[inight] = aer_param[3]
                 aer_fit[inight] = aer_param[4]
                 fit_err[inight] = aer_param[5]
-                        
+                
+            # Save gases data
+            if ngases > 1:
+                for igas in range(ngases):
+                    _, idgas = RetrieveGasesNames(gas_name=gas_name[igas], gas_id=False)
+                    # Scaling retrieval case:
+                    if f"          {idgas}           0           3\n" in lines:
+                        gas_ind = lines.index(f"          {idgas}           0           3\n")
+                        gas_param = lines[gas_ind+3].split()
+                        gas_scale[igas, inight] = float(gas_param[2])
+                        gas_scaleerr[igas, inight] = float(gas_param[3])
+                        gas_scalefit[igas, inight] = float(gas_param[4])
+                        gas_errscalefit[igas, inight] = float(gas_param[5])
+                else:
+                    _, idgas = RetrieveGasesNames(gas_name=gas_name, gas_id=False)
+                    # Scaling retrieval case:
+                    if f"          {idgas}           0           3\n" in lines:
+                        gas_ind = lines.index(f"          {idgas}           0           3\n")
+                        gas_param = lines[gas_ind+3].split()
+                        gas_scale[inight] = float(gas_param[2])
+                        gas_scaleerr[inight] = gas_param[3]
+                        gas_scalefit[inight] = gas_param[4]
+                        gas_errscalefit[inight] = gas_param[5]
+          
         ## Read Temperature, Gases data
         with open(f"{filepath}/core_{ifile}/nemesis.prf") as f:
             # Read file
@@ -1040,13 +1142,14 @@ def ReadAllForAuroraOverTime(filepath):
     
     return nnight, time_axis, chisquare, radiance, rad_err, rad_fit, wavenumb, \
             temp_prior_mre, temp_errprior_mre, temp_fit_mre, temp_errfit_mre, \
-            aer_mre, aer_err,  aer_fit, fit_err, height, pressure, temperature, \
+            aer_mre, aer_err,  aer_fit, fit_err, \
+            gas_scale, gas_scaleerr,  gas_scalefit, gas_errscalefit,\
+            height, pressure, temperature, \
             gases, gases_id, aer_prf, h_prf
 
 
 
 def ReadPreviousWork(fpath, ncore, corestart, namerun, over_axis):
-
 
 # Initialize local variables
     lat_core = np.empty((ncore, 2)) # 2D array containing latitude and core directory number
