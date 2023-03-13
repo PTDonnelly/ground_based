@@ -11,7 +11,11 @@ from Tools.CalculateErrors import CalculateErrors
 def interpolate_doppler_profile() -> object:
     # Read in Doppler velocity look-up table to get correction factor
     f = np.loadtxt("C:/Users/padra/Documents/Research/github/ground_based/inputs/doppler_shift_correction_profile.txt", dtype=float)
-    correction_factor, doppler_velocity = f[:, 0], f[:, 1]
+    radiance_profile, doppler_velocity = f[:, 0], f[:, 1]
+    # Interpolate this function for normalisation
+    r_interp = interpolate.interp1d(doppler_velocity, radiance_profile)
+    # Normalise radiance profile to vdop = -11.2 (central meridian on Feb 15)
+    correction_factor = radiance_profile / r_interp(-11.2)
     # Interpolate Radiance Doppler profile
     return interpolate.interp1d(doppler_velocity, correction_factor)
 

@@ -234,11 +234,12 @@ def WriteLimbSpx(dataset, mode, spectrals):
                 f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(spec[0], spec[1], spec[2]))
 
     # If subdirectory does not exist, create it
-    dir = f'../outputs/{dataset}/spxfiles_limb_90/'
+    mu1, mu2 = 0, 90
+    dir = f'../outputs/{dataset}/spxfiles_bins_lowmu_{mu1}_{mu2}/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-    mubins = np.arange(89, 90, 1)
+    mubins = np.arange(mu1, mu2, 1)
     nmubins = len(mubins)
 
     # Loop over latitudes to create one .spxfile per latitude
