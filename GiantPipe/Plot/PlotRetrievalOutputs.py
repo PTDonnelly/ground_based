@@ -98,7 +98,7 @@ retrieval_test =[
         "limb_80_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
         "limb_85_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
         "limb_90_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
-]
+        ]
 
 
 # Plotting subroutines:
@@ -448,28 +448,39 @@ def PlotRetrievedTemperatureProfileSuperpose(over_axis):
         # If retrieval test comparison subdirectory does not exist, create it
         subdir = f"{dir}/temperature_profile_comparison/"
         if not os.path.exists(subdir):
-                os.makedirs(subdir)
+            os.makedirs(subdir)
         ntest = len(retrieval_test)
+        # Read profile data from NEMESIS prior file 
+        _, prior_p, prior_temperature, prior_err, _, _, _, _ = ReadTemperatureGasesPriorProfile(f"{fpath}{retrieval_test[0]}/core_1/")
         # Plotting retrieved temperature profile for each latitude
         for ilat in range(176):
-            fig, axes = plt.subplots(1, 1, figsize=(7, 10))
+            fig, axes = plt.subplots(1, 2, sharey=True, figsize=(10, 10), gridspec_kw={'width_ratios': [2, 1]})
             # Loop over each prior used for retrievals tests
             for i, itest in enumerate(retrieval_test):
                 col = cmap(i/ntest)
                 # Read retrieved profiles from .prf outputs files
                 temperature, _, latitude, _, pressure, _, _, _, _ = ReadprfFiles(filepath=f"{fpath}{itest}", over_axis=over_axis)
-                # Plot 
-                axes.plot(temperature[:, ilat], pressure, lw=2, label=f"{itest[5:6]}", color = col)
-            # Read profile data from NEMESIS prior file 
-            _, prior_p, prior_temperature, prior_err, _, _, _, _ = ReadTemperatureGasesPriorProfile(f"{fpath}{itest}/core_1/")
+                # Plot Temperatures and residuals
+                axes[0].plot(temperature[:, ilat], pressure, lw=2, label=f"{itest[5:7]}", color=col)
+                axes[1].plot(temperature[:, ilat]-prior_temperature, pressure, lw=2, color=col)
             # Plot the prior only for the last itest (because it's the same for all itest)
-            axes.plot(prior_temperature, prior_p, lw=2, label=f"Prior", color='black')
-            axes.fill_betweenx(prior_p, prior_temperature-prior_err, prior_temperature+prior_err, color='black', alpha=0.2)
-            axes.set_yscale('log')
-            axes.invert_yaxis()
-            axes.grid()
-            axes.legend(loc="upper right", fontsize=15)
-            axes.tick_params(labelsize=15)
+            axes[0].plot(prior_temperature, prior_p, lw=2, label=f"Prior", color='black', zorder=1)
+            axes[0].fill_betweenx(prior_p, prior_temperature-prior_err, prior_temperature+prior_err, color='black', alpha=0.2, zorder=0)
+            axes[0].set_xlim((90, 390))
+            axes[0].set_yscale('log')
+            axes[0].set_ylim((10e4, 10e-3))
+            # axes[0].invert_yaxis()
+            axes[0].grid()
+            axes[0].legend(loc="upper right", fontsize=15)
+            axes[0].tick_params(labelsize=15)
+            axes[1].plot([0]*len(prior_temperature), prior_p, lw=2, color='black', zorder=1)
+            axes[1].fill_betweenx(prior_p, -prior_err, +prior_err, color='black', alpha=0.2, zorder=0)
+            axes[1].set_xlim((-30, 30))
+            axes[1].set_yscale('log')
+            axes[1].set_ylim((1e4, 1e-3))
+            # axes[1].invert_yaxis()
+            axes[1].grid()
+            axes[1].tick_params(labelsize=15)
             # Add a big axis 
             plt.axes([0.1, 0.09, 0.8, 0.8], frameon=False) 
             plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)        

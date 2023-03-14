@@ -103,15 +103,21 @@ class ReadNemesisOutputs:
         return [[i, line] for i, line in enumerate(lines) if 'lambda' in line].pop()
     
     @classmethod
-    def get_retrieved_spectrum(cls, lines: List[str], ny: int) -> List[str]:
+    def get_retrieved_spectrum(cls, lines: List[str], ngeom: int, ny: int) -> List[str]:
         
         # Find where each variable starts in the file
         header = cls.get_spectrum_header(lines)
-        header_idx = header[0]
-        return header, lines[header_idx+1:header_idx+ny+1]
+        header_start = header[0]
+        spectrum = [[] for _ in range(ngeom)]
+        for igeom in range(ngeom):
+            increment = ny * (ngeom +1)
+            header_end = header_start + increment
+            spectrum[igeom].append(lines[header_start+1:header_end+1])
+        return header, spectrum
     
     @staticmethod
-    def get_reformed_spectrum(spectrum: List[str], ny: int) -> List[str]:
+    def get_reformed_spectrum(spectrum: List[str], ngeom: int, ny: int) -> List[str]:
+        
         values = [column.split() for column in spectrum]
         return [list(x) for x in zip(*values)]
     
@@ -126,11 +132,11 @@ class ReadNemesisOutputs:
             ngeom, ny, nx, latitude, longitude = cls.get_mre_header(lines)
 
             # Get spectral information
-            spectrum_header, raw_spectrum = cls.get_retrieved_spectrum(lines, ny)
-            spectrum = cls.get_reformed_spectrum(raw_spectrum, ny)
+            spectrum_header, raw_spectrum = cls.get_retrieved_spectrum(lines, ngeom, ny)
+            spectrum = cls.get_reformed_spectrum(raw_spectrum, ngeom, ny)
 
             # Get retrieved profiles and convert to float type
             apr_config, profiles_header, raw_profiles = cls.get_retrieved_profiles(lines)
             profiles = cls.convert_profiles_to_data(lines, raw_profiles)
 
-        return dict_of(spectrum, profiles, apr_config, ny, latitude)
+        return dict_of(spectrum, profiles, apr_config, ngeom, ny, latitude)

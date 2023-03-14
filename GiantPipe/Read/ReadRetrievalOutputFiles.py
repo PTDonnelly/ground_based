@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import operator
 from scipy.io import FortranFile
@@ -6,12 +7,13 @@ import Globals
 def RetrieveLatitudeFromCoreNumber(fpath):
 
     # Initialize local variables
-    ncore = int(179)                     # number of core directories (177-1), 
-                                    # which is also equivalent to the number of latitude points 
+    dirs = list(os.walk(fpath))
+    ncore = len(dirs[:-1]) # number of core directories, 
+                                    # which is also equivalent to the number of latitude points  
     lat_core = np.empty((ncore, 2)) # 2D array containing latitude and core directory number
     # Read all .prf files through all core directories
     for ifile in range(ncore):
-        filename = f"{fpath}_{ifile+1}/nemesis.prf"
+        filename = f"{fpath}/core_{ifile+1}/nemesis.prf"
         with open(filename) as f:
             # Read header contents
             lines = f.readlines()
@@ -276,7 +278,7 @@ def ReadprfFiles(filepath, over_axis):
 
     if over_axis=="latitude":
         # Retrieve latitude-core_number correspondance
-        coor_core, ncoor, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, nlevel, ngas = RetrieveLatitudeFromCoreNumber(f"{filepath}/")
     elif over_axis=="longitude":
         # Retrieve longitude-core_number correspondance
         coor_core, ncoor, nlevel, ngas = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
