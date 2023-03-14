@@ -44,15 +44,15 @@ def main():
     # Binning
     bin_cmerid  = False     # Use central meridian binning scheme
     bin_cpara   = False     # Use central parallel binning scheme
-    bin_ctl     = True     # Use centre-to-limb binning scheme
+    bin_ctl     = False     # Use centre-to-limb binning scheme
     bin_region  = False     # Use regional binning scheme (for a zoom 2D retrieval)
     bin_av_region = False   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
-    save        = False     # Store calculated profiles to local files
-    plotting    = False     # Plot calculated profiles
+    save        = False      # Store calculated profiles to local files
+    plotting    = False      # Plot calculated profiles
     mapping     = False      # Plot maps of observations or retrieval
-    spx         = True     # Write spxfiles as spectral input for NEMESIS
-    retrieval   = False      # Plot NEMESIS outputs 
+    spx         = False      # Write spxfiles as spectral input for NEMESIS
+    retrieval   = True      # Plot NEMESIS outputs 
 
     ############################################################
     # Perform geometric registration and radiometric calibration
@@ -238,29 +238,17 @@ def main():
     ###############################################################
 
     if retrieval:
-
-        from Plot.PlotRetrievalOutputs import PlotContributionFunction
-        from Plot.PlotRetrievalOutputs import PlotChiSquareOverNy, PlotChiSquareOverNySuperpose, PlotChiSquareMap
-        from Plot.PlotRetrievalOutputs import PlotRetrievedTemperature, PlotRetrievedTemperatureProfile, PlotRetrievedTemperatureProfileSuperpose 
-        from Plot.PlotRetrievalOutputs import PlotRetrievedTemperatureMaps, PlotRetrievedTemperatureCrossSection
-        from Plot.PlotRetrievalOutputs import PlotRetrievedRadiance, PlotRetrievedRadianceMap, PlotRetrievedRadianceMeridian, PlotRetrievedRadianceMeridianSuperpose
-        from Plot.PlotRetrievalOutputs import PlotRadianceParametricTest
-        from Plot.PlotRetrievalOutputs import PlotRetrievedAerosolProfile, PlotRetrievedAerosolMaps, PlotRetrievedAerosolCrossSection
-        from Plot.PlotRetrievalOutputs import PlotRetrievedGasesProfile, PlotRetrievedGasesProfileSuperpose, PlotRetrievedGasesMaps, PlotRetrievedGasesCrossSection
-        from Plot.PlotRetrievalOutputs import PlotComparisonParametricGasesHydrocarbons, PlotComparisonParametricGasesHydrocarbonsParallel
-        from Plot.PlotRetrievalOutputs import PlotAllForAuroraOverTime
-
-        # PlotTemperaturePriorProfiles()
-        # PlotAerosolPriorProfiles()
-        # PlotRetrievedTemperature()
-        # PlotRetrievedTemperatureProfile()
-        # PlotRetrievedRadiance()
-        # PlotRetrievedAerosolProfile()
-        # PlotRetrievedRadianceMeridian()
-        PlotRetrievedTemperatureCrossSection()
-        # PlotChiSquareOverNySuperpose()
+        from Plot.PlotNemesis import PlotNemesis as pn
         
+        # pn.plot_spectrum_with_latitude()
 
+
+        from Plot.PlotRetrievalOutputs import PlotRetrievedTemperatureProfileSuperpose
+        
+        PlotRetrievedTemperatureProfileSuperpose(over_axis='latitude')
+
+
+    return
 
 if __name__ == '__main__':
     import numpy as np

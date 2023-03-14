@@ -13,6 +13,7 @@ from Tools.SetWave import SetWave
 from Read.ReadPrior import ReadTemperatureGasesPriorProfile, ReadAerosolPriorProfile
 from Read.ReadRetrievalOutputFiles import ReadprfFiles, ReadmreFiles, ReadaerFiles, ReadLogFiles, ReadmreParametricTest, ReadAerFromMreFiles, ReadContributionFunctions, ReadAllForAuroraOverTime
 from Read.ReadZonalWind import ReadZonalWind
+# from Read.ReadSolarWindPredi import ReadSolarWindPredi
 
 # Colormap definition
 cmap = plt.get_cmap("magma")
@@ -39,6 +40,67 @@ def RetrieveGasesNames(gas_id):
 
     return gas_name
 
+# retrieval_test = [
+#             f"{iprior}_temp_ktable-highreso_no852_no887",
+#             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_ktable-highreso_no852_no887",
+#             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_ktable-highreso_no852_no887",
+#             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_NH3_ktable-highreso_no852_no887",
+#             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_NH3_ktable-highreso_no852_no887",
+#             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6pknee02mbar_ktable-highreso_no852_no887",
+#             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6_ktable-highreso_no852_no887",
+#             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
+#             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_NH3_ktable-highreso_no852_no887",
+#             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_NH3p_ktable-highreso_no852_no887",
+#             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_NH3p_ktable-highreso_no852_no887",
+#             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_NH3p_ktable-highreso_no852_no887",
+#                     ]
+# If subdirectory does not exist, create it
+dir = '../retrievals/retrieved_figures/'
+if not os.path.exists(dir):
+    os.makedirs(dir)
+# Retrieval outputs directory path
+fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_2_maximum_emission_angle/"
+# Array of prior file names
+prior = ['ptd11']#, 'jupiter_v2016']
+retrieval_test =[
+    # Experiment 1
+        # # "cmerid_flat5_jupiter2021_greycloud_0",
+        # "cmerid_flat5_jupiter2021_greycloud_0_1p",
+        # "cmerid_flat5_jupiter2021_greycloud_0_1p_27s",
+        # "cmerid_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+        # # "cmerid_flat5_jupiter2021_nh3cloud_0",
+        # "cmerid_flat5_jupiter2021_nh3cloud_0_1p",
+        # "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s",
+        # "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # # "ctl_flat5_jupiter2021_greycloud_0",
+        # "ctl_flat5_jupiter2021_greycloud_0_1p",
+        # "ctl_flat5_jupiter2021_greycloud_0_1p_27s",
+        # "ctl_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+        # # "ctl_flat5_jupiter2021_nh3cloud_0",
+        # "ctl_flat5_jupiter2021_nh3cloud_0_1p",
+        # "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s",
+        # "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "limb_flat5_jupiter2021_greycloud_0",
+        # "limb_flat5_jupiter2021_greycloud_0_1p",
+        # "limb_flat5_jupiter2021_greycloud_0_1p_27s",
+        # "limb_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+        # # "limb_flat5_jupiter2021_nh3cloud_0",
+        # "limb_flat5_jupiter2021_nh3cloud_0_1p",
+        # "limb_flat5_jupiter2021_nh3cloud_0_1p_27s",
+        # "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
+    #Experiment 2
+        "limb_50_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "limb_55_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "limb_60_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "limb_65_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "limb_70_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "limb_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "limb_80_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "limb_85_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "limb_90_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
+]
+
+
 # Plotting subroutines:
 
 def PlotContributionFunction(over_axis="latitude"):
@@ -48,7 +110,7 @@ def PlotContributionFunction(over_axis="latitude"):
     if not os.path.exists(dir):
         os.makedirs(dir)
     # Retrieval outputs directory path
-    fpath = "/Users/db496/Documents/Research/Observations/NEMESIS_outputs/"
+    fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_2_maximum_emission_angle/experiment_2_maximum_emission_angle/outputs/"
     # Array of prior file names
     prior = ['jupiter_v2021']#, 'jupiter_v2016']
     # Loop over each prior used for retrievals tests
@@ -71,6 +133,22 @@ def PlotContributionFunction(over_axis="latitude"):
 
 
 
+
+
+
+
+def PlotCheckPente():
+    x = np.linspace(0,1,100)
+    y = np.linspace(0,1,100)
+    for f in [0.4, 0.41, 0.42, 0.43, 0.45, 0.46, 0.47, 0.48, 0.49, 0.5]: 
+        result = x*y**(-(1-f)/f)
+        plt.plot(x, result, label=f"{f}")
+    plt.gca().invert_yaxis()
+    plt.yscale("log")
+    plt.xscale("log")
+    plt.legend()
+    plt.show()
+    plt.close()
 
 
 ####### ChiSquare plotting and mapping routines ####### 
@@ -132,37 +210,12 @@ def PlotChiSquareOverNySuperpose(over_axis='latitude'):
     # Retrieval outputs directory path
     fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_1_initial_tests/"
     
-    # Array of prior file names
-    prior = ['jupiter_v2021']#, 'jupiter_v2016']
-    
-    # Loop over each prior used for retrievals tests
     for iprior in prior:
-        retrieval_test = [
-                        # "cmerid_flat5_jupiter2021_greycloud_0",
-                        "cmerid_flat5_jupiter2021_greycloud_0_1p",
-                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s",
-                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s_26s",
-                        "cmerid_flat5_jupiter2021_nh3cloud_0",
-                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p",
-                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s",
-                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-                        "ctl_flat5_jupiter2021_greycloud_0",
-                        "ctl_flat5_jupiter2021_greycloud_0_1p",
-                        "ctl_flat5_jupiter2021_greycloud_0_1p_27s",
-                        "ctl_flat5_jupiter2021_greycloud_0_1p_27s_26s",
-                        "ctl_flat5_jupiter2021_nh3cloud_0",
-                        "ctl_flat5_jupiter2021_nh3cloud_0_1p",
-                        "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s",
-                        "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-                        "limb_flat5_jupiter2021_greycloud_0",
-                        "limb_flat5_jupiter2021_greycloud_0_1p",
-                        "limb_flat5_jupiter2021_greycloud_0_1p_27s",
-                        "limb_flat5_jupiter2021_greycloud_0_1p_27s_26s",
-                        "limb_flat5_jupiter2021_nh3cloud_0",
-                        "limb_flat5_jupiter2021_nh3cloud_0_1p",
-                        "limb_flat5_jupiter2021_nh3cloud_0_1p_27s",
-                        "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
-                        ]
+        # Loop over each prior used for retrievals tests
+        # If retrieval test subdirectory does not exist, create it
+        subdir = f"{dir}{iprior}_selected_meridien_tests_experiment2/chisquare_comparison/"
+        if not os.path.exists(subdir):
+            os.makedirs(subdir)
         ntest = len(retrieval_test)
         # Create the array to store chisquare over latitude for each test 
         maxchisg = []
@@ -347,38 +400,13 @@ def PlotRetrievedTemperatureProfile(over_axis='latitude'):
     if not os.path.exists(dir):
         os.makedirs(dir)
     # Retrieval outputs directory path
-    fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_1_initial_tests/"
-    
+    fpath = "/Users/db496/Documents/Research/Observations/NEMESIS_outputs/"
     # Array of prior file names
     prior = ['jupiter_v2021']#, 'jupiter_v2016']
-    
     # Loop over each prior used for retrievals tests
     for iprior in prior:
         retrieval_test = [
-                        # "cmerid_flat5_jupiter2021_greycloud_0",
-                        "cmerid_flat5_jupiter2021_greycloud_0_1p",
-                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s",
-                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s_26s",
-                        "cmerid_flat5_jupiter2021_nh3cloud_0",
-                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p",
-                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s",
-                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-                        "ctl_flat5_jupiter2021_greycloud_0",
-                        "ctl_flat5_jupiter2021_greycloud_0_1p",
-                        "ctl_flat5_jupiter2021_greycloud_0_1p_27s",
-                        "ctl_flat5_jupiter2021_greycloud_0_1p_27s_26s",
-                        "ctl_flat5_jupiter2021_nh3cloud_0",
-                        "ctl_flat5_jupiter2021_nh3cloud_0_1p",
-                        "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s",
-                        "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-                        "limb_flat5_jupiter2021_greycloud_0",
-                        "limb_flat5_jupiter2021_greycloud_0_1p",
-                        "limb_flat5_jupiter2021_greycloud_0_1p_27s",
-                        "limb_flat5_jupiter2021_greycloud_0_1p_27s_26s",
-                        "limb_flat5_jupiter2021_nh3cloud_0",
-                        "limb_flat5_jupiter2021_nh3cloud_0_1p",
-                        "limb_flat5_jupiter2021_nh3cloud_0_1p_27s",
-                        "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
+                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_NH3p_fshfix_no852_no887_aprmodif"
                         ]
         ntest = len(retrieval_test)
         # Loop over each retrieval tests for the current prior file
@@ -386,7 +414,7 @@ def PlotRetrievedTemperatureProfile(over_axis='latitude'):
             # Read profile data from NEMESIS prior file 
             _, prior_p, prior_temperature, prior_err, _, _, _, _ = ReadTemperatureGasesPriorProfile(f"{fpath}{itest}/core_1/")
             # If retrieval test subdirectory does not exist, create it
-            subdir = f"{dir}{itest}/profiles/"
+            subdir = f"{dir}{iprior}{itest}/profiles/"
             if not os.path.exists(subdir):
                 os.makedirs(subdir)
             # Read retrieved profiles from .prf outputs files
@@ -416,35 +444,12 @@ def PlotRetrievedTemperatureProfile(over_axis='latitude'):
 def PlotRetrievedTemperatureProfileSuperpose(over_axis):
 
     print('Plotting NEMESIS retrieved temperature profiles (superpose figure of several tests)...')
-    # If subdirectory does not exist, create it
-    dir = '../retrievals/retrieved_figures/'
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    # Retrieval outputs directory path
-    fpath = "/Users/db496/Documents/Research/Observations/NEMESIS_outputs/"
-    # Array of prior file names
-    prior = ['jupiter_v2021']#, 'jupiter_v2016']
-    # Loop over each prior used for retrievals tests
     for iprior in prior:
         # If retrieval test comparison subdirectory does not exist, create it
-        # subdir = f"{dir}/{iprior}_temp_aerosol1-10mu_greycloud_70-300mbar/chisquare_comparison/"
-        # subdir = f"{dir}/{iprior}_temp_aerosol1-10mu_paraH2_greycloud_70-300mbar/chisquare_comparison/"
-        subdir = f"{dir}/zonal_parametric_hydrocb_NH3/temperature_profile_comparison/"
-        # subdir = f"{dir}/{iprior}_temp_aerosol1-10or1mu_nospecies/chisquare_comparison/"
-        # subdir = f"{dir}/{iprior}_temp_aerosol1-10mu_scale05or075or1/chisquare_comparison/"
+        subdir = f"{dir}/temperature_profile_comparison/"
         if not os.path.exists(subdir):
                 os.makedirs(subdir)
-        # List of retrieval tests for comparison...
-        retrieval_test = [f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H4-C2H6_NH3_no852_no887",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H4-C2H6_NH3p_fshfix_no852_no887_aprmodif",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H4-C2H6pknee02mbar_NH3p_fshfix_no852_no887_aprmodif",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6_NH3p_fshfix_no852_no887_aprmodif",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_NH3_no852_no887",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_no852_no887",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_NH3p_fshfix_no852_no887_aprmodif"
-        ]
         ntest = len(retrieval_test)
-        
         # Plotting retrieved temperature profile for each latitude
         for ilat in range(176):
             fig, axes = plt.subplots(1, 1, figsize=(7, 10))
@@ -454,11 +459,11 @@ def PlotRetrievedTemperatureProfileSuperpose(over_axis):
                 # Read retrieved profiles from .prf outputs files
                 temperature, _, latitude, _, pressure, _, _, _, _ = ReadprfFiles(filepath=f"{fpath}{itest}", over_axis=over_axis)
                 # Plot 
-                axes.plot(temperature[:, ilat], pressure, lw=2, label=r'T_aer10${\mu}$m_'+f"{itest}"[52:], color = col)
+                axes.plot(temperature[:, ilat], pressure, lw=2, label=f"{itest[5:6]}", color = col)
             # Read profile data from NEMESIS prior file 
             _, prior_p, prior_temperature, prior_err, _, _, _, _ = ReadTemperatureGasesPriorProfile(f"{fpath}{itest}/core_1/")
             # Plot the prior only for the last itest (because it's the same for all itest)
-            axes.plot(prior_temperature, prior_p, lw=2, label=f"{iprior} at {latitude[ilat]}", color='black')
+            axes.plot(prior_temperature, prior_p, lw=2, label=f"Prior", color='black')
             axes.fill_betweenx(prior_p, prior_temperature-prior_err, prior_temperature+prior_err, color='black', alpha=0.2)
             axes.set_yscale('log')
             axes.invert_yaxis()
@@ -895,32 +900,23 @@ def PlotRetrievedRadianceMeridian(over_axis):
 def PlotRetrievedRadianceMeridianSuperpose(over_axis):
 
     print('Plotting NEMESIS retrieved radiance meridians (superpose figure of several tests)...')
-    # If subdirectory does not exist, create it
-    dir = '../retrievals/retrieved_figures/'
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    # Retrieval outputs directory path
-    fpath = "/Users/db496/Documents/Research/Observations/NEMESIS_outputs/"
-    # Array of prior file names
-    prior = ['jupiter_v2021']#, 'jupiter_v2016']
-    # Loop over each prior used for retrievals tests
+    # # If subdirectory does not exist, create it
+    # dir = '../retrievals/retrieved_figures/'
+    # if not os.path.exists(dir):
+    #     os.makedirs(dir)
+    # # Retrieval outputs directory path
+    # fpath = "/Users/db496/Documents/Research/Observations/NEMESIS_outputs/"
+    # # Array of prior file names
+    # prior = ['jupiter_v2021']#, 'jupiter_v2016']
+    # # Loop over each prior used for retrievals tests
     for iprior in prior:
-        # If retrieval test comparison subdirectory does not exist, create it
-        # subdir = f"{dir}/{iprior}_temp_aerosol1-10mu_greycloud_70-300mbar/merid_radiance_comparison/"
-        # subdir = f"{dir}/{iprior}_temp_aerosol1-10mu_paraH2_greycloud_70-300mbar/merid_radiance_comparison/"
-        subdir = f"{dir}/zonal_parametric_hydrocb_NH3/merid_radiance_comparison/"
-        # subdir = f"{dir}/{iprior}_temp_aerosol1-10or1mu_nospecies/merid_radiance_comparison/"
-        # subdir = f"{dir}/{iprior}_temp_aerosol1-10mu_scale05or075or1/merid_radiance_comparison/"
-        if not os.path.exists(subdir):
-                os.makedirs(subdir)
-        # List of retrieval tests for comparison...
-        retrieval_test = [f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H4-C2H6_NH3_no852_no887",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H4-C2H6_NH3p_fshfix_no852_no887_aprmodif",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H4-C2H6pknee02mbar_NH3p_fshfix_no852_no887_aprmodif",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6_NH3p_fshfix_no852_no887_aprmodif",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_NH3_no852_no887",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_no852_no887",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_NH3p_fshfix_no852_no887_aprmodif"
+        retrieval_test = [
+                        f"{iprior}_temp_no852_no887",
+            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H4-C2H6pknee02mbar_no852_no887",
+            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H6_no852_no887",
+            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H6_ktable-highreso_no852_no887",
+            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H6pknee02mbar_no852_no887"
+
                         ]
         ntest = len(retrieval_test)
 
@@ -930,6 +926,10 @@ def PlotRetrievedRadianceMeridianSuperpose(over_axis):
         # Loop over each retrieval tests for the current prior file
         iretrieve = 0
         for itest in retrieval_test:
+            # If retrieval test subdirectory does not exist, create it
+            subdir = f"{dir}{iprior}_selected_meridien_tests/{itest}/merid_radiances/"
+            if not os.path.exists(subdir):
+                os.makedirs(subdir)
             # Read retrieved profiles from .mre outputs files
             radiance[iretrieve, :, :], wavenumb, rad_err[iretrieve, :, :], rad_fit[iretrieve, :, :], latitude, nlat = ReadmreFiles(filepath=f"{fpath}{itest}", over_axis=over_axis)
             iretrieve +=1

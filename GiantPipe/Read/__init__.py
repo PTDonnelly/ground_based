@@ -5,3 +5,4 @@ from .ReadGravity import ReadGravity
 from .ReadNpy import ReadCentralMeridNpy
 from .ReadNpy import ReadCentreToLimbNpy
 from .ReadZonalWind import ReadZonalWind
+from .ReadNemesisOutputs import ReadNemesisOutputs
