@@ -43,7 +43,6 @@ class ReadNemesisOutputs:
         number_of_retrievals = line_1[0]
         ngeom, ny, nx = line_2[1], line_2[2], line_2[3]
         latitude, longitude = line_3[0], line_3[1]
-
         return int(ngeom), int(ny), int(nx), float(latitude), float(longitude)
     
     @staticmethod
@@ -104,27 +103,62 @@ class ReadNemesisOutputs:
     
     @classmethod
     def get_retrieved_spectrum(cls, lines: List[str], ngeom: int, ny: int) -> List[str]:
-        
+        """Follows NEMESIS manual conventions.
+        NCONV: int = number of convolution wavenumbers per geometry
+        NGEOM: int = number geometries
+        NY: int = number of spectral points (NCONV * NGEOM)"""
+
         # Find where each variable starts in the file
         header = cls.get_spectrum_header(lines)
         header_start = header[0]
+        # Construct spectrum nested list
+        nconv = int(ny / (ngeom))
         spectrum = [[] for _ in range(ngeom)]
         for igeom in range(ngeom):
-            increment = ny * (ngeom +1)
-            header_end = header_start + increment
-            spectrum[igeom].append(lines[header_start+1:header_end+1])
+            geom_start = header_start + (nconv * igeom)
+            geom_end = header_start + (nconv * (igeom + 1))
+            geom = lines[geom_start+1:geom_end+1]
+            values = (conv.split() for conv in geom)
+            reshape_values = [list(value) for value in zip(*values)]
+            spectrum[igeom].extend(reshape_values)
         return header, spectrum
     
     @staticmethod
-    def get_reformed_spectrum(spectrum: List[str], ngeom: int, ny: int) -> List[str]:
-        
-        values = [column.split() for column in spectrum]
-        return [list(x) for x in zip(*values)]
+    def get_spx_header(lines: List[str]) -> list:
+        null, latitude, longitude, ngeom = [float(value) for value in lines[0].split()]
+        return null, latitude, longitude, int(ngeom)
+    
+    @staticmethod
+    def find_angles_line(lines: List[str]) -> list:
+       return [i for i, line in enumerate(lines) if len(line.split()) == 6]
+
+    @classmethod
+    def get_spx_block(cls, lines: List[str], ngeom: int) -> list:
+        """Follows NEMESIS manual conventions.
+        NCONV: int = number of convolution wavenumbers per geometry
+        NGEOM: int = number geometries
+        NY: int = number of spectral points (NCONV * NGEOM)"""
+
+        # Specify where geometries start in the file (always the second line)
+        block_idx = cls.find_angles_line(lines)
+
+        # Construct lists to hold data
+        nconv, nav, angles, spectrum = [[] for _ in range(4)] 
+        for i, igeom in enumerate(block_idx):
+            nconv.append(int(lines[igeom-2]))
+            nav.append(int(lines[igeom-1]))
+            angles.append([value for value in lines[igeom].split()])
+            geom_start = igeom
+            geom_end = igeom + nconv[i]
+            geom = lines[geom_start+1:geom_end+1]
+            spectrum.append((conv.split() for conv in geom))
+        return nconv, nav, angles, spectrum
     
     @classmethod
-    def read_mre(cls, filepath):
-        
+    def read_mre(cls, filepath: str) -> dict:
+
         with open(filepath) as f:
+            
             # Read file
             lines = f.readlines()
 
@@ -132,11 +166,26 @@ class ReadNemesisOutputs:
             ngeom, ny, nx, latitude, longitude = cls.get_mre_header(lines)
 
             # Get spectral information
-            spectrum_header, raw_spectrum = cls.get_retrieved_spectrum(lines, ngeom, ny)
-            spectrum = cls.get_reformed_spectrum(raw_spectrum, ngeom, ny)
+            spectrum_header, spectrum = cls.get_retrieved_spectrum(lines, ngeom, ny)
 
             # Get retrieved profiles and convert to float type
             apr_config, profiles_header, raw_profiles = cls.get_retrieved_profiles(lines)
             profiles = cls.convert_profiles_to_data(lines, raw_profiles)
 
         return dict_of(spectrum, profiles, apr_config, ngeom, ny, latitude)
+    
+    @classmethod
+    def read_spx(cls, filepath: str) -> dict:
+        
+        with open(filepath) as f:
+            
+            # Read file
+            lines = f.readlines()
+
+            # Get .spx header
+            _, latitude, longitude, ngeom = cls.get_spx_header(lines)
+
+            # Read in spectrum for each block (geometry)
+            nconv, nav, angles, spectrum = cls.get_spx_block(lines, ngeom)
+
+        return dict_of(nconv, ngeom, angles)

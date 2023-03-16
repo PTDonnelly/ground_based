@@ -241,11 +241,12 @@ def main():
         from Plot.PlotNemesis import PlotNemesis as pn
         
         # pn.plot_spectrum_with_latitude()
+        pn.plot_superposed_spectra_with_latitude()
 
 
         from Plot.PlotRetrievalOutputs import PlotRetrievedTemperatureProfileSuperpose
         
-        PlotRetrievedTemperatureProfileSuperpose(over_axis='latitude')
+        # PlotRetrievedTemperatureProfileSuperpose(over_axis='latitude')
 
 
     return
