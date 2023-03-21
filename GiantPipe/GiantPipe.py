@@ -50,9 +50,9 @@ def main():
     # Output
     save        = False      # Store calculated profiles to local files
     plotting    = False      # Plot calculated profiles
-    mapping     = False      # Plot maps of observations or retrieval
+    mapping     = True      # Plot maps of observations or retrieval
     spx         = False      # Write spxfiles as spectral input for NEMESIS
-    retrieval   = True      # Plot NEMESIS outputs 
+    retrieval   = False      # Plot NEMESIS outputs 
 
     ############################################################
     # Perform geometric registration and radiometric calibration
@@ -199,15 +199,17 @@ def main():
     if mapping:
 
         from Plot.PlotMaps import PlotMaps, PlotZoomMaps, PlotMapsPerNight
-        from Plot.PlotPoles import PlotPolesFromGlobal
-        from Plot.PlotPseudoWindShear import PlotPseudoWindShear, PlotCompositePseudoWindShear
-        from Plot.PlotBrightnessTemperatureProf import PlotCompositeTBprofile
+        # from Plot.PlotPoles import PlotPolesFromGlobal
+        # from Plot.PlotPseudoWindShear import PlotPseudoWindShear, PlotCompositePseudoWindShear
+        # from Plot.PlotBrightnessTemperatureProf import PlotCompositeTBprofile
 
-        dataset = '2018May'
+        mode = 'giantpipe'
+        dataset = '2016Feb'
 
-    ### Point to location of observations
-        files       = FindFiles(dataset=dataset, mode='_files')
-    ## Plot cylindrical maps
+        ### Point to location of observations
+        files = FindFiles(dataset=dataset, mode=mode+'_files')
+    
+        ## Plot cylindrical maps
         if bin_cmerid:
             # Create plots and save global maps into npy arrays
             PlotMaps(dataset, files, spectrals)
@@ -216,7 +218,8 @@ def main():
             _, spectrals = ReadCentralMeridNpy(dataset=dataset, mode=mode, return_singles=False, return_spectrals=True)
             # Create plots and save global maps into npy arrays
             PlotMaps(dataset, files, spectrals)
-    # Plot pole maps from global maps npy arrays
+    
+        # Plot pole maps from global maps npy arrays
         # PlotZoomMaps(dataset=dataset, central_lon=180, lat_target=-20, lon_target=285, lat_window=15, lon_window=30)
         # PlotPolesFromGlobal(dataset=dataset, per_night=False)
         # PlotPseudoWindShear(dataset=dataset)

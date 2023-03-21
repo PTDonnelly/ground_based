@@ -7,7 +7,7 @@ def ReadCentralMeridNpy(dataset, mode, return_singles, return_spectrals):
 
     if return_singles:
         # Point to stored meridional profiles and calibration coefficients
-        profiles  = FindFiles(dataset=dataset, mode=mode+'_singles')
+        profiles  = FindFiles(dataset=dataset, mode=mode+'_merid_singles')
 
         # Load .npy files
         singles    = np.asarray([np.load(p) for p in profiles])
@@ -18,7 +18,7 @@ def ReadCentralMeridNpy(dataset, mode, return_singles, return_spectrals):
     
     if return_spectrals:
         # Point to stored meridional profiles and calibration coefficients
-        profiles  = FindFiles(dataset=dataset, mode=mode+'_spectrals')
+        profiles  = FindFiles(dataset=dataset, mode=mode+'_merid_spectrals')
 
         # Load .npy files
         spectrals    = np.asarray([np.load(p) for p in profiles])
@@ -57,7 +57,7 @@ def ReadCentralParallelNpy(dataset, mode, return_singles, return_spectrals):
 def ReadCentreToLimbNpy(dataset, mode, return_singles, return_spectrals):
     if return_singles:
         # Point to stored ctl profiles
-        profiles = FindFiles(dataset=dataset, mode=mode+'_singles')
+        profiles = FindFiles(dataset=dataset, mode=mode+'_ctl_singles')
         # Load .npy files
         singles = np.asarray([np.load(p) for p in profiles])
         # Fix shape (numpy changes array shape when storing)
@@ -67,7 +67,7 @@ def ReadCentreToLimbNpy(dataset, mode, return_singles, return_spectrals):
     
     if return_spectrals:
         # Point to stored ctl profiles
-        profiles = FindFiles(dataset=dataset, mode=mode+'_spectrals')
+        profiles = FindFiles(dataset=dataset, mode=mode+'_ctl_spectrals')
         # Load .npy files
         spectrals = np.asarray([np.load(p) for p in profiles])
         # Fix shape (numpy changes array shape when storing)

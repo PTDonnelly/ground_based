@@ -23,7 +23,7 @@ def GetCylandMuMaps(files):
     # Loop over file to load individual (and original) cylindrical maps
     for ifile, fpath in enumerate(files):
         ## Step 1: Read img, cmap and mufiles
-        imghead, _, cylhead, cyldata, _, mudata = ReadFits(filepath=f"{fpath}")
+        imghead, _, cylhead, cyldata, _, mudata, _, _ = ReadFits(filepath=f"{fpath}")
 
         ## Step 2: Geometric registration of pixel information
         # Save flag depending on Northern (1) or Southern (-1) viewing
@@ -79,7 +79,7 @@ def MuNormalization(files):
         if filter_name =='Q1' or filter_name == 'Q2' or filter_name =='Q3':
             mu_power = 0.18
         # Normalization by mumaps to the power mu_power
-        cmaps[ifile, :, :] = cmaps[ifile, :, :] / mumaps[ifile, :, :]**mu_power
+        cmaps[ifile, :, :] = np.divide(cmaps[ifile, :, :], mumaps[ifile, :, :]**mu_power)
         # Convert radiance cmaps to brightness temperature 
         cmaps[ifile, :, :] = ConvertBrightnessTemperature(cmaps[ifile, :, :], wavelength=wavelength[ifile])
 
