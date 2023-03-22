@@ -213,7 +213,6 @@ class PlotNemesis:
         _, axes = plt.subplots(nrows=nconv, ncols=3, sharex=True, figsize=(12, nconv), dpi=300)
         cmap = plt.get_cmap('cividis')
         plt.suptitle(f"Latitude = {latitude}\n[0, -1p, 27s, 26s]")
-        
 
         # Read spectra from mrefile, reshape nested lists from (ngeom, nconv) to (nconv, ngeom) and broadcast as numpy array
         wavenumber, measured_radiance, measurement_error, retrieved_radiance, emission_angles, measured_TB, retrieved_TB = [[] for _ in range(7)]
@@ -244,10 +243,10 @@ class PlotNemesis:
 
             # Plot each column in figure (i % n_plots_per_filter = 0, 1, or 2)
             if (icol == 0):
-                # Plot CTL profile of radiance
-                ax.fill_between(emission_angles[0], measured_radiance[0][iconv, :]-measurement_error[0][iconv, :], measured_radiance[0][iconv, :]+measurement_error[0][iconv, :], color='black', alpha=0.3)
-                ax.plot(emission_angles[0], measured_radiance[0][iconv, :], color='black', lw=1.5, label='Observed')
                 for itest in range(ntests):
+                    # Plot CTL profile of radiance
+                    ax.fill_between(emission_angles[itest], measured_radiance[itest][iconv, :]-measurement_error[itest][iconv, :], measured_radiance[itest][iconv, :]+measurement_error[itest][iconv, :], color='black', alpha=0.3)
+                    ax.plot(emission_angles[itest], measured_radiance[itest][iconv, :], color='black', lw=1.5, label='Observed')
                     col = cmap(itest / ntests)
                     ax.plot(emission_angles[itest], retrieved_radiance[itest][iconv, :], color=col, lw=1.5, label='Retrieved')
                 # Define axis parameters
@@ -259,9 +258,9 @@ class PlotNemesis:
                 # Add filter wavenumber
                 ax.text(tx, ty, int(wave), fontsize=fontsize+1, fontweight='bold', bbox=dict(facecolor='white', edgecolor='grey', boxstyle='round'))
             elif (icol == 1):
-                # Plot CTL profile of residual radiance (fit minus measurement)
-                ax.fill_between(emission_angles[0], -measurement_error[0][iconv, :], +measurement_error[0][iconv, :], color='black', alpha=0.3)
                 for itest in range(ntests):
+                    # Plot CTL profile of residual radiance (fit minus measurement)
+                    ax.fill_between(emission_angles[itest], -measurement_error[itest][iconv, :], +measurement_error[itest][iconv, :], color='black', alpha=0.3)
                     col = cmap(itest / ntests)
                     ax.plot(emission_angles[itest], retrieved_radiance[itest][iconv, :] - measured_radiance[itest][iconv, :], color=col, lw=1.5)
                 # Define axis parameters
@@ -300,8 +299,83 @@ class PlotNemesis:
         plt.close()
         return
 
+    @classmethod
+    def plot_superposed_temperatures(cls, dir: str, mre_data: dict, spx_data: dict) -> None:
+        
+        # Define common plotting parameters
+        fontsize = 7
+        linewidth = 1
+        ntests = len(mre_data)
+        ny = float(mre_data[0]['ny'])
+        ngeom = int(mre_data[0]['ngeom'])
+        nconv = int(ny / ngeom)
+        savepng, savepdf = True, False
+        
+        # Set up figure
+        latitude = float(mre_data[0]['latitude'])
+        figname = f"{dir}{latitude}.png"
+        _, axes = plt.subplots(nrows=1, ncols=2, sharey=True, figsize=(5, 5), gridspec_kw={'width_ratios': [2, 1]}, dpi=300)
+        cmap = plt.get_cmap('cividis')
+        plt.suptitle(f"Latitude = {latitude}\n[0, -1p, 27s, 26s]", fontsize=fontsize)
+
+        # Read temperature profile from mrefile, reshape nested lists from (npro, nparams) to (nparams, npro) and broadcast as numpy array
+        temperature_prior, temperature_prior_err, temperature_retrieved, temperature_retrieved_error = [[] for _ in range(4)]
+        pressure = np.arange(120)
+        for mre in mre_data:
+            profiles = np.asarray([value for value in zip(*mre['profiles'][0])], dtype=float)
+            temperature_prior.append(profiles[0])
+            temperature_prior_err.append(profiles[1])
+            temperature_retrieved.append(profiles[2])
+            temperature_retrieved_error.append(profiles[3])
+            latitude = float(mre['latitude'])
+
+        # Loop over each axis object
+        for i, ax in enumerate(np.transpose(axes.flat)):                         
+            ymin, ymax = 0, 120
+            ylabel = 'Pressure (atm)'
+            if (i == 0):
+                # Plot a priori temperature profile
+                ax.fill_betweenx(pressure, temperature_prior[0]-temperature_prior_err[0], temperature_prior[0]+temperature_prior_err[0], color='black', alpha=0.3)
+                ax.plot(temperature_prior[0], pressure, color='black', label='Prior')
+                # Loop over each test
+                for itest in range(ntests):
+                    col = cmap(itest / ntests)
+                    ax.plot(temperature_retrieved[itest], pressure, color=col, label='Retrieved')
+                # Define axis parameters
+                xmin, xmax = 90, 390
+                xticks = np.arange(xmin, xmax+1, 60)
+                xlabel = "Temperature (K)"
+            elif (i == 1):
+                # Plot residual a priori temperature profile
+                ax.fill_betweenx(pressure, -temperature_prior_err[0], temperature_prior_err[0], color='black', alpha=0.3)
+                ax.plot([0]*len(temperature_prior[0]), pressure, color='black', label='Prior')
+                # Loop over each test
+                for itest in range(ntests):
+                    col = cmap(itest / ntests)
+                    ax.plot(temperature_retrieved[itest]-temperature_prior[0], pressure, color=col, label='Retrieved')
+                # Define axis parameters
+                xmin, xmax = -30, 30
+                xticks = np.arange(xmin, xmax+1, 15)
+                xlabel = r"$\Delta$Temperature (K)"
+            
+            # Clean up axes
+            ax.grid(axis='both', markevery=1, color='k', ls=':', lw=0.5*linewidth)
+            ax.set_xlim((xmin, xmax))
+            ax.set_ylim((ymin, ymax))
+            ax.set_xlabel(xlabel, fontsize=fontsize, labelpad=1)
+            ax.set_xticks(xticks)
+            if (i == 0):
+                ax.set_xlabel(ylabel, fontsize=fontsize, labelpad=1)
+            ax.tick_params(axis='both', length=1, pad=1, labelsize=fontsize)
+
+        # Finish and close plot
+        plt.subplots_adjust(hspace=0.1, wspace=0.2)  
+        plt.savefig(figname, dpi=300, bbox_inches='tight')
+        plt.close()
+        return
+
     @staticmethod
-    def get_retrievals() -> Tuple[list, list]:
+    def get_retrievals() -> Tuple[str, list]:
         # experiment = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_1_initial_tests/"
         # tests = [
         #         "ctl_flat5_jupiter2021_nh3cloud_0_1p/",
@@ -341,6 +415,24 @@ class PlotNemesis:
                 "bins_maxmu_70_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/"
                 ]
         
+        # experiment = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_4_characterise_ctl_profile_bins_fixedwidth/"
+        # tests = [
+        #         "bins_fixedwidth_5_10_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_fixedwidth_10_15_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_fixedwidth_15_20_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_fixedwidth_20_25_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_fixedwidth_25_30_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_fixedwidth_30_35_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         # "bins_fixedwidth_35_40_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_fixedwidth_40_45_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_fixedwidth_45_50_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_fixedwidth_50_55_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_fixedwidth_55_60_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_fixedwidth_60_65_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_fixedwidth_65_70_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_fixedwidth_70_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/"
+        #         ]
+        
         return experiment, tests
 
     @classmethod
@@ -377,7 +469,7 @@ class PlotNemesis:
         return
     
     @classmethod
-    def plot_superposed_spectra_with_latitude(cls) -> None:
+    def plot_superposed_results_with_latitude(cls) -> None:
         """Plots the measured and retrieved spectra from multiple tests in a given experiment
         on the same axes for comparison."""
 
@@ -385,13 +477,13 @@ class PlotNemesis:
         experiment, tests = cls.get_retrievals()
 
         # Get subdirectory, if it does not exist, create it
-        dirname = "spectra_experiment/"
+        mode = 'temperature'
+        dirname = f"{mode}_experiment/"
         dir = cls.make_new_dir(f"{experiment}{dirname}")
 
         # Loop over each core
         core_numbers = np.arange(1, 147, 1)
         for core_number in core_numbers:
-                    
             # Find this core in multiple tests within this experiment
             mre_data, spx_data = [], []
             for test in tests:
@@ -405,11 +497,13 @@ class PlotNemesis:
                 # Read .spx file
                 spx_data.append(nem.read_spx(f"{core}/nemesis.spx"))
                 
-            # Plot spectra
-            if mre_data[0]['ngeom'] == 1:
-                # cls.plot_single_spectrum(dir, mre_data, spx_data)
-                pass
-            else:
-                cls.plot_superposed_ctl_spectrum(dir, mre_data, spx_data)
-
+            if mode == 'spectra':
+                if mre_data[0]['ngeom'] == 1:
+                    cls.plot_single_spectrum(dir, mre_data, spx_data)
+                else:
+                    cls.plot_superposed_ctl_spectrum(dir, mre_data, spx_data)
+            elif mode =='temperature':
+                cls.plot_superposed_temperatures(dir, mre_data, spx_data)
+            # exit()
         return
+    

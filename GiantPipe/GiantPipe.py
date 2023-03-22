@@ -35,6 +35,7 @@ def main():
     from Write.WriteSpx import WriteParaSpx
     from Write.WriteSpx import WriteCentreToLimbSpx
     from Write.WriteSpx import WriteLimbSpx
+    from Write.WriteSpx import WriteLimbAverageSpx
     from Write.WriteSpx import WriteRegionalSpx
     from Write.WriteSpx import WriteRegionalAverageSpx
 
@@ -44,15 +45,15 @@ def main():
     # Binning
     bin_cmerid  = False     # Use central meridian binning scheme
     bin_cpara   = False     # Use central parallel binning scheme
-    bin_ctl     = False     # Use centre-to-limb binning scheme
+    bin_ctl     = True     # Use centre-to-limb binning scheme
     bin_region  = False     # Use regional binning scheme (for a zoom 2D retrieval)
     bin_av_region = False   # Use averaged regional binning scheme (for a single profile retrieval)
     # Output
     save        = False      # Store calculated profiles to local files
     plotting    = False      # Plot calculated profiles
-    mapping     = True      # Plot maps of observations or retrieval
+    mapping     = False      # Plot maps of observations or retrieval
     spx         = False      # Write spxfiles as spectral input for NEMESIS
-    retrieval   = False      # Plot NEMESIS outputs 
+    retrieval   = True      # Plot NEMESIS outputs 
 
     ############################################################
     # Perform geometric registration and radiometric calibration
@@ -156,7 +157,8 @@ def main():
         if spx:
             # Write mean central meridian profiles to spxfile
             # WriteCentreToLimbSpx(dataset=dataset, mode=mode, spectrals=spectrals)
-            WriteLimbSpx(dataset=dataset, mode=mode, spectrals=spectrals)
+            # WriteLimbSpx(dataset=dataset, mode=mode, spectrals=spectrals)
+            WriteLimbAverageSpx(dataset=dataset, mode=mode, spectrals=spectrals)
 
     if bin_region: 
         # Execute the bi-dimensional binning scheme 
@@ -244,12 +246,13 @@ def main():
         from Plot.PlotNemesis import PlotNemesis as pn
         
         # pn.plot_spectrum_with_latitude()
-        pn.plot_superposed_spectra_with_latitude()
+        pn.plot_superposed_results_with_latitude()
 
 
-        from Plot.PlotRetrievalOutputs import PlotRetrievedTemperatureProfileSuperpose
-        
-        # PlotRetrievedTemperatureProfileSuperpose(over_axis='latitude')
+        # from Plot.PlotRetrievalOutputs import PlotChiSquareOverNy, PlotChiSquareOverNySuperpose, PlotRetrievedTemperatureProfileSuperpose
+        # # PlotChiSquareOverNy(over_axis='latitude')
+        # PlotChiSquareOverNySuperpose(over_axis='latitude')
+        # # PlotRetrievedTemperatureProfileSuperpose(over_axis='latitude')
 
 
     return

@@ -59,11 +59,14 @@ dir = '../retrievals/retrieved_figures/'
 if not os.path.exists(dir):
     os.makedirs(dir)
 # Retrieval outputs directory path
-fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_2_maximum_emission_angle/"
+# fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_1_initial_tests/"
+# fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_2_maximum_emission_angle/"
+# fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_3_characterise_ctl_profile_bins_maxmu/"
+fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_4_characterise_ctl_profile_bins_fixedwidth/"
 # Array of prior file names
 prior = ['ptd11']#, 'jupiter_v2016']
 retrieval_test =[
-    # Experiment 1
+        # Experiment 1
         # # "cmerid_flat5_jupiter2021_greycloud_0",
         # "cmerid_flat5_jupiter2021_greycloud_0_1p",
         # "cmerid_flat5_jupiter2021_greycloud_0_1p_27s",
@@ -88,16 +91,47 @@ retrieval_test =[
         # "limb_flat5_jupiter2021_nh3cloud_0_1p",
         # "limb_flat5_jupiter2021_nh3cloud_0_1p_27s",
         # "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
-    #Experiment 2
-        "limb_50_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-        "limb_55_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-        "limb_60_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-        "limb_65_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-        "limb_70_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-        "limb_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-        "limb_80_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-        "limb_85_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-        "limb_90_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
+        # Experiment 2
+        # "limb_50_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "limb_55_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "limb_60_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "limb_65_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "limb_70_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "limb_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "limb_80_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "limb_85_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "limb_90_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
+        # Experiment 3
+        # "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "bins_maxmu_5_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "bins_maxmu_10_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "bins_maxmu_15_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "bins_maxmu_20_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "bins_maxmu_25_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "bins_maxmu_30_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "bins_maxmu_35_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "bins_maxmu_40_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "bins_maxmu_45_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # # "bins_maxmu_50_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # # "bins_maxmu_55_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # # "bins_maxmu_60_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "bins_maxmu_65_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "bins_maxmu_70_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
+        # Experiment 4
+        "bins_fixedwidth_5_10_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "bins_fixedwidth_10_15_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "bins_fixedwidth_15_20_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "bins_fixedwidth_20_25_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "bins_fixedwidth_25_30_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "bins_fixedwidth_30_35_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        # "bins_fixedwidth_35_40_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "bins_fixedwidth_40_45_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "bins_fixedwidth_45_50_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "bins_fixedwidth_50_55_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "bins_fixedwidth_55_60_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "bins_fixedwidth_60_65_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "bins_fixedwidth_65_70_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+        "bins_fixedwidth_70_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
         ]
 
 
@@ -133,10 +167,6 @@ def PlotContributionFunction(over_axis="latitude"):
 
 
 
-
-
-
-
 def PlotCheckPente():
     x = np.linspace(0,1,100)
     y = np.linspace(0,1,100)
@@ -159,46 +189,46 @@ def PlotChiSquareOverNy(over_axis):
     dir = '../retrievals/retrieved_figures/'
     if not os.path.exists(dir):
         os.makedirs(dir)
-    # Retrieval outputs directory path
-    fpath = "/Users/db496/Documents/Research/Observations/NEMESIS_outputs/"
-    # Array of prior file names
-    prior = ['jupiter_v2021']#, 'jupiter_v2016']
+    # # Retrieval outputs directory path
+    # # fpath = "/Users/db496/Documents/Research/Observations/NEMESIS_outputs/"
+    # # Array of prior file names
+    # prior = ['jupiter_v2021']#, 'jupiter_v2016']
+    # # Loop over each prior used for retrievals tests
+    # for iprior in prior:
+    #     retrieval_test = [
+    #                     f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_no852_no887"
+    #                     ]
+    ntest = len(retrieval_test)
     # Loop over each prior used for retrievals tests
-    for iprior in prior:
-        retrieval_test = [
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee008mbar-C2H4-C2H6pknee02mbar_no852_no887"
-                        ]
-        ntest = len(retrieval_test)
-        # Loop over each prior used for retrievals tests
-        for itest in retrieval_test:
-            # If retrieval test subdirectory does not exist, create it
-            subdir = f"{dir}{itest}/chisq_ny/"
-            if not os.path.exists(subdir):
-                os.makedirs(subdir)
-            # Read retrieved profiles from .prf outputs files
-            chisquare, latitude, _ = ReadLogFiles(filepath=f"{fpath}{itest}", over_axis=over_axis)
-            maxchi = np.nanmax(chisquare)
-            # Plot Figure of chisq/ny over latitude
-            fig = plt.subplots(1, 1, figsize=(12, 6))
-            plt.plot(latitude, chisquare, lw=2)
-            plt.grid()
-            if maxchi > 1:
-                plt.ylim(0, ceil(maxchi))
-                plt.yticks(np.arange(ceil(maxchi)+1))
-            else:
-                plt.ylim(0, 1)
-                plt.yticks(np.arange(0, 1.01, 0.1))
-            plt.tick_params(labelsize=15)        
-            plt.ylabel('\u03C7'r'$^{2}/N_y$', size=20)
-            if over_axis=="longitude":
-                plt.xlabel("System III West Longitude", size=20)
-            elif over_axis=="latitude":
-                plt.xlabel("Planetocentric Latitude", size=20)
-            # Save figure in the retrievals outputs directory
-            plt.savefig(f"{subdir}{itest}_chisquare.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_chisquare.eps", dpi=100)
-            # Close figure to avoid overlapping between plotting subroutines
-            plt.close()
+    for itest in retrieval_test:
+        # If retrieval test subdirectory does not exist, create it
+        subdir = f"{dir}{itest}/chisq_ny/"
+        if not os.path.exists(subdir):
+            os.makedirs(subdir)
+        # Read retrieved profiles from .prf outputs files
+        chisquare, latitude, _ = ReadLogFiles(filepath=f"{fpath}{itest}", over_axis=over_axis)
+        maxchi = np.nanmax(chisquare)
+        # Plot Figure of chisq/ny over latitude
+        fig = plt.subplots(1, 1, figsize=(12, 6))
+        plt.plot(latitude, chisquare, lw=2)
+        plt.grid()
+        if maxchi > 1:
+            plt.ylim(0, ceil(maxchi))
+            plt.yticks(np.arange(ceil(maxchi)+1))
+        else:
+            plt.ylim(0, 1)
+            plt.yticks(np.arange(0, 1.01, 0.1))
+        plt.tick_params(labelsize=15)        
+        plt.ylabel('\u03C7'r'$^{2}/N_y$', size=20)
+        if over_axis=="longitude":
+            plt.xlabel("System III West Longitude", size=20)
+        elif over_axis=="latitude":
+            plt.xlabel("Planetocentric Latitude", size=20)
+        # Save figure in the retrievals outputs directory
+        plt.savefig(f"{subdir}{itest}_chisquare.png", dpi=150, bbox_inches='tight')
+        #plt.savefig(f"{subdir}{itest}_chisquare.eps", dpi=100)
+        # Close figure to avoid overlapping between plotting subroutines
+        plt.close()
 
 def PlotChiSquareOverNySuperpose(over_axis='latitude'):
 
@@ -208,12 +238,12 @@ def PlotChiSquareOverNySuperpose(over_axis='latitude'):
     if not os.path.exists(dir):
         os.makedirs(dir)
     # Retrieval outputs directory path
-    fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_1_initial_tests/"
+    # fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_1_initial_tests/"
     
     for iprior in prior:
         # Loop over each prior used for retrievals tests
         # If retrieval test subdirectory does not exist, create it
-        subdir = f"{dir}{iprior}_selected_meridien_tests_experiment2/chisquare_comparison/"
+        subdir = f"{dir}{iprior}_chisquare_comparison/"
         if not os.path.exists(subdir):
             os.makedirs(subdir)
         ntest = len(retrieval_test)
@@ -227,7 +257,7 @@ def PlotChiSquareOverNySuperpose(over_axis='latitude'):
             # Read retrieved profiles from .prf outputs files
             chisquare, latitude, nlat = ReadLogFiles(filepath=f"{fpath}{itest}", over_axis=over_axis)
             maxchisg.append(np.nanmax(chisquare))
-            plt.plot(latitude, chisquare, lw=2, label=r'T_aer10${\mu}$m_C$_2$H$_2$p-C$_2$H$_4$-C$_2$H$_6$p_'+f"{itest}"[69:-7], color = col)
+            plt.plot(latitude, chisquare, lw=2, label=rf"{itest}"[16:21], color = col)
             # plt.plot(latitude, chisquare, lw=2, label=f"{itest}"[14:32]+"C2H2_C2H6_NH3")
             # plt.plot(latitude, chisquare, lw=2, label=f"{itest}"[14:32])
             # plt.plot(latitude, chisquare, lw=2, label=f"{itest}"[14:])
@@ -315,7 +345,9 @@ def PlotRetrievedTemperature(over_axis='latitude'):
         os.makedirs(dir)
     
     # Retrieval outputs directory path
-    fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_1_initial_tests/"
+    # fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_1_initial_tests/"
+    fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_3_characterise_ctl_profile_bins_maxmu/"
+    # fpath = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_4_characterise_ctl_profile_bins_fixedwidth/"
     
     # Array of prior file names
     prior = ['jupiter_v2021']#, 'jupiter_v2016']
@@ -324,29 +356,45 @@ def PlotRetrievedTemperature(over_axis='latitude'):
     for iprior in prior:
         retrieval_test = [
                         # "cmerid_flat5_jupiter2021_greycloud_0",
-                        "cmerid_flat5_jupiter2021_greycloud_0_1p",
-                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s",
-                        "cmerid_flat5_jupiter2021_greycloud_0_1p_27s_26s",
-                        "cmerid_flat5_jupiter2021_nh3cloud_0",
-                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p",
-                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s",
-                        "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-                        "ctl_flat5_jupiter2021_greycloud_0",
-                        "ctl_flat5_jupiter2021_greycloud_0_1p",
-                        "ctl_flat5_jupiter2021_greycloud_0_1p_27s",
-                        "ctl_flat5_jupiter2021_greycloud_0_1p_27s_26s",
-                        "ctl_flat5_jupiter2021_nh3cloud_0",
-                        "ctl_flat5_jupiter2021_nh3cloud_0_1p",
-                        "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s",
-                        "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
-                        "limb_flat5_jupiter2021_greycloud_0",
-                        "limb_flat5_jupiter2021_greycloud_0_1p",
-                        "limb_flat5_jupiter2021_greycloud_0_1p_27s",
-                        "limb_flat5_jupiter2021_greycloud_0_1p_27s_26s",
-                        "limb_flat5_jupiter2021_nh3cloud_0",
-                        "limb_flat5_jupiter2021_nh3cloud_0_1p",
-                        "limb_flat5_jupiter2021_nh3cloud_0_1p_27s",
-                        "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
+                        # "cmerid_flat5_jupiter2021_greycloud_0_1p",
+                        # "cmerid_flat5_jupiter2021_greycloud_0_1p_27s",
+                        # "cmerid_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        # "cmerid_flat5_jupiter2021_nh3cloud_0",
+                        # "cmerid_flat5_jupiter2021_nh3cloud_0_1p",
+                        # "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        # "cmerid_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+                        # "ctl_flat5_jupiter2021_greycloud_0",
+                        # "ctl_flat5_jupiter2021_greycloud_0_1p",
+                        # "ctl_flat5_jupiter2021_greycloud_0_1p_27s",
+                        # "ctl_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        # "ctl_flat5_jupiter2021_nh3cloud_0",
+                        # "ctl_flat5_jupiter2021_nh3cloud_0_1p",
+                        # "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        # "ctl_flat5_jupiter2021_nh3cloud_0_1p_27s_26s",
+                        # "limb_flat5_jupiter2021_greycloud_0",
+                        # "limb_flat5_jupiter2021_greycloud_0_1p",
+                        # "limb_flat5_jupiter2021_greycloud_0_1p_27s",
+                        # "limb_flat5_jupiter2021_greycloud_0_1p_27s_26s",
+                        # "limb_flat5_jupiter2021_nh3cloud_0",
+                        # "limb_flat5_jupiter2021_nh3cloud_0_1p",
+                        # "limb_flat5_jupiter2021_nh3cloud_0_1p_27s",
+                        # "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s"
+                        #
+                        "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        "bins_maxmu_5_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        "bins_maxmu_10_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        "bins_maxmu_15_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        "bins_maxmu_20_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        "bins_maxmu_25_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        "bins_maxmu_30_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        "bins_maxmu_35_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        "bins_maxmu_40_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        "bins_maxmu_45_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        # "bins_maxmu_50_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        # "bins_maxmu_55_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        # "bins_maxmu_60_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        "bins_maxmu_65_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                        "bins_maxmu_70_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/"
                         ]
         ntest = len(retrieval_test)
         
@@ -461,7 +509,8 @@ def PlotRetrievedTemperatureProfileSuperpose(over_axis):
                 # Read retrieved profiles from .prf outputs files
                 temperature, _, latitude, _, pressure, _, _, _, _ = ReadprfFiles(filepath=f"{fpath}{itest}", over_axis=over_axis)
                 # Plot Temperatures and residuals
-                axes[0].plot(temperature[:, ilat], pressure, lw=2, label=f"{itest[5:7]}", color=col)
+                print(ilat, f"{itest[16:18]}")
+                axes[0].plot(temperature[:, ilat], pressure, lw=2, label=f"{itest[16:18]}", color=col)
                 axes[1].plot(temperature[:, ilat]-prior_temperature, pressure, lw=2, color=col)
             # Plot the prior only for the last itest (because it's the same for all itest)
             axes[0].plot(prior_temperature, prior_p, lw=2, label=f"Prior", color='black', zorder=1)

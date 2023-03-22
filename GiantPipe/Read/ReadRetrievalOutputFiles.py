@@ -8,6 +8,7 @@ def RetrieveLatitudeFromCoreNumber(fpath):
 
     # Initialize local variables
     dirs = list(os.walk(fpath))
+    print(fpath)
     ncore = len(dirs[:-1]) # number of core directories, 
                                     # which is also equivalent to the number of latitude points  
     lat_core = np.empty((ncore, 2)) # 2D array containing latitude and core directory number
@@ -138,7 +139,7 @@ def ReadLogFiles(filepath, over_axis):
 
     if over_axis == "latitude":
         # Retrieve latitude-core_number correspondance
-        coor_core, ncoor, _, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}/core")
+        coor_core, ncoor, _, _ = RetrieveLatitudeFromCoreNumber(f"{filepath}/")
     elif over_axis =="longitude":
         # Retrieve longitude-core_number correspondance
         coor_core, ncoor, _, _ = RetrieveLongitudeFromCoreNumber(f"{filepath}/core")
@@ -448,7 +449,6 @@ def ReadAerFromMreFiles(filepath, over_axis):
     if over_axis=="2D": return aerosol, aer_err, aer_fit, fit_err, latitude, nlat, longitude, nlon
     if over_axis=="latitude" or "longitude": return aerosol, aer_err, aer_fit, fit_err, coor_axis, ncoor
 
-
 def ReadmreParametricTest(filepath):
 
     ncores = 1000
@@ -500,7 +500,6 @@ def ReadmreParametricTest(filepath):
             coeffs[2, icore] = tmp[2]
 
     return radiance, wavenumb, rad_err, rad_fit, rad_diff, coeffs, ncores
-
 
 def ReadContributionFunctions(filepath, over_axis):
 
