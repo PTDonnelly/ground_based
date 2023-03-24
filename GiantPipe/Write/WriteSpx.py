@@ -15,35 +15,33 @@ def WriteMeridSpx(dataset, mode, spectrals):
         # Write first line of texfile with relevant formatting
         clat = lats[0]
         LCM  = np.mean(LCMs)
-        nmu  = len(mus)
+        nmu  = 1
         f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:12.5f}\n".format(0, clat, LCM, nmu))
 
-        # Loop over NGEOM geometries (no. of geometries = no. of emission angle points)
-        for igeom, mu in enumerate(mus):
-            # Calculate NCONV spectral points (NCONV = no. of wavenumbers per geometry = 1 for merid binning)
-            nconv = 1
-            # I can't remember what NAV is... check the NEMESIS manual
-            nav   = 1
-            # The "angles line": this defines a "geometry" that holds a "spectrum"
-            clat           = lats[igeom]
-            clon           = LCMs[igeom]
-            solar_ang      = 0
-            emission_angle = mu
-            azimuth_angle  = 0
-            wgeom          = 1 
-            # The spectrum lines: these are the spectral points that occur at a given "geometry"
-            wave    = waves[igeom]
-            rad     = rads[igeom]
-            rad_err = rad_errs[igeom]
-
-            # Write output to texfile with relevant formatting
-            f.write("{0:d}\n".format(nconv))
-            f.write("{0:d}\n".format(nav))
-            f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:12.5f}  {4:12.5f}  {5:12.5f}\n".format(clat, clon, solar_ang, emission_angle, azimuth_angle, wgeom))
-            f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(wave, rad, rad_err))
+        # Calculate NCONV spectral points (NCONV = no. of wavenumbers per geometry = 1 for merid binning)
+        nconv = len(waves)
+        # I can't remember what NAV is... check the NEMESIS manual
+        nav   = 1
+        # The "angles line": this defines a "geometry" that holds a "spectrum"
+        clat           = lats[0]
+        clon           = LCMs[0]
+        solar_ang      = 0
+        emission_angle = min(mus)
+        azimuth_angle  = 0
+        wgeom          = 1 
+        # The spectrum lines: these are the spectral points that occur at a given "geometry"
+        waves.reverse()
+        rads.reverse()
+        rad_errs.reverse()
+        # Write output to texfile with relevant formatting
+        f.write("{0:d}\n".format(nconv))
+        f.write("{0:d}\n".format(nav))
+        f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:12.5f}  {4:12.5f}  {5:12.5f}\n".format(clat, clon, solar_ang, emission_angle, azimuth_angle, wgeom))
+        for spec in zip(waves, rads, rad_errs):
+            f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(spec[0], spec[1], spec[2]))
 
     # If subdirectory does not exist, create it
-    dir = f'../outputs/{dataset}/spxfiles_merid/'
+    dir = f'../outputs/{dataset}/spxfiles_merid_new/'
     if not os.path.exists(dir):
         os.makedirs(dir)
 
@@ -281,8 +279,6 @@ def WriteLimbAverageSpx(dataset, mode, spectrals):
     def create_ctl_spx(f, lats, LCMs, mus, rads, rad_errs, waves):
         """Write spxfile for meridional binning method """
         
-        # Hard-code this here as it is the mean in 65-75
-        mus = [70]
         # Reshape the lists and calculate the mean over the bins
         rads_avg = [np.nanmean(rad) for rad in zip(*rads)]
         rad_errs_avg = [np.nanmean(rad_err) for rad_err in zip(*rad_errs)]
@@ -291,11 +287,11 @@ def WriteLimbAverageSpx(dataset, mode, spectrals):
         # Write first line of texfile with relevant formatting
         clat = lats[0]
         LCM  = np.mean(LCMs)
-        nmu  = len(mus)
+        nmu  = 1
         f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:d}\n".format(0, clat, LCM, nmu))
  
         # Calculate NCONV spectral points (NCONV = no. of wavenumbers per geometry = 1 for merid binning)
-        nconv = 1
+        nconv = len(waves_avg)
         # I can't remember what NAV is... check the NEMESIS manual
         nav   = 1
         # The "angles line": this defines a "geometry" that holds a "spectrum"
@@ -311,7 +307,6 @@ def WriteLimbAverageSpx(dataset, mode, spectrals):
         f.write("{0:12.5f}  {1:12.5f}  {2:12.5f}  {3:12.5f}  {4:12.5f}  {5:12.5f}\n".format(clat, clon, solar_ang, emission_angle, azimuth_angle, wgeom))
         # The spectrum lines: these are the spectral points that occur at a given "geometry"
         wave, rad, rad_err = waves_avg, rads_avg, rad_errs_avg
-        print(wave, rad, rad_err)
         # Write output to texfile with relevant formatting
         for iconv, spec in enumerate(zip(wave, rad, rad_err)):
             f.write("{0:10.4f}  {1:15.6e}  {2:15.6e}\n".format(spec[0], spec[1], spec[2]))
@@ -323,12 +318,11 @@ def WriteLimbAverageSpx(dataset, mode, spectrals):
         os.makedirs(dir)
 
     mubins = np.arange(mu1, mu2, 1)
-    nmubins = len(mubins)
 
     # Loop over latitudes to create one .spxfile per latitude
     for ilat in range(Globals.nlatbins):
         lats, LCMs, mus, rads, rad_errs, waves = [[] for _ in range(6)]
-        for imu in range(nmubins):
+        for imu, _ in enumerate(mubins):
             imu += mubins[0]
 
             # Extract variables and throw NaNs
@@ -342,13 +336,12 @@ def WriteLimbAverageSpx(dataset, mode, spectrals):
             if lat:
                 lats.append(lat[0])
                 LCMs.append(LCM[0])
-                mus.append(mu[0])
+                mus.append(np.mean((mu1, mu2)))
                 rads.append(rad)
                 rad_errs.append(rad_err)
                 waves.append(wave)
         # Only write spxfile for latitudes with spectral information
         if lats:
-            print(ilat)
             # Open textfile
             with open(f"{dir}lat_{lats[0]}.txt", 'w') as f:
                 create_ctl_spx(f, lats, LCMs, mus, rads, rad_errs, waves)

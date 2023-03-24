@@ -62,7 +62,6 @@ class PlotNemesis:
         figname = f"{dir}{latitude}.png"
         _, (ax1, ax2, ax3, ax4) = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(6, 6), dpi=300)
         plt.suptitle(f"Latitude = {latitude}")
-
         ax1.plot(wavenumber, measured_radiance, color='black', label='Observed')
         ax1.plot(wavenumber, retrieved_radiance, color='red', label='Retrieved')
         fill_neg = [radiance - error for radiance, error in zip(measured_radiance, measured_radiance_error)]
@@ -101,6 +100,64 @@ class PlotNemesis:
 
         plt.xlabel(r"Wavenumber (cm$^{-1}$)")
         plt.xticks(wavenumber)
+        plt.savefig(figname, dpi=300, bbox_inches='tight')
+        plt.close()
+        return
+    
+    @classmethod
+    def plot_single_temperature_profile(cls, dir: str, mre: dict, spx: dict) -> None:
+
+        # Define common plotting parameters
+        fontsize = 7
+        linewidth = 1
+        savepng, savepdf = True, False
+
+        # Read spectrum (remove the extra surrounding list from ngeom = 1)
+        profiles = np.asarray([value for value in zip(*mre['profiles'][0])], dtype=float)
+        temperature_prior = profiles[0]
+        temperature_prior_err = profiles[1]
+        temperature_retrieved = profiles[2]
+        temperature_retrieved_error = profiles[3]
+        latitude = float(mre['latitude'])
+        pressure = np.arange(120)
+
+        figname = f"{dir}{latitude}.png"
+        _, axes = plt.subplots(nrows=1, ncols=2, sharey=True, figsize=(5, 5), gridspec_kw={'width_ratios': [2, 1]}, dpi=300)
+        plt.suptitle(f"Latitude = {latitude}")
+        
+        # Loop over each axis object
+        for i, ax in enumerate(np.transpose(axes.flat)):                         
+            ymin, ymax = 0, 120
+            ylabel = 'Pressure (atm)'
+            if (i == 0):
+                # Plot a priori temperature profile
+                ax.fill_betweenx(pressure, temperature_prior-temperature_prior_err, temperature_prior+temperature_prior_err, color='black', alpha=0.3)
+                ax.plot(temperature_prior, pressure, color='black', label='Prior')
+                ax.plot(temperature_retrieved, pressure, color='red', label='Retrieved')
+                # Define axis parameters
+                xmin, xmax = 90, 390
+                xticks = np.arange(xmin, xmax+1, 60)
+                xlabel = "Temperature (K)"
+            elif (i == 1):
+                # Plot residual a priori temperature profile
+                ax.fill_betweenx(pressure, -temperature_prior_err, temperature_prior_err, color='black', alpha=0.3)
+                ax.plot([0]*len(temperature_prior), pressure, color='black', label='Prior')
+                ax.plot(temperature_retrieved-temperature_prior, pressure, color='red', label='Retrieved')
+                # Define axis parameters
+                xmin, xmax = -30, 30
+                xticks = np.arange(xmin, xmax+1, 15)
+                xlabel = r"$\Delta$Temperature (K)"
+            
+            # Clean up axes
+            ax.grid(axis='both', markevery=1, color='k', ls=':', lw=0.5*linewidth)
+            ax.set_xlim((xmin, xmax))
+            ax.set_ylim((ymin, ymax))
+            ax.set_xlabel(xlabel, fontsize=fontsize, labelpad=1)
+            ax.set_xticks(xticks)
+            if (i == 0):
+                ax.set_xlabel(ylabel, fontsize=fontsize, labelpad=1)
+            ax.tick_params(axis='both', length=1, pad=1, labelsize=fontsize)
+
         plt.savefig(figname, dpi=300, bbox_inches='tight')
         plt.close()
         return
@@ -306,10 +363,6 @@ class PlotNemesis:
         fontsize = 7
         linewidth = 1
         ntests = len(mre_data)
-        ny = float(mre_data[0]['ny'])
-        ngeom = int(mre_data[0]['ngeom'])
-        nconv = int(ny / ngeom)
-        savepng, savepdf = True, False
         
         # Set up figure
         latitude = float(mre_data[0]['latitude'])
@@ -396,24 +449,24 @@ class PlotNemesis:
         #         "limb_90_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/"
         #         ]
         
-        experiment = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_3_characterise_ctl_profile_bins_maxmu/"
-        tests = [
-                "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                "bins_maxmu_5_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                "bins_maxmu_10_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                "bins_maxmu_15_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                "bins_maxmu_20_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                "bins_maxmu_25_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                "bins_maxmu_30_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                "bins_maxmu_35_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                "bins_maxmu_40_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                "bins_maxmu_45_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                # "bins_maxmu_50_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                # "bins_maxmu_55_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                # "bins_maxmu_60_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                "bins_maxmu_65_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                "bins_maxmu_70_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/"
-                ]
+        # experiment = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_3_characterise_ctl_profile_bins_maxmu/"
+        # tests = [
+        #         "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_maxmu_5_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_maxmu_10_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_maxmu_15_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_maxmu_20_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_maxmu_25_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_maxmu_30_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_maxmu_35_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_maxmu_40_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_maxmu_45_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         # "bins_maxmu_50_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         # "bins_maxmu_55_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         # "bins_maxmu_60_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_maxmu_65_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "bins_maxmu_70_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/"
+        #         ]
         
         # experiment = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_4_characterise_ctl_profile_bins_fixedwidth/"
         # tests = [
@@ -432,11 +485,17 @@ class PlotNemesis:
         #         "bins_fixedwidth_65_70_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
         #         "bins_fixedwidth_70_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/"
         #         ]
+
+        experiment = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_7_meridian_vs_limb/"
+        tests = [
+                "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+                "merid_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/"
+                ]
         
         return experiment, tests
 
     @classmethod
-    def plot_spectrum_with_latitude(cls) -> None:
+    def plot_single_mre(cls) -> None:
         """Plots the measured and retrieved spectra from a single test in a given experiment."""
 
         # Get filepaths of retrieval outputs
@@ -446,12 +505,12 @@ class PlotNemesis:
         for test in tests:
             
             # Get subdirectory, if it does not exist, create it - format argument as you like
-            dirname = "spectra_tests/"
-            dir = cls.make_new_dir(f"{experiment}{dirname}{test}")
+            spectra_dir = cls.make_new_dir(f"{experiment}spectra_tests/{test}")
+            temperature_dir = cls.make_new_dir(f"{experiment}temperature_tests/{test}")
                    
             # Point to individual retrieval outputs
             cores = natsort.natsorted(glob.glob(f"{experiment}{test}core*"))
-            
+                        
             # Loop over each core
             for core in cores:
                 
@@ -463,13 +522,57 @@ class PlotNemesis:
                 
                 # Plot spectra
                 if mre['ngeom'] == 1:
-                    cls.plot_single_spectrum(dir, mre, spx)
+                    cls.plot_single_spectrum(spectra_dir, mre, spx)
+                    cls.plot_single_temperature_profile(temperature_dir, mre, spx)
                 else:
                     cls.plot_ctl_spectrum(dir, mre, spx)
+                
+        return
+
+    @classmethod
+    def plot_multiple_mre(cls) -> None:
+        """Plots the measured and retrieved spectra from a single test in a given experiment."""
+
+        # Get filepaths of retrieval outputs
+        experiment, tests = cls.get_retrievals()
+
+        # Get subdirectory, if it does not exist, create it - format argument as you like
+        spectra_dir = cls.make_new_dir(f"{experiment}spectra_experiment/")
+        temperature_dir = cls.make_new_dir(f"{experiment}temperature_experiment/")
+
+        # Create fixed grid on which to plot retrievals
+        latitudes = np.arange(-89.5, 90, 1)
+
+        for latitude in latitudes:
+            
+            # Create empty lists to store each test at this latitude
+            mre_data, spx_data = [], []
+
+            # Loop over each test within the experiment
+            for test in tests:
+                
+                # Point to location of retrieval outputs
+                cores = natsort.natsorted(glob.glob(f"{experiment}{test}core*"))
+                
+                # Verify if latitude exists in this test, return filepath to core
+                core = nem.check_core(cores, latitude)
+                # print(core, latitude)
+                if not core:
+                    pass
+                else:
+                    # Read .mre file
+                    mre_data.append(nem.read_mre(f"{core}/nemesis.mre"))
+
+                    # Read .spx file
+                    spx_data.append(nem.read_spx(f"{core}/nemesis.spx"))
+
+            # Plot results
+            print(latitude, len(mre_data))
+            cls.plot_superposed_temperatures(temperature_dir, mre_data, spx_data)
         return
     
     @classmethod
-    def plot_superposed_results_with_latitude(cls) -> None:
+    def plot_superposed_results(cls) -> None:
         """Plots the measured and retrieved spectra from multiple tests in a given experiment
         on the same axes for comparison."""
 

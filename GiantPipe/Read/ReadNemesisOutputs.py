@@ -2,7 +2,7 @@ import numpy.typing as npt
 import numpy as np
 import operator
 import Globals
-from typing import List
+from typing import List, Tuple
 import time
 from sorcery import dict_of
 
@@ -189,3 +189,24 @@ class ReadNemesisOutputs:
             nconv, nav, angles, spectrum = cls.get_spx_block(lines, ngeom)
 
         return dict_of(nconv, ngeom, angles)
+   
+    @classmethod
+    def check_core(cls, filepaths: List[str], latitude: float) -> Tuple[bool, str]:
+        
+        check = []
+        for filepath in filepaths:
+            # Get latitudes .mre file
+            mre = cls.read_mre(f"{filepath}/nemesis.mre")
+            check.append(mre["latitude"])
+        
+        # Return a tuple containing the location of the match
+        find = np.where(check == latitude)
+        
+        ### FIX THIS, we are losing the equator because it thinks zero index is None
+        print(find[0])
+        if not find[0][0]:
+            return False
+        else:
+            # print(find, find[0], find[0][0])
+            index = find[0][0]
+            return filepaths[index]
