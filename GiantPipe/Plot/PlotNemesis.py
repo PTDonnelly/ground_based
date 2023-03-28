@@ -175,98 +175,9 @@ class PlotNemesis:
         plt.savefig(figname, dpi=300, bbox_inches='tight')
         plt.close()
         return
-    
+        
     @classmethod
-    def plot_ctl_spectrum(cls, dir: str, mre: dict, spx: dict) -> None:
-        
-        # Read spectra from mrefile, reshape nested lists from (ngeom, nconv) to (nconv, ngeom) and broadcast as numpy array
-        ngeom, ny = mre['ngeom'], mre['ny']
-        wavenumber = np.asarray([value for value in zip(*[mre['spectrum'][igeom][1] for igeom in range(ngeom)])], dtype=float)
-        measured_radiance = np.asarray([value for value in zip(*[mre['spectrum'][igeom][2] for igeom in range(ngeom)])], dtype=float)
-        measurement_error = np.asarray([value for value in zip(*[mre['spectrum'][igeom][3] for igeom in range(ngeom)])], dtype=float)
-        retrieved_radiance = np.asarray([value for value in zip(*[mre['spectrum'][igeom][5] for igeom in range(ngeom)])], dtype=float)
-        latitude = float(mre['latitude'])
-        
-        # Read geometry information from spxfile
-        emission_angles = np.asarray([spx['angles'][igeom][3] for igeom in range(ngeom)], dtype=float)
-        nconvs = np.asarray([spx['nconv'][igeom] for igeom in range(ngeom)], dtype=int)
-
-        # Convert from radiance to brightness temperature
-        measured_TB = cls.radiance_to_brightness_temperature(wavenumber, measured_radiance)
-        retrieved_TB = cls.radiance_to_brightness_temperature(wavenumber, retrieved_radiance)
-
-        # Define common plotting parameters
-        fontsize = 7
-        linewidth = 1
-        n_plots_per_filter = 3
-        nconv = int(ny / ngeom)
-        savepng, savepdf = True, False
-        
-        # Set up figure
-        figname = f"{dir}{latitude}.png"
-        _, axes = plt.subplots(nrows=nconv, ncols=3, sharex=True, figsize=(12, nconv), dpi=300)
-        plt.suptitle(f"Latitude = {latitude}")
-        
-        # Loop over each axis object
-        for i, ax in enumerate(np.transpose(axes.flat)):
-            iconv = int(i / n_plots_per_filter)
-            icol = int(i % n_plots_per_filter)
-            title = wavenumber[iconv][0]
-            xmin, xmax = min(emission_angles), max(emission_angles)+0.5
-            xticks = np.flipud(np.arange(xmax, xmin, -10))
-            xlabel = r'Emission Angle ($^{\circ}$)'
-
-            # Plot each column in figure (i % n_plots_per_filter = 0, 1, or 2)
-            if (icol == 0):
-                # Plot CTL profile of radiance
-                ax.fill_between(emission_angles, measured_radiance[iconv, :]-measurement_error[iconv, :], measured_radiance[iconv, :]+measurement_error[iconv, :], color='black', alpha=0.3)
-                ax.plot(emission_angles, measured_radiance[iconv, :], color='black', lw=1.5, label='Observed')
-                ax.plot(emission_angles, retrieved_radiance[iconv, :], color='red', lw=1.5, label='Retrieved')
-                # Define axis parameters
-                ymin, ymax = np.min((measured_radiance[iconv, :], retrieved_radiance[iconv, :])), 1.1*(np.max((measured_radiance[iconv, :], retrieved_radiance[iconv, :])))
-                ylabel = "R"
-                tx, ty = xmin + 0.05*(xmax-xmin), ymin + 0.3*(ymax-ymin)
-                # Add filter wavenumber
-                ax.text(tx, ty, int(title), fontsize=fontsize+1, fontweight='bold', bbox=dict(facecolor='white', edgecolor='grey', boxstyle='round'))
-            elif (icol == 1):
-                # Plot CTL profile of residual radiance (fit minus measurement)
-                ax.fill_between(emission_angles, -measurement_error[iconv, :], +measurement_error[iconv, :], color='black', alpha=0.3)
-                ax.plot(emission_angles, retrieved_radiance[iconv, :] - measured_radiance[iconv, :], color='black', lw=1.5, label='Observed')
-                # Define axis parameters
-                ymin, ymax = -1.5*(np.max(measurement_error[iconv, :])), 1.5*(np.max(measurement_error[iconv, :]))
-                ylabel = r"$\Delta$ R"
-                # Add zero line
-                ax.plot((xmin, xmax), (0, 0), lw=0.75, color='black', zorder=1)
-            elif (icol == 2):
-                # Plot CTL profile of brightness temperature
-                ax.plot(emission_angles, retrieved_TB[iconv] - measured_TB[iconv], color='black', lw=1.5, label='Observed')
-                # Define axis parameters
-                ymin, ymax = -2, 2
-                yticks = np.arange(ymin, ymax+0.1, 1)
-                ylabel = r"$\Delta$ T$_{B}$"
-                # Add zero line
-                ax.plot((xmin, xmax), (0, 0), lw=0.75, color='black', zorder=1)
-
-            # Clean up axes
-            ax.grid(axis='both', markevery=1, color='k', ls=':', lw=0.5*linewidth)
-            ax.set_xlim((xmin, xmax))
-            ax.set_ylim((ymin, ymax))
-            ax.set_ylabel(ylabel, fontsize=fontsize, labelpad=1)
-            ax.set_xticks(xticks)
-            if (icol == 2):
-                ax.set_yticks(yticks)
-            if (iconv == nconv-1):
-                ax.set_xlabel(xlabel, fontsize=fontsize, labelpad=1)
-            ax.tick_params(axis='both', length=1, pad=1, labelsize=fontsize)
-
-        # Finish and close plot
-        plt.subplots_adjust(hspace=0.1, wspace=0.2)  
-        plt.savefig(figname, dpi=300, bbox_inches='tight')
-        plt.close()
-        return
-    
-    @classmethod
-    def plot_superposed_ctl_spectrum(cls, dir: str, mre_data: dict, spx_data: dict) -> None:
+    def plot_ctl_spectrum(cls, dir: str, mre_data: dict, spx_data: dict) -> None:
     
         # Define common plotting parameters
         fontsize = 7
@@ -276,7 +187,6 @@ class PlotNemesis:
         ny = float(mre_data[0]['ny'])
         ngeom = int(mre_data[0]['ngeom'])
         nconv = int(ny / ngeom)
-        savepng, savepdf = True, False
         
         # Set up figure
         latitude = float(mre_data[0]['latitude'])
@@ -319,7 +229,7 @@ class PlotNemesis:
                 ax.plot(emission_angles[0], measured_radiance[0][iconv, :], color='black', lw=1.5, label='Observed')
                 for itest in range(ntests):
                     col = cmap(itest / ntests)
-                    ax.plot(emission_angles[itest], retrieved_radiance[itest][iconv, :], color=col, lw=1.5, label='Retrieved')
+                    ax.plot(emission_angles[itest], retrieved_radiance[itest][iconv, :], color=col, lw=1.5, label=f"Test {itest}")
                 values = [(meas[iconv, :], retr[iconv, :]) for (meas, retr) in zip(measured_radiance, retrieved_radiance)]
                 ymin, ymax = 0.95*np.min([np.min(v) for v in values]), 1.05*np.max([np.max(v) for v in values])
                 ylabel = "R"
@@ -427,15 +337,15 @@ class PlotNemesis:
         #         "bins_fixedwidth_70_75_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/"
         #         ]
 
-        experiment = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_7_meridian_vs_limb/"
-        tests = [
-                "merid_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
-                "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/"
-                ]
-        
-        # experiment = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_5_full_ctl_parametric_gas_retrieval/"
+        # experiment = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_7_meridian_vs_limb/"
         # tests = [
-        #         "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_11s_27s_26s/",
+        #         "merid_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/",
+        #         "limb_flat5_jupiter2021_nh3cloud_0_1p_27s_26s/"
+        #         ]
+        
+        experiment = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_5_full_ctl_parametric_gas_retrieval/"
+        tests = [
+                "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_11s_27s_26s/"]#,
         #         "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_11pt_27p_26p/",
         #         "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_11pt_27p_26s/",
         #         "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_11pt_27s_26p/",
@@ -448,8 +358,11 @@ class PlotNemesis:
         return experiment, tests
 
     @classmethod
-    def plot_multiple_mre(cls) -> None:
-        """Plots the measured and retrieved spectra from a single test in a given experiment."""
+    def plot_results_global(cls) -> None:
+        """Reads and plots the contents of NEMESIS output files for a global retrieval
+        mre: contains the measured and retrieved spectra, and retrieved profiles
+        spx: contains the measured spectrum (useful for reconstructing geometries)
+        """
 
         # Get filepaths of retrieval outputs
         experiment, tests = cls.get_retrievals()
@@ -479,62 +392,44 @@ class PlotNemesis:
                 if not core:
                     pass
                 else:
-                    # Read .mre file
+                    # Read NEMESIS outputs
                     mre_data.append(nem.read_mre(f"{core}/nemesis.mre"))
-
-                    # # Read .spx file
-                    # spx_data.append(nem.read_spx(f"{core}/nemesis.spx"))
+                    spx_data.append(nem.read_spx(f"{core}/nemesis.spx"))
 
             # Plot results
             if not mre_data:
                 pass
             else:
+                pass
                 # cls.plot_spectrum(spectra_dir, mre_data, spx_data)
-                # cls.plot_superposed_ctl_spectrum(spectra_dir, mre_data, spx_data)
+                # cls.plot_ctl_spectrum(spectra_dir, mre_data, spx_data)
                 # cls.plot_temperature(temperature_dir, mre_data, spx_data)
 
-                # Create final plots for figure
-                FinalPlot.plot_spectrum_meridian_vs_limb(f"{spectra_dir}_final", mre_data)
-                FinalPlot.plot_temperatures_meridian_vs_limb(f"{temperature_dir}_final", mre_data)
+                # # Create final plots for figure
+                # FinalPlot.plot_spectrum_meridian_vs_limb(f"{spectra_dir}_final", mre_data)
+                # FinalPlot.plot_temperatures_meridian_vs_limb(f"{temperature_dir}_final", mre_data)
         return
     
     @classmethod
-    def plot_superposed_results(cls) -> None:
-        """Plots the measured and retrieved spectra from multiple tests in a given experiment
-        on the same axes for comparison."""
+    def plot_contribution_function(cls) -> None:
+        """Reads and plots the contents of NEMESIS output files
+        mre: contains the measured and retrieved spectra, and retrieved profiles
+        spx: contains the measured spectrum (useful for reconstructing geometries)
+        """
 
         # Get filepaths of retrieval outputs
         experiment, tests = cls.get_retrievals()
 
         # Get subdirectory, if it does not exist, create it - format argument as you like
-        spectra_dir = cls.make_new_dir(f"{experiment}spectra_experiment/")
-        temperature_dir = cls.make_new_dir(f"{experiment}temperature_experiment/")
+        kk_dir = cls.make_new_dir(f"{experiment}contribution_function/")
 
-        # Loop over each core
-        core_numbers = np.arange(1, 147, 1)
-        for core_number in core_numbers:
-            # Find this core in multiple tests within this experiment
-            mre_data, spx_data = [], []
-            for test in tests:
-                
-                # Point to individual retrieval outputs
-                core = glob.glob(f"{experiment}{test}core_{core_number}").pop()
-                    
-                # Read .mre file
-                mre_data.append(nem.read_mre(f"{core}/nemesis.mre"))
+        # Read contribution function (K-matrix) from covariance file
+        kk = nem.read_kk(f"{experiment}{tests.pop()}core_1/nemesis.cov")
 
-                # Read .spx file
-                spx_data.append(nem.read_spx(f"{core}/nemesis.spx"))
-                
-            if mre_data[0]['ngeom'] == 1:
-                # cls.plot_single_spectrum(dir, mre_data, spx_data)
-                pass
-            else:
-                cls.plot_superposed_ctl_spectrum(spectra_dir, mre_data, spx_data)
-            # elif mode =='temperature':
-                cls.plot_temperature(temperature_dir, mre_data)
-        return
-    
+        # Plot contribution function
+        FinalPlot.plot_contribution_function(f"{kk_dir}_final", kk)
+        exit()
+
 class FinalPlot:
 
     def __init__():
@@ -678,3 +573,8 @@ class FinalPlot:
         plt.savefig(figname, dpi=300, bbox_inches='tight')
         plt.close()
         return
+    
+    @classmethod
+    def plot_contribution_function(cls, dir: str, kk: dict) -> None:
+
+        pass

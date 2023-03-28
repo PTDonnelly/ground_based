@@ -189,7 +189,12 @@ class ReadNemesisOutputs:
             nconv, nav, angles, spectrum = cls.get_spx_block(lines, ngeom)
 
         return dict_of(nconv, ngeom, angles)
-   
+    
+    @classmethod
+    def read_kk(cls, filepath: str) -> dict:
+
+        return
+
     @classmethod
     def check_core(cls, filepaths: List[str], latitude: float) -> Tuple[bool, str]:
         
@@ -200,13 +205,9 @@ class ReadNemesisOutputs:
             check.append(mre["latitude"])
         
         # Return a tuple containing the location of the match
-        find = np.where(check == latitude)
-        
-        ### FIX THIS, we are losing the equator because it thinks zero index is None
-        print(find[0])
-        if not find[0][0]:
+        find = check == latitude
+        found = [filepath for i, filepath in enumerate(filepaths) if find[i] == True]
+        if not found:
             return False
         else:
-            # print(find, find[0], find[0][0])
-            index = find[0][0]
-            return filepaths[index]
+            return found.pop()
