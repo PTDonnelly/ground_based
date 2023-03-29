@@ -345,8 +345,8 @@ class PlotNemesis:
         
         experiment = "/Users/ptdonnelly/Documents/Research/projects/nemesis_centre_to_limb/retrievals/experiment_5_full_ctl_parametric_gas_retrieval/"
         tests = [
-                "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_11s_27s_26s/"]#,
-        #         "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_11pt_27p_26p/",
+                # "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_11s_27s_26s/"]#,
+                "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_11pt_27p_26p/"]#,
         #         "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_11pt_27p_26s/",
         #         "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_11pt_27s_26p/",
         #         "bins_maxmu_0_75_flat5_jupiter2021_nh3cloud_0_1p_11pt_27s_26s/",
@@ -422,13 +422,20 @@ class PlotNemesis:
 
         # Get subdirectory, if it does not exist, create it - format argument as you like
         kk_dir = cls.make_new_dir(f"{experiment}contribution_function/")
+        
+        # Create an empty list to store each test
+        mre_data, kk_data = [], []
 
-        # Read contribution function (K-matrix) from covariance file
-        kk = nem.read_kk(f"{experiment}{tests.pop()}core_1/nemesis.cov")
+        # Loop over each test within the experiment
+        for test in tests:
+            
+            # Read NEMESIS outputs
+            mre_data.append(nem.read_mre(f"{experiment}{test}core_1/nemesis.mre"))
+            kk_data.append(nem.read_kk(f"{experiment}{test}core_1/nemesis.cov"))
 
         # Plot contribution function
-        FinalPlot.plot_contribution_function(f"{kk_dir}_final", kk)
-        exit()
+        # FinalPlot.plot_1d_contribution_function(f"{kk_dir}", mre_data, kk_data)
+        FinalPlot.plot_2d_contribution_function(f"{kk_dir}", mre_data, kk_data)
 
 class FinalPlot:
 
@@ -475,19 +482,19 @@ class FinalPlot:
                     ax.plot(wavenumber[itest], retrieved_radiance[itest], color=test_colors[itest], label=test_labels[itest])
                 ylabel = "Radiance (nw ...)"
                 ax.legend(loc='upper right')
-            if (i == 1):
+            elif (i == 1):
                 # Plot residual radiance
                 for itest in range(ntests):
                     ax.fill_between(wavenumber[itest], [-1 * err for err in measurement_error[itest]], measurement_error[itest], color=test_colors[itest], alpha=0.25)
                     ax.plot(wavenumber[itest], retrieved_radiance[itest]-measured_radiance[itest], color=test_colors[itest])
                 ylabel = r"$\Delta$ Radiance (nw ...)"
-            if (i == 2):
+            elif (i == 2):
                 # Plot brightness temperature
                 for itest in range(ntests):
                     ax.plot(wavenumber[itest], measured_TB[itest], color=test_colors[itest], lw=0, marker='.', markersize='4')
                     ax.plot(wavenumber[itest], retrieved_TB[itest], color=test_colors[itest])
                 ylabel = r"T$_{B}$ (K)"
-            if (i == 3):
+            elif (i == 3):
                 # Plot residual brightness temperature
                 for itest in range(ntests):
                     ax.plot(wavenumber[itest], retrieved_TB[itest]-measured_TB[itest], color=test_colors[itest])
@@ -575,6 +582,112 @@ class FinalPlot:
         return
     
     @classmethod
-    def plot_contribution_function(cls, dir: str, kk: dict) -> None:
+    def plot_1d_contribution_function(cls, dir: str, mre_data: dict, kk_data: dict) -> None:
+        
+        # Define common plotting parameters
+        fontsize = 9
+        linewidth = 1
+        npro, ny = kk_data[0]['npro'], kk_data[0]['ny']
+        pressure = np.arange(npro)
 
-        pass
+        # Read outputs
+        weighting_function = [[[float(value) for value in values] for values in zip(*kk['kk'])] for kk in kk_data]
+        wavenumber = [[[float(value) for value in values[1]] for values in mre['spectrum']] for mre in mre_data]
+        labels = wavenumber[0].pop()
+        
+        # Set up figure
+        latitude = float(0.5) # mre_data[0]['latitude'])
+        figname = f"{dir}{latitude}.png"
+        _, axes = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(4, 4), dpi=300)
+        cmap = plt.get_cmap('turbo')
+        plt.suptitle(f"Contribution Weighting Functions at the Equator", fontsize=fontsize)
+        titles = ['Meridian', 'Limb']
+
+        # Loop over each axis object
+        for i, ax in enumerate(np.transpose(axes.flat)):      
+            xmin, xmax = 0, 1
+            ymin, ymax = 0, 120
+            xlabel = r"Normalised $\frac{dR}{dx}$"
+            ylabel = "Pressure (atm)"
+
+            for iy in range(ny):
+                if (i == 0):
+                    data = weighting_function[i][iy][:npro]
+                    normalised_data  = [value / max(data) for value in data]
+                elif (i == 1):
+                    data = weighting_function[i][ny-iy-1][:npro]
+                    normalised_data  = [value / max(data) for value in data]
+                ax.plot(normalised_data, pressure, color=cmap(iy / ny), label=int(labels[iy]))
+            
+            ax.grid(axis='both', markevery=1, color='k', ls=':', lw=0.5)
+            ax.set_title(titles[i], fontsize=fontsize, pad=2)
+            ax.set_xlim((xmin, xmax))
+            ax.set_ylim((ymin, ymax))
+            ax.set_xlabel(xlabel, fontsize=fontsize-1, labelpad=2)
+            if (i == 0):
+                ax.set_ylabel(ylabel, fontsize=fontsize-1, labelpad=2)
+            elif (i == 1):
+                ax.legend(loc='upper right', fontsize=fontsize-2)
+            ax.tick_params(axis='both', length=1, pad=1, labelsize=fontsize-1)
+        
+        # Finish and close plot
+        plt.subplots_adjust(hspace=0.1, wspace=0.2)  
+        plt.savefig(figname, dpi=300, bbox_inches='tight')
+        plt.close()
+        return
+    
+    @classmethod
+    def plot_2d_contribution_function(cls, dir: str, mre_data: dict, kk_data: dict) -> None:
+
+        # Define common plotting parameters
+        fontsize = 9
+        linewidth = 1
+        npro, ny = kk_data[0]['npro'], kk_data[0]['ny']
+        pressure = np.arange(npro)
+
+        # Read outputs
+        kk = np.asarray([[[float(value) for value in values] for values in zip(*kk['kk'])] for kk in kk_data].pop(), dtype=float)
+        # tmp = [k for k in zip(*kk)]
+
+        # exit()
+
+        wavenumber = [[[float(value) for value in values[1]] for values in mre['spectrum']] for mre in mre_data]
+        titles = wavenumber[0].pop()
+
+         # Set up figure
+        latitude = float(0.5) # mre_data[0]['latitude'])
+        figname = f"{dir}{latitude}.png"
+        _, axes = plt.subplots(nrows=2, ncols=4, sharex=True, sharey=True, figsize=(6, 4), dpi=300)
+        cmap = plt.get_cmap('turbo')
+        plt.suptitle(f"Contribution Weighting Functions at the Equator", fontsize=fontsize)
+
+        # Loop over each axis object
+        for i, ax in enumerate(np.transpose(axes.flat)):      
+            xmin, xmax = 0, 1
+            ymin, ymax = 0, 120
+            xlabel = r"Normalised $\frac{dR}{dx}$"
+            ylabel = "Pressure (atm)"
+
+            geom = int(i + ((ny / 8) * (i + 1)))
+            data = kk[:geom, :npro]
+            normalised_data  = data#value / max(data) for value in data]
+            ax.imshow(normalised_data, cmap='cividis')
+
+
+
+            # ax.grid(axis='both', markevery=1, color='k', ls=':', lw=0.5)
+            # ax.set_title(titles[i], fontsize=fontsize, pad=2)
+            # ax.set_xlim((xmin, xmax))
+            # ax.set_ylim((ymin, ymax))
+            # ax.set_xlabel(xlabel, fontsize=fontsize-1, labelpad=2)
+            # # if (i == 0):
+            # #     ax.set_ylabel(ylabel, fontsize=fontsize-1, labelpad=2)
+            # # elif (i == 1):
+            # #     ax.legend(loc='upper right', fontsize=fontsize-2)
+            # ax.tick_params(axis='both', length=1, pad=1, labelsize=fontsize-1)
+        
+        # Finish and close plot
+        plt.subplots_adjust(hspace=0.2, wspace=0.2)  
+        plt.savefig(figname, dpi=300, bbox_inches='tight')
+        plt.close()
+        return
