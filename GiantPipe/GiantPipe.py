@@ -245,8 +245,9 @@ def main():
     if retrieval:
         from Plot.PlotNemesis import PlotNemesis as pn
         
-        # pn.plot_results_global()
-        pn.plot_contribution_function()
+        pn.plot_results_global()
+        # pn.plot_results()
+        # pn.plot_contribution_function()
 
 
         # from Plot.PlotRetrievalOutputs import PlotChiSquareOverNy, PlotChiSquareOverNySuperpose, PlotRetrievedTemperatureProfileSuperpose

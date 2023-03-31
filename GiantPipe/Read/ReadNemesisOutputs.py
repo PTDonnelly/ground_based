@@ -238,6 +238,24 @@ class ReadNemesisOutputs:
 
         return gas_name
     
+    @staticmethod
+    def read_xsc(filepath: str) -> dict:
+        
+
+        with open(filepath) as f:
+            lines = f.readlines()
+            wavenumber, cross_section, single_scattering_albedo = [], [], []
+            for iline, line in enumerate(lines):
+                if (iline == 0):
+                    pass
+                elif (iline % 2 == 1):
+                    split = line.split()
+                    wavenumber.append(split[0])
+                    cross_section.append(split[1])
+                elif (iline % 2 == 0):
+                    single_scattering_albedo.append(line)
+        return dict_of(wavenumber, cross_section, single_scattering_albedo)
+    
     @classmethod
     def read_mre(cls, filepath: str) -> dict:
 
@@ -320,3 +338,4 @@ class ReadNemesisOutputs:
             return False
         else:
             return found.pop()
+    
