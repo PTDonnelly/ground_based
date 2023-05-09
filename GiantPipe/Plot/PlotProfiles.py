@@ -104,7 +104,7 @@ def PlotMeridProfiles(dataset, mode, files, singles, spectrals):
     # if spectrals[0, ifilt_v, 1] >=0 and spectrals[-1, ifilt_v, 1]>=0:
     #     plt.xlim(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1]) 
     #     plt.xticks(ticks=np.arange(360,-1,-60), labels=list(np.arange(360,-1,-60)))
-    plt.ylabel("Radiance (nW cm$^{-1}$ sr$^{-1}$)", size=18)
+    plt.ylabel("Radiance (nW cm$^{-2}$ sr$^{-1}$ [cm$^{-1}$]$^{-1}$)", size=18)
     # Save figure showing calibation method 
     plt.savefig(f"{dir}all_filters_calibration_merid_profiles.png", dpi=150, bbox_inches='tight')
     #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
@@ -139,7 +139,7 @@ def PlotParaProfiles(dataset, mode, files, singles, spectrals):
         if spectrals[0, ifilt_v, 1] >=0 and spectrals[-1, ifilt_v, 1]>=0:
             plt.xlim(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1]) 
             plt.xticks(ticks=np.arange(360,-1,-30), labels=list(np.arange(360,-1,-30)))
-        plt.ylabel("Radiance (nW cm$^{-1}$ sr$^{-1}$)", size=15)
+        plt.ylabel("Radiance (nW cm$^{-2}$ sr$^{-1}$ [cm$^{-1}$]$^{-1}$)", size=15)
         # Save figure showing calibation method 
         plt.savefig(f"{dir}{wave}_parallel_profiles.png", dpi=150, bbox_inches='tight')
         #plt.savefig(f"{dir}{wave}_parallel_profiles.eps", dpi=900)
@@ -178,7 +178,7 @@ def PlotParaProfiles(dataset, mode, files, singles, spectrals):
     # if spectrals[0, ifilt_v, 1] >=0 and spectrals[-1, ifilt_v, 1]>=0:
     #     plt.xlim(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1]) 
     #     plt.xticks(ticks=np.arange(360,-1,-60), labels=list(np.arange(360,-1,-60)))
-    plt.ylabel("Radiance (nW cm$^{-1}$ sr$^{-1}$)", size=18)
+    plt.ylabel("Radiance (nW cm$^{-2}$ sr$^{-1}$ [cm$^{-1}$]$^{-1}$)", size=18)
     # Save figure showing calibation method 
     plt.savefig(f"{dir}all_filters_parallel_profiles.png", dpi=150, bbox_inches='tight')
     #plt.savefig(f"{dir}{wave}all_filters_parallel_profiles.eps", dpi=900)
@@ -316,7 +316,7 @@ def PlotRegionalMaps(dataset, mode, spectrals):
             cbar = fig.colorbar(im, ax=ax[irow[iax]][icol[iax]], extend='both', fraction=0.04, pad=0.05)#, orientation='horizontal')
             cbar.ax.tick_params(labelsize=12)
             cbar.ax.locator_params(nbins=6)
-            cbar.ax.set_title(r"[nW cm$^{-1}$ sr$^{-1}$]", size=12, pad=8)
+            cbar.ax.set_title(r"[nW cm$^{-2}$ sr$^{-1}$ [cm$^{-1}$]$^{-1}$]", size=12, pad=8)
             iax+=1 
     plt.axes([0.15, 0.1, 0.8, 0.8], frameon=False) 
     plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
@@ -372,7 +372,7 @@ def PlotRegionalAverage(dataset, mode, files, singles, spectrals):
     # if spectrals[0, ifilt_v, 1] >=0 and spectrals[-1, ifilt_v, 1]>=0:
     #     plt.xlim(spectrals[0, ifilt_v, 1], spectrals[-1, ifilt_v, 1]) 
     #     plt.xticks(ticks=np.arange(360,-1,-60), labels=list(np.arange(360,-1,-60)))
-    plt.ylabel("Radiance (nW cm$^{-1}$ sr$^{-1}$)", size=18)
+    plt.ylabel("Radiance (nW cm$^{-2}$ sr$^{-1}$ [cm$^{-1}$]$^{-1}$)", size=18)
     # Save figure showing calibation method 
     plt.savefig(f"{dir}all_filters_av_regional_profiles.png", dpi=150, bbox_inches='tight')
     #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)

@@ -1,11 +1,11 @@
-from ast import Global
-from cProfile import label
 import os
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec 
 from matplotlib import colors
 from matplotlib import ticker
+from matplotlib.ticker import FormatStrFormatter
 import cartopy.crs as ccrs
 import operator
 import datetime
@@ -56,7 +56,7 @@ def PlotMaps(dataset, files, spectrals):
     globalmaps = np.empty((Globals.nfilters, Globals.ny, Globals.nx))
 
     # Calling the correction method chosen for this dataset
-    if dataset == '2018May':
+    if dataset == '2018May' or dataset == '2018May_completed':
         cmaps, mumaps, wavenumber, adj_location = PolynomialAdjust(dir, files, spectrals)
         mumin = [0.02, 0.02, 0.1, 0.08, 0.01, 0.05, 0.02, 0.02, 0.02, 0.02, 0.01, 0.01, 0.01]
         Nfilters = Globals.nfilters
@@ -65,10 +65,10 @@ def PlotMaps(dataset, files, spectrals):
         mumin = np.empty(13)
         mumin.fill(0.01)
         Nfilters = 10
-    else:
-        cmaps, mumaps, wavenumber = MuNormalization(files)
-        mumin = [0.02, 0.05, 0.1, 0.08, 0.05, 0.05, 0.0, 0.0, 0.1, 0.08, 0.15, 0.05, 0.05]
-        Nfilters = 13 if dataset == '2018May_completed' else 10
+    # else:
+    #     cmaps, mumaps, wavenumber = MuNormalization(files)
+    #     mumin = [0.02, 0.05, 0.1, 0.08, 0.05, 0.05, 0.0, 0.0, 0.1, 0.08, 0.15, 0.05, 0.05]
+    #     Nfilters = 13 if dataset == '2018May_completed' else 10
 
     print('Mapping global maps...')
 
@@ -133,6 +133,150 @@ def PlotMaps(dataset, files, spectrals):
                     np.save(f"{dir}calib_{wavnb}_global_maps", globalmaps[ifilt, :, :])
                     # Write global maps to txtfiles
                     # np.savetxt(f"{dir}calib_{wavnb}_global_maps.txt", globalmaps[ifilt, :, :])
+
+
+def PlotMontageGlobalMaps(dataset):
+
+    """ Plotting Montage Global maps using stored global maps array """
+
+    print('Mapping Montage Global maps...')
+    # If subdirectory does not exist, create it
+    dir = f'../outputs/{dataset}/global_maps_figures/'
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    
+    # Define local inputs    
+    lat           = np.arange(-89.75,90,step=0.5)               # Latitude range from pole-to-pole
+    central_lon   = 0.                                          # Central longitude for polar projection
+    central_lat   = 90.                                         # Absolute central latitude value for polar projection 
+    lat_lim       = 10.                                         # Absolute latitude limit for polar projection 
+    dmeridian     = 30                                          # Meridian lines step, interger to please xlocs parameter in gridlines
+    dparallel     = 10                                          # Parallel lines step, interger to please ylocs in gridlines
+    num_merid     = int(360/dmeridian + 1)                      # Number of meridian lines
+    num_parra     = int((90-np.abs(lat_lim)) / dparallel + 1)   # Number of parallel lines per hemisphere
+    lon_to_write  = 45                                          # Array to set on which longitude will be written latitude labels
+    
+    globalmap     = np.empty((Globals.nfilters, Globals.ny, Globals.nx))
+    Nfilters = Globals.nfilters if dataset == '2018May' or '2018May_completed' else 11
+    
+    #  Subplot figure with both hemisphere
+    for ifilt in range(Nfilters):
+        if ifilt < 6 or ifilt > 7:
+            if dataset == '2018May':
+                # Retrive wavenumber corresponding to ifilt
+                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+                adj_location = 'average' if ifilt < 10 else 'southern'
+                globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{wavnb}_global_maps_{adj_location}_adj.npy')
+            elif dataset == '2018May_completed':
+                # Retrive wavenumber corresponding to ifilt
+                _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+                globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{wavnb}_global_maps_{adj_location}_adj.npy')
+            elif dataset == '2022July' or dataset == '2022August':
+                if ifilt == 4: 
+                    _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt+1)
+                elif ifilt > 5: 
+                    _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt+2)
+                else:
+                    _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+                globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{wavnb}_global_maps.npy')
+
+    fig, ax = plt.subplots(6, 2, figsize=(10, 16), sharex=True, sharey=True)
+    iax = 0
+    for ifilt in [0,10,11,12,5,4,6,7,8,9,3,2,1]:
+        if ifilt < 6 or ifilt > 7:
+            _, wavlg, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+                   
+            irow = [0,1,1,2,2,3,3,4,4,5,5]
+            icol = [0,0,1,0,1,0,1,0,1,0,1]
+            ititle = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)', '(i)', '(j)', '(k)']
+            
+            # Remove the frame of the empty subplot
+            ax[0][1].set_frame_on(False)
+            ax[0][1].tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+        
+
+            # Setting brightness temperature extremes to plot global map
+            max = np.nanmax(globalmap[ifilt, :, :]) 
+            min = np.nanmin(globalmap[ifilt, :, :]) 
+            # Plotting global map
+           
+            im = ax[irow[iax]][icol[iax]].imshow(globalmap[ifilt, :, :], origin='lower', vmin=min, vmax=max, cmap='inferno')
+            ax[irow[iax]][icol[iax]].set_xticks(np.arange(0, Globals.nx+1,  step = 120), list(np.arange(360,-1,-60)))
+            ax[irow[iax]][icol[iax]].set_yticks(np.arange(0, Globals.ny+1, step = 60), list(np.arange(-90,91,30)))
+            ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"              {wavlg}"+r" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=15)
+            ax[irow[iax]][icol[iax]].tick_params(labelsize=14)
+            cbar = fig.colorbar(im, ax=ax[irow[iax]][icol[iax]], extend='both', fraction=0.04, pad=0.05, format="%.0f")#, orientation='horizontal')
+            cbar.ax.tick_params(labelsize=12)
+            cbar.ax.locator_params(nbins=6)
+            cbar.ax.set_title(r" T$_{B}$ [K]", size=15, pad=10)
+            iax +=1
+    plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
+    plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+    plt.ylabel("Planetocentric Latitude", size=20)
+    plt.xlabel("System III West Longitude", size=20)
+    # Save south pole map figure of the current filter 
+    if dataset == '2018May':
+        plt.savefig(f"{dir}calib_all_global_maps.png", dpi=150, bbox_inches='tight')
+        # plt.savefig(f"{dir}calib_all_global_maps.eps", dpi=150, bbox_inches='tight')
+    else:
+        plt.savefig(f"{dir}calib_all_global_maps.png", dpi=150, bbox_inches='tight')
+        # plt.savefig(f"{dir}calib_all_global_maps.eps", dpi=150, bbox_inches='tight')
+        # Clear figure to avoid overlapping between plotting subroutines
+        plt.close()
+
+
+
+    mumin = [0.15, 0.15, 0.02, 0.25, 0.3, 0.2, 0.5, 0.5, 0.15, 0.3, 0.6, 0.5, 0.05]
+    plt.figure(figsize=(20,22))
+    G = gridspec.GridSpec(6, 6, wspace=0.7, hspace=0.7)
+    iax = 0
+    for ifilt in [0,10,11,12,5,4,6,7,8,9,3,2,1]:
+        if ifilt < 6 or ifilt > 7:
+            adj_location= 'average' if ifilt < 10 else 'southern'
+            # Get filter index for spectral profiles
+            _, wavl, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+            # Get polynome coefficient calculating for 2018May dataset 
+            
+            coeff = np.load(f'../outputs/2018May/global_maps_figures/calib_{wavnb}_polynomial_coefficients_{adj_location}.npy')
+            bandmu = np.load(f"../outputs/2018May/global_maps_figures/calib_{wavnb}_bandmu_{adj_location}.npy")
+            bandc = np.load(f"../outputs/2018May/global_maps_figures/calib_{wavnb}_bandc_{adj_location}.npy")
+            cdata = np.load(f"../outputs/2018May/global_maps_figures/calib_{wavnb}_cdata_{adj_location}.npy")
+                
+            # Calculate polynomial adjustement for each hemisphere (using mask selections)
+            p = np.poly1d(coeff)
+            # Define a linear space to show the polynomial adjustment variation over all emission angle range
+            t = np.linspace(mumin[ifilt], 1, 100)
+
+            irow = [0,1,1,2,2,3,3,4,4,5,5]
+            icol = [0,0,3,0,3,0,3,0,3,0,3]
+            ititle = ['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)', '(h)', '(i)', '(j)', '(k)']
+
+            # Plot figure showing limb correction using polynomial adjustment method
+            ax = plt.subplot(G[irow[iax],icol[iax]])
+            ax.plot(bandmu, bandc, lw=0, marker='.', markersize=0.5, color = 'black')
+            ax.plot(t, p(t), '-',color='red')
+            ax.set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m \n"+'Observed \n T$_B$ [K]', fontfamily='sans-serif', loc='left', fontsize=18)
+            ax.tick_params(labelsize=18)
+            
+            ax = plt.subplot(G[irow[iax],icol[iax]+1])
+            ax.plot(t, (p(1))/p(t), '-',color='red')
+            ax.set_title('Polynomial \n'+'Fucntion', fontfamily='sans-serif', loc='left', fontsize=18)
+            ax.tick_params(labelsize=18)
+
+            ax = plt.subplot(G[irow[iax],icol[iax]+2])
+            ax.plot(bandmu, cdata, lw=0, marker='.', markersize=0.5, color = 'black')
+            ax.set_title('Corrected \nT$_B$ [K]', fontfamily='sans-serif', loc='left', fontsize=18)
+            ax.tick_params(labelsize=18)
+            iax+=1
+    plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
+    plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+    plt.xlabel("Emission angle cosine", size=20)
+    # Save figure showing limb correction using polynomial adjustment method 
+    plt.savefig(f"{dir}calib_all_wavl_polynomial_adjustment.png", dpi=150, bbox_inches='tight')
+    # plt.savefig(f"{directory}calib_all_wavl_polynomial_adjustment.eps", dpi=150, bbox_inches='tight')   
+
+
+
 
 def PlotZoomMaps(dataset, central_lon, lat_target, lon_target, lat_window, lon_window):
     """ Mapping zoom maps for each VISIR filter """
@@ -250,7 +394,7 @@ def PlotMapsPerNight(dataset, files, spectrals):
     cmaps, mumaps, wavenumber = ApplyPolynom(dir, files, spectrals)
     # cmaps, mumaps, wavenumber = MuNormalization(files)
     mumin = np.empty(13)
-    mumin.fill(0.15)
+    mumin.fill(0.09)
 
     list_time = []
     list_ifile = []
@@ -258,24 +402,24 @@ def PlotMapsPerNight(dataset, files, spectrals):
         print(fpath)
         # retrieve date, hour of the cylmaps corresponding to 
         # the current file in an array to be sorted
-        hour = fpath.split('_20')
+        hour = fpath.split('_201')
         hour  = hour[-1].split('.')
         hour  = hour[0]
         hour = hour.replace('T', '')
         hour = hour.replace('-', '')
-        hour = hour.replace(':', '')
+        hour = hour.replace('_', '')
         # Append hour and ifile into lists
         list_time.append(hour)
         list_ifile.append(ifile)
     # Store in the tobs_ifile array
-    tobs_ifile[:, 0] = list_time
+    tobs_ifile[:, 0] = [float(x) for x in list_time]
     tobs_ifile[:, 1] = list_ifile
     # Sort the arrays in function of time 
     tobs_ifile = sorted(tobs_ifile, key=operator.itemgetter(1))
     tobs_ifile = np.asarray(tobs_ifile, dtype='float')
 
     # Set night limits 
-    night_limits = [0, 180524120000, 180525120000, 180526120000, 180527120000]
+    night_limits = [0, 80524120000, 80525120000, 80526120000, 80527120000]
                     
     for inight in range(len(night_limits)-1):
         for ifilt in range(Globals.nfilters):
@@ -531,4 +675,278 @@ def PlotSubplotMapsPerNight(dataset):
             plt.close()
             # Write global maps to np.array
             # np.save(f"{dir}calib_{wavnb}_zonalpert_maps_lon{lon_target}_lat{lat_target}_all_nights", zonalpert[ifilt, :, :])
-                                      
+
+def PlotSubplotMapsPerNightForJGRPaper(dataset):
+    """ In the case of a multiple consecutive night dataset, 
+        we could try to track the planetary-scale waves, for
+        that we need to explore the global dynamics for each 
+        night, therefore we need a global map per night."""
+
+    print('Plotting subplot of zoom maps per night in one figure...')
+
+    # If subdirectory does not exist, create it
+    dir = f'../outputs/{dataset}/global_maps_per_night_figures/'
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    
+    # Define local inputs    
+    lat = np.arange(-89.75,90,step=0.5) # Latitude range from pole-to-pole
+    lon = np.arange(360,0, -0.5)        # Longitude range in System III West
+    # Set extreme values for mapping
+    central_lon=180
+    lat_target=18
+    lon_target=310
+    lat_window=10
+    lon_window=50
+    
+    Nnight = 4
+    Nfilters = Globals.nfilters if dataset == '2018May' or '2018May_completed' else 11
+    zonalpert     = np.empty((Nnight, Globals.nfilters, Globals.ny, Globals.nx))
+    title = [r'2018 May 24$^{th}$', r'2018 May 24$^{th}$-25$^{th}$', r'2018 May 25$^{th}$-26$^{th}$', r'2018 May 26$^{th}$-27$^{th}$']
+    #  Subplot figure with both hemisphere
+    for ifilt in range(Nfilters):
+        if ifilt < 6 or ifilt > 7:
+            if dataset == '2018May_completed':
+                # Retrive wavenumber corresponding to ifilt
+                for inight in range(Nnight):
+                    _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+                    zonalpert[inight, ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_per_night_figures/calib_{wavnb}_zonalpert_maps_lon310_lat18_night_{inight}.npy')
+                    
+    
+   
+    fig = plt.figure(figsize=(16,7))
+    projection = ccrs.PlateCarree(central_longitude=central_lon)
+    for inight in range(Nnight):
+        
+        # Set the limit of the zoom maps
+        if central_lon > lon_target:
+            lonmax = np.asarray(np.where((lon == lon_target+lon_window+central_lon)))
+            lonmin = np.asarray(np.where((lon == lon_target-lon_window+central_lon)))
+        else:
+            lonmax = np.asarray(np.where((lon == lon_target+lon_window)))
+            lonmin = np.asarray(np.where((lon == lon_target-lon_window)))
+        latmax = np.asarray(np.where((lat == lat_target+lat_window+0.25)))
+        latmin = np.asarray(np.where((lat == lat_target-lat_window+0.25)))
+
+        #8.59mu
+        ax = plt.subplot2grid((4,3), (inight,0),  projection = projection)
+        # Set extreme values of the zoom maps
+        max = np.nanmax(zonalpert[inight, 1, int(latmin):int(latmax), int(lonmax):int(lonmin)]) 
+        min = np.nanmin(zonalpert[inight, 1, int(latmin):int(latmax), int(lonmax):int(lonmin)])
+        norm = colors.TwoSlopeNorm(vmin=-8, vmax=6, vcenter=0)
+        # Mapping zoom area
+        im = ax.imshow(zonalpert[inight, 1, :, :], \
+                        transform=ccrs.PlateCarree(central_longitude=central_lon), \
+                        origin='lower', extent=[0, 360, -90, 90], norm=norm, \
+                        regrid_shape=1000, cmap='seismic')
+        ax.set_extent([lon_target-lon_window, lon_target+lon_window, lat_target-lat_window, lat_target+lat_window], \
+                        crs = ccrs.PlateCarree())
+        ax.set_title(title[inight], size=20)
+        ax.tick_params(labelsize=20)
+        if central_lon > lon_target:
+            if inight < 3:
+                plt.xticks(np.arange(lon_target-lon_window-central_lon, lon_target+lon_window+1-central_lon,  step = lon_window/2),\
+                            [])
+                # plt.xlim(360-lon_target-lon_window, 360-lon_target+lon_window)
+            else:
+                plt.xticks(np.arange(lon_target-lon_window-central_lon, lon_target+lon_window+1-central_lon,  step = lon_window/2),\
+                            list([int(x) for x in np.arange(central_lon-lon_target+lon_window,central_lon-lon_target-lon_window-1,-lon_window/2)]))
+                # ax.xlim(180-lon_target-lon_window, 180-lon_target+lon_window)
+        else:
+            if inight < 3:
+                plt.xticks(np.arange(360-lon_target-lon_window, 360-lon_target+lon_window+1,  step = lon_window/2),
+                            [])
+                plt.xlim(360-lon_target-lon_window, 360-lon_target+lon_window)
+            else: 
+                plt.xticks(np.arange(360-lon_target-lon_window, 360-lon_target+lon_window+1,  step = lon_window/2),\
+                            list([int(x) for x in np.arange(lon_target+lon_window,lon_target-lon_window-1,-lon_window/2)]))
+                plt.xlim(360-lon_target-lon_window, 360-lon_target+lon_window)
+        plt.yticks(np.arange(lat_target-lat_window, lat_target+lat_window+1, step = 10))
+        _, wavl, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=1)
+        plt.figtext(0.1,0.91,f"(a)  {wavl} "+r"$\mu$m", size=20)
+
+        #10.77mu
+        ax = plt.subplot2grid((4,3), (inight,1),  projection = projection)
+        # Set extreme values of the zoom maps
+        max = np.nanmax(zonalpert[inight, 5, int(latmin):int(latmax), int(lonmax):int(lonmin)]) 
+        min = np.nanmin(zonalpert[inight, 5, int(latmin):int(latmax), int(lonmax):int(lonmin)])
+        norm = colors.TwoSlopeNorm(vmin=-8, vmax=6, vcenter=0)
+        # Mapping zoom area
+        im = ax.imshow(zonalpert[inight, 5, :, :], \
+                        transform=ccrs.PlateCarree(central_longitude=central_lon), \
+                        origin='lower', extent=[0, 360, -90, 90], norm=norm, \
+                        regrid_shape=1000, cmap='seismic')
+        ax.set_extent([lon_target-lon_window, lon_target+lon_window, lat_target-lat_window, lat_target+lat_window], \
+                        crs = ccrs.PlateCarree())
+        ax.set_title(title[inight], size=20)
+        ax.tick_params(labelsize=20)
+        if central_lon > lon_target:
+            if inight < 3:
+                plt.xticks(np.arange(lon_target-lon_window-central_lon, lon_target+lon_window+1-central_lon,  step = lon_window/2),\
+                            [])
+                # plt.xlim(360-lon_target-lon_window, 360-lon_target+lon_window)
+            else:
+                plt.xticks(np.arange(lon_target-lon_window-central_lon, lon_target+lon_window+1-central_lon,  step = lon_window/2),\
+                            list([int(x) for x in np.arange(central_lon-lon_target+lon_window,central_lon-lon_target-lon_window-1,-lon_window/2)]))
+                # ax.xlim(180-lon_target-lon_window, 180-lon_target+lon_window)
+        else:
+            if inight < 3:
+                plt.xticks(np.arange(360-lon_target-lon_window, 360-lon_target+lon_window+1,  step = lon_window/2),
+                            [])
+                plt.xlim(360-lon_target-lon_window, 360-lon_target+lon_window)
+            else: 
+                plt.xticks(np.arange(360-lon_target-lon_window, 360-lon_target+lon_window+1,  step = lon_window/2),\
+                            list([int(x) for x in np.arange(lon_target+lon_window,lon_target-lon_window-1,-lon_window/2)]))
+                plt.xlim(360-lon_target-lon_window, 360-lon_target+lon_window)
+        #plt.yticks(np.arange(lat_target-lat_window, lat_target+lat_window+1, step = 5))
+        _, wavl, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=5)
+        plt.figtext(0.37,0.91,f"(b)  {wavl} "+r"$\mu$m", size=20)
+
+        #7.9mu
+        ax2 = plt.subplot2grid((4,3), (inight,2),  projection = projection)
+        # Set extreme values of the zoom maps
+        max = np.nanmax(zonalpert[inight, 0, int(latmin):int(latmax), int(lonmax):int(lonmin)]) 
+        min = np.nanmin(zonalpert[inight, 0, int(latmin):int(latmax), int(lonmax):int(lonmin)])
+        norm = colors.TwoSlopeNorm(vmin=-8, vmax=6, vcenter=0)
+        # Mapping zoom area
+        im = ax2.imshow(zonalpert[inight, 0, :, :], \
+                        transform=ccrs.PlateCarree(central_longitude=central_lon), \
+                        origin='lower', extent=[0, 360, -90, 90], norm=norm, \
+                        regrid_shape=1000, cmap='seismic')
+        ax2.set_extent([lon_target-lon_window, lon_target+lon_window, lat_target-lat_window, lat_target+lat_window], \
+                        crs = ccrs.PlateCarree())
+        ax2.set_title(title[inight], size=20)
+        ax2.tick_params(labelsize=20)
+
+
+        if central_lon > lon_target:
+            if inight < 3:
+                plt.xticks(np.arange(lon_target-lon_window-central_lon, lon_target+lon_window+1-central_lon,  step = lon_window/2),\
+                            [])
+                # plt.xlim(360-lon_target-lon_window, 360-lon_target+lon_window)
+            else:
+                plt.xticks(np.arange(lon_target-lon_window-central_lon, lon_target+lon_window+1-central_lon,  step = lon_window/2),\
+                            list([int(x) for x in np.arange(central_lon-lon_target+lon_window,central_lon-lon_target-lon_window-1,-lon_window/2)]))
+                # ax.xlim(180-lon_target-lon_window, 180-lon_target+lon_window)
+        else:
+            if inight < 3:
+                plt.xticks(np.arange(360-lon_target-lon_window, 360-lon_target+lon_window+1,  step = lon_window/2),
+                            [])
+                plt.xlim(360-lon_target-lon_window, 360-lon_target+lon_window)
+            else: 
+                plt.xticks(np.arange(360-lon_target-lon_window, 360-lon_target+lon_window+1,  step = lon_window/2),\
+                            list([int(x) for x in np.arange(lon_target+lon_window,lon_target-lon_window-1,-lon_window/2)]))
+                plt.xlim(360-lon_target-lon_window, 360-lon_target+lon_window)
+        # plt.yticks(np.arange(lat_target-lat_window, lat_target+lat_window+1, step = 5))
+        _, wavl, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=0)
+        plt.figtext(0.65,0.91,f"(c)  {wavl} "+r"$\mu$m", size=20)
+        
+    plt.axes([0.115, 0.1, 0.8, 0.8], frameon=False) 
+    plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+    plt.xlabel('System III West Longitude', size=20)
+    plt.ylabel('Planetocentric Latitude', size=20)
+    cax = plt.axes([0.92, 0.2, 0.02, 0.6])
+    cbar = plt.colorbar(im, cax=cax, format="%.0f", extend='both', fraction=0.015, pad=0.05)
+    cbar.ax.tick_params(labelsize=20)
+    cbar.locator = ticker.MaxNLocator(nbins=10)
+    cbar.update_ticks()
+    cbar.ax.set_title(r" T$_{B}^{'}$ [K]", size=20, pad=30)
+    
+    plt.savefig(f"{dir}calib_zonalpert_maps_lon{lon_target}_lat{lat_target}_all_nights.png", dpi=150, bbox_inches='tight')
+    # plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_all_nights.eps", dpi=150, bbox_inches='tight')
+    # Clear figure to avoid overlapping between plotting subroutines
+    plt.close()
+    # Write global maps to np.array
+    # np.save(f"{dir}calib_{wavnb}_zonalpert_maps_lon{lon_target}_lat{lat_target}_all_nights", zonalpert[ifilt, :, :])
+
+
+    # For the baroclinic warm anomalies at 55N-70W
+    # Set extreme values for mapping
+    central_lon=180
+    lat_target=45
+    lon_target=100
+    lat_window=20
+    lon_window=50
+    
+    Nnight = 4
+    Nfilters = Globals.nfilters if dataset == '2018May' or '2018May_completed' else 11
+    zonalpert     = np.empty((Nnight, Globals.nfilters, Globals.ny, Globals.nx))
+    title = [r'2018 May 24$^{th}$', r'2018 May 24$^{th}$-25$^{th}$', r'2018 May 25$^{th}$-26$^{th}$', r'2018 May 26$^{th}$-27$^{th}$']
+    #  Subplot figure with both hemisphere
+    for ifilt in range(Nfilters):
+        if ifilt < 6 or ifilt > 7:
+            if dataset == '2018May_completed':
+                # Retrive wavenumber corresponding to ifilt
+                for inight in range(Nnight):
+                    _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
+                    zonalpert[inight, ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_per_night_figures/calib_{wavnb}_zonalpert_maps_night_{inight}.npy')
+                    
+    
+   
+    fig = plt.figure(figsize=(6, 8))
+    projection = ccrs.PlateCarree(central_longitude=central_lon)
+    for inight in range(3):
+        
+        # Set the limit of the zoom maps
+        if central_lon > lon_target:
+            lonmax = np.asarray(np.where((lon == lon_target+lon_window+central_lon)))
+            lonmin = np.asarray(np.where((lon == lon_target-lon_window+central_lon)))
+        else:
+            lonmax = np.asarray(np.where((lon == lon_target+lon_window)))
+            lonmin = np.asarray(np.where((lon == lon_target-lon_window)))
+        latmax = np.asarray(np.where((lat == lat_target+lat_window+0.25)))
+        latmin = np.asarray(np.where((lat == lat_target-lat_window+0.25)))
+
+        #8.59mu
+        ax = plt.subplot2grid((3,1), (inight,0),  projection = projection)
+        # Set extreme values of the zoom maps
+        max = np.nanmax(zonalpert[inight, 0, int(latmin):int(latmax), int(lonmax):int(lonmin)]) 
+        min = np.nanmin(zonalpert[inight, 0, int(latmin):int(latmax), int(lonmax):int(lonmin)])
+        norm = colors.TwoSlopeNorm(vmin=-8, vmax=6, vcenter=0)
+        # Mapping zoom area
+        im = ax.imshow(zonalpert[inight, 0, :, :], \
+                        transform=ccrs.PlateCarree(central_longitude=central_lon), \
+                        origin='lower', extent=[0, 360, -90, 90], norm=norm, \
+                        regrid_shape=1000, cmap='seismic')
+        ax.set_extent([lon_target-lon_window, lon_target+lon_window, lat_target-lat_window, lat_target+lat_window], \
+                        crs = ccrs.PlateCarree())
+        ax.set_title(title[inight], size=20)
+        ax.tick_params(labelsize=20)
+        if central_lon > lon_target:
+            if inight < 2:
+                plt.xticks(np.arange(lon_target-lon_window-central_lon, lon_target+lon_window+1-central_lon,  step = lon_window/2),\
+                            [])
+                # plt.xlim(360-lon_target-lon_window, 360-lon_target+lon_window)
+            else:
+                plt.xticks(np.arange(lon_target-lon_window-central_lon, lon_target+lon_window+1-central_lon,  step = lon_window/2),\
+                            list([int(x) for x in np.arange(central_lon-lon_target+lon_window,central_lon-lon_target-lon_window-1,-lon_window/2)]))
+                # ax.xlim(180-lon_target-lon_window, 180-lon_target+lon_window)
+        else:
+            if inight < 2:
+                plt.xticks(np.arange(360-lon_target-lon_window, 360-lon_target+lon_window+1,  step = lon_window/2),
+                            [])
+                plt.xlim(360-lon_target-lon_window, 360-lon_target+lon_window)
+            else: 
+                plt.xticks(np.arange(360-lon_target-lon_window, 360-lon_target+lon_window+1,  step = lon_window/2),\
+                            list([int(x) for x in np.arange(lon_target+lon_window,lon_target-lon_window-1,-lon_window/2)]))
+                plt.xlim(360-lon_target-lon_window, 360-lon_target+lon_window)
+        plt.yticks(np.arange(lat_target-lat_window, lat_target+lat_window+1, step = 10))
+
+    plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
+    plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+    plt.xlabel('System III West Longitude', size=20)
+    plt.ylabel('Planetocentric Latitude', size=20)
+    cax = plt.axes([0.95, 0.2, 0.06, 0.6])
+    cbar = plt.colorbar(im, cax=cax, format="%.0f", extend='both', fraction=0.015, pad=0.15)
+    cbar.ax.tick_params(labelsize=20)
+    cbar.locator = ticker.MaxNLocator(nbins=10)
+    cbar.update_ticks()
+    cbar.ax.set_title(r" T$_{B}^{'}$ [K]", size=20, pad=30)
+    
+    _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=0)
+    plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_lon{lon_target}_lat{lat_target}_all_nights.png", dpi=150, bbox_inches='tight')
+    # plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_all_nights.eps", dpi=150, bbox_inches='tight')
+    # Clear figure to avoid overlapping between plotting subroutines
+    plt.close()
+    # Write global maps to np.array
+    # np.save(f"{dir}calib_{wavnb}_zonalpert_maps_lon{lon_target}_lat{lat_target}_all_nights", zonalpert[ifilt, :, :])
