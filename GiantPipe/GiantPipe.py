@@ -49,7 +49,7 @@ def main():
     save        = True      # Store calculated profiles to local files
     plotting    = True      # Plot calculated profiles
     mapping     = True      # Plot maps of observations or retrieval
-    spx         = False      # Write spxfiles as spectral input for NEMESIS
+    spx         = True      # Write spxfiles as spectral input for NEMESIS
     retrieval   = False      # Plot NEMESIS outputs 
 
     ############################################################
@@ -62,7 +62,7 @@ def main():
     if calibrate:
         # Define calibration mode
         mode = 'drm'
-        dataset = '2018May'
+        dataset = '2018May_completed'
 
 
         # Point to observations
@@ -78,7 +78,7 @@ def main():
     
     # Define calibration mode
     mode   = 'giantpipe'
-    dataset = '2018May_completed'
+    dataset = '2018May'
     # Point to observations
     files  = FindFiles(dataset=dataset, mode=mode+'_files')
     nfiles = len(files)
@@ -193,29 +193,32 @@ def main():
     ############################################################
     if mapping:
 
-        from Plot.PlotMaps import PlotMaps, PlotZoomMaps, PlotMapsPerNight, PlotSubplotMapsPerNight
+        from Plot.PlotMaps import PlotMaps, PlotMontageGlobalMaps, PlotZoomMaps, PlotMapsPerNight, PlotSubplotMapsPerNight, PlotSubplotMapsPerNightForJGRPaper
         from Plot.PlotPoles import PlotPolesFromGlobal
         from Plot.PlotPseudoWindShear import PlotPseudoWindShear, PlotCompositePseudoWindShear
-        # from Plot.PlotBrightnessTemperatureProf import PlotCompositeTBprofile
+        from Plot.PlotBrightnessTemperatureProf import PlotCompositeTBprofile
 
-        dataset = '2018May_completed'
+        dataset = '2018May'
 
     ### Point to location of observations
         files       = FindFiles(dataset=dataset, mode='_files')
-    # Plot cylindrical maps
-        if bin_cmerid:
-            # Create plots and save global maps into npy arrays
-            PlotMaps(dataset, files, spectrals)
-        if not bin_cmerid:
-            # Read in individual calibration coefficients
-            _, spectrals = ReadCentralMeridNpy(dataset=dataset, mode=mode, return_singles=False, return_spectrals=True)
-            # Create plots and save global maps into npy arrays
-            # PlotMaps(dataset, files, spectrals)
+    # # # Plot cylindrical maps
+    #     if bin_cmerid:
+    # #     #     # Create plots and save global maps into npy arrays
+    #         PlotMaps(dataset, files, spectrals)
+    #     if not bin_cmerid:
+    #     #     # Read in individual calibration coefficients
+    #         _, spectrals = ReadCentralMeridNpy(dataset=dataset, mode=mode, return_singles=False, return_spectrals=True)
+    #     #     # Create plots and save global maps into npy arrays
+    #         PlotMaps(dataset, files, spectrals)
+            
     # Plot pole maps from global maps npy arrays
         # PlotZoomMaps(dataset=dataset, central_lon=180, lat_target=-20, lon_target=285, lat_window=15, lon_window=30)
-        # PlotPolesFromGlobal(dataset=dataset, per_night=False)
+        PlotPolesFromGlobal(dataset=dataset, per_night=False)
+        # PlotMontageGlobalMaps(dataset=dataset)
         # PlotMapsPerNight(dataset=dataset, files=files, spectrals=spectrals)
-        PlotSubplotMapsPerNight(dataset=dataset)
+        # PlotSubplotMapsPerNight(dataset=dataset)
+        # PlotSubplotMapsPerNightForJGRPaper(dataset=dataset)
         # PlotPseudoWindShear(dataset=dataset)
         # PlotCompositePseudoWindShear(dataset=dataset)
         # PlotCompositeTBprofile(dataset=dataset)
@@ -244,40 +247,50 @@ def main():
         from Plot.PlotRetrievalOutputs import PlotRetrievedTemperatureMaps, PlotRetrievedTemperatureCrossSection
         from Plot.PlotRetrievalOutputs import PlotRetrievedRadiance, PlotRetrievedRadianceMap, PlotRetrievedRadianceMeridian, PlotRetrievedRadianceMeridianSuperpose
         from Plot.PlotRetrievalOutputs import PlotRadianceParametricTest
-        from Plot.PlotRetrievalOutputs import PlotRetrievedAerosolProfile, PlotRetrievedAerosolMaps, PlotRetrievedAerosolCrossSection
+        from Plot.PlotRetrievalOutputs import PlotRetrievedAerosolProfile, PlotRetrievedAerosolMaps, PlotRetrievedAerosolCrossSection,PlotRetrievedAerosolsMeridianProfiles
         from Plot.PlotRetrievalOutputs import PlotRetrievedGasesProfile, PlotRetrievedGasesProfileSuperpose, PlotRetrievedGasesMaps, PlotRetrievedGasesCrossSection
-        from Plot.PlotRetrievalOutputs import PlotRetrievedGasesMeridianProfiles
+        from Plot.PlotRetrievalOutputs import PlotRetrievedGasesMeridianProfiles, PlotRetrievedGasesMeridianProfilesSuperposed
+
         from Plot.PlotRetrievalOutputs import PlotComparisonParametricGasesHydrocarbons, PlotComparisonParametricGasesHydrocarbonsParallel
         from Plot.PlotRetrievalOutputs import PlotAllForAuroraOverTime
-        from Plot.PlotRetrievalOutputs import PlotCheckPente
         from Plot.PlotRetrievalOutputs import PlotSolarWindActivity
 
 
-        # # PlotTemperaturePriorProfiles()
-        # # PlotRetrievedTemperature()
-        # # PlotRetrievedTemperatureProfile()
+        # # # # PlotTemperaturePriorProfiles()
+        # # # # PlotRetrievedTemperature()
+        # # # # PlotRetrievedTemperatureProfile()
         # PlotRetrievedTemperatureCrossSection(over_axis="latitude")
-        # # PlotRetrievedTemperatureMaps()
+        # PlotRetrievedTemperatureMaps()
 
-        # # PlotRetrievedRadianceMeridian(over_axis="latitude")
+        # PlotRetrievedRadianceMeridian(over_axis="latitude")
+        # PlotRetrievedRadianceMeridianSuperpose(over_axis="latitude")
+        # PlotRetrievedRadianceMap()
         
-        # # PlotAerosolPriorProfiles()
-        # # PlotRetrievedAerosolProfile()
-        # # PlotRetrievedAerosolMaps()
+        # # # # # # PlotAerosolPriorProfiles()
+        # # # # # # PlotRetrievedAerosolProfile()
+        # PlotRetrievedAerosolCrossSection(over_axis="latitude")
+        # PlotRetrievedAerosolsMeridianProfiles(over_axis="latitude")
+        # PlotRetrievedAerosolMaps()
         
-        # # PlotChiSquareOverNy(over_axis="latitude")
+        # # # # # # PlotChiSquareOverNy(over_axis="latitude")
         # PlotChiSquareOverNySuperpose(over_axis="latitude")
-        # # PlotChiSquareMap()
+        # PlotChiSquareMap()
         
         # PlotWindShearFromRetrievedTemperature(over_axis="latitude")
         
-        # # PlotRetrievedGasesCrossSection(over_axis="latitude")
+        # PlotRetrievedGasesProfile(over_axis="latitude")
+        # # # # PlotRetrievedGasesCrossSection(over_axis="latitude")
         # PlotRetrievedGasesMeridianProfiles(over_axis="latitude")
+        # PlotRetrievedGasesMeridianProfilesSuperposed(over_axis="latitude")
         # PlotComparisonParametricGasesHydrocarbons()
+        # PlotRetrievedGasesMaps()
         
         # stat_test()
-        # PlotCheckPente()
+        # # PlotCheckPente()
+        # PlotAllForAuroraOverTime()
         PlotSolarWindActivity()
+
+        # PlotContributionFunction()
 
 
 if __name__ == '__main__':

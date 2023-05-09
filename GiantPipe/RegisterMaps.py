@@ -84,7 +84,7 @@ def RegisterMaps(files, binning):
                     # Adjust co-ordinates from edge to centre of bins
                     lat = lat + Globals.latstep/res
                     lon = lon - Globals.latstep/res
-                    # Convert from planetographic to planetocentric latitudes
+                    # Convert from mumap values to emission angle values
                     mu_ang = mudata[y, x]
                     mu  = 180/pi * acos(mu_ang)
                     # Calculate pxel radiance and error

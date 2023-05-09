@@ -6,7 +6,6 @@ import Globals
 from Tools.RetrieveGasesNames import RetrieveGasesNames
 
 def RetrieveLatitudeFromCoreNumber(fpath):
-
     # Initialize local variables
     dirs = list(os.walk(f"{fpath}"))
     ncore = len(dirs[:-1]) # number of core directories, 
@@ -49,7 +48,7 @@ def RetrieveLongitudeFromCoreNumber(fpath):
             prior_param = lines[1].split()
             nlevel             = int(prior_param[2])
             ngas               = int(prior_param[3])
-        filename = f"{fpath}/core__{ifile+1}/nemesis.mre"
+        filename = f"{fpath}/core_{ifile+1}/nemesis.mre"
         with open(filename) as f:
             # Read header contents
             lines = f.readlines()

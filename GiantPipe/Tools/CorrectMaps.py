@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import Globals
 from Read.ReadFits import ReadFits
 from Tools.SetWave import SetWave
@@ -292,19 +292,19 @@ def PolynomialAdjust(directory, files, spectrals):
                 
                 axes[0].plot(bandmu[mask], bandc[mask], lw=0, marker='.', markersize=0.5, color = 'black')
                 axes[0].set_ylabel(r'Observed T$_B$ [K]', size=15)
-                axes[0].set_xlabel("Emission angle", size=15)
+                axes[0].set_xlabel("Emission angle cosine", size=15)
                 axes[0].plot(t, p(t), '-',color='red')
                 axes[0].tick_params(labelsize=12)
                 
 
                 axes[1].plot(t, (p(1))/p(t), '-',color='red')
                 axes[1].set_ylabel("Polynome adjustment", size=15)
-                axes[1].set_xlabel("Emission angle", size=15)
+                axes[1].set_xlabel("Emission angle cosine", size=15)
                 axes[1].tick_params(labelsize=12)
                 
                 axes[2].plot(bandmu[mask], cdata, lw=0, marker='.', markersize=0.5, color = 'black')
                 axes[2].set_ylabel(r'Corrected T$_B$ [K]', size=15)
-                axes[2].set_xlabel("Emission angle", size=15)
+                axes[2].set_xlabel("Emission angle cosine", size=15)
                 axes[2].tick_params(labelsize=12)
 
             # Save figure showing limb correction using polynomial adjustment method 
@@ -313,8 +313,18 @@ def PolynomialAdjust(directory, files, spectrals):
             # plt.savefig(f"{directory}calib_{wavnb}_polynomial_adjustment_{adj_location}.eps", dpi=150, bbox_inches='tight')
             # Save polynomial coefficients
             if adj_location != 'hemispheric':
+                # Polynoe coeff
                 np.save(f"{directory}calib_{wavnb}_polynomial_coefficients_{adj_location}", coeff)
-                # np.savetxt(f"{directory}calib_{wavnb}_polynomial_coefficients_{adj_location}.txt", coeff)            
+                np.savetxt(f"{directory}calib_{wavnb}_polynomial_coefficients_{adj_location}.txt", coeff)
+                # bandmu
+                np.save(f"{directory}calib_{wavnb}_bandmu_{adj_location}", bandmu[mask])
+                np.savetxt(f"{directory}calib_{wavnb}_bandmu_{adj_location}.txt", bandmu[mask])
+                # bandc
+                np.save(f"{directory}calib_{wavnb}_bandc_{adj_location}", bandc[mask])
+                np.savetxt(f"{directory}calib_{wavnb}_bandc_{adj_location}.txt", bandc[mask])
+                # cdata
+                np.save(f"{directory}calib_{wavnb}_cdata_{adj_location}", cdata)
+                np.savetxt(f"{directory}calib_{wavnb}_cdata_{adj_location}.txt", cdata)            
             # Apply polynomial adjustment over individual cmaps depending of wave value
             for ifile, iwave in enumerate(wavenumber):
                 if iwave == wave:
@@ -332,8 +342,6 @@ def PolynomialAdjust(directory, files, spectrals):
                         
         # Clear figure to avoid overlapping between plotting subroutines
         plt.close()
-
-    return cmaps, mumaps, wavenumber, adj_location 
 
 def ApplyPolynom(directory, files, spectrals):
     """ Function to apply a pre-calculated polynomial adjustment with 
