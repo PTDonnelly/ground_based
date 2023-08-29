@@ -21,8 +21,8 @@ class Config:
     ########## Input flags
     ##### Filepaths
     # Point to data directory
-    data_directory: str = "/Users/ptdonnelly/Documents/Research/data/visir/"
-    # data_directory: str = "C:/Users/padra/Documents/Research/data/visir/"
+    # data_directory: str = "/Users/ptdonnelly/Documents/Research/data/visir/"
+    data_directory: str = "C:/Users/padra/Documents/Research/data/visir/"
     # Point to pipeline inputs directory
     input_directory: str = "/Users/ptdonnelly/Documents/Research/github/ground_based_2/inputs/"
     # Point to specific epoch directory

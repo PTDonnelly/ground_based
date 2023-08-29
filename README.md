@@ -12,7 +12,7 @@ This code is still currently coupled quite heavily to the overall structure of t
 ### The pathing for pointing to the observations assumes that your data is in a hierarchy like:
     /root/data/visir/2016feb/wvisir_J7.9_2016-02-15T08:47:39.7606_Jupiter_clean_withchop.fits.gz
 
-    /root/data/visir/2016feb//wvisir_Q1_2016-02-15T05:02:43.2867_Jupiter_clean_withchop.fits.gz
+    /root/data/visir/2016feb/wvisir_Q1_2016-02-15T05:02:43.2867_Jupiter_clean_withchop.fits.gz
 
     ...
 

@@ -4,7 +4,7 @@ import io
 import pstats
 import time
 
-from config import Config
+from giantpipe import Config
 
 class Clock:
     """Responsible for timing the execution of the code."""
