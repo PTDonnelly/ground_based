@@ -339,9 +339,15 @@ def PolynomialAdjust(directory, files, spectrals):
                             cmaps[ifile, :, :] = cmaps[ifile, :, :] * p(1) / p(mumaps[ifile, :, :])
                     else: # adj_location == 'southern' or adj_location == 'average':
                         cmaps[ifile, :, :] = cmaps[ifile, :, :] * p(1) / p(mumaps[ifile, :, :])
-                        
+        
+        type(cmaps)
+        type(mumaps)
+        type(wavenumber)
+        type(adj_location)
         # Clear figure to avoid overlapping between plotting subroutines
         plt.close()
+
+    return cmaps, mumaps, wavenumber, adj_location
 
 def ApplyPolynom(directory, files, spectrals):
     """ Function to apply a pre-calculated polynomial adjustment with 
@@ -356,7 +362,7 @@ def ApplyPolynom(directory, files, spectrals):
         cmaps[ifile, :, :] = ConvertBrightnessTemperature(cmaps[ifile, :, :], wavelength=wavelength[ifile])
 
     for ifilt in range(Globals.nfilters):
-        adj_location= 'average' if ifilt < 8 else 'southern'
+        adj_location= 'average' if ifilt < 10 else 'southern'
         if ifilt != 6 and ifilt != 7:
             # Get filter index for spectral profiles
             waves = spectrals[:, ifilt, 5]

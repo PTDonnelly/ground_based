@@ -56,15 +56,19 @@ def PlotMaps(dataset, files, spectrals):
     globalmaps = np.empty((Globals.nfilters, Globals.ny, Globals.nx))
 
     # Calling the correction method chosen for this dataset
-    if dataset == '2018May' or dataset == '2018May_completed':
+    if dataset == '2018May': # or dataset == '2018May_completed':
         cmaps, mumaps, wavenumber, adj_location = PolynomialAdjust(dir, files, spectrals)
-        mumin = [0.02, 0.02, 0.1, 0.08, 0.01, 0.05, 0.02, 0.02, 0.02, 0.02, 0.01, 0.01, 0.01]
+        mumin = [0.02, 0.02, 0.1, 0.08, 0.01, 0.05, 0.02, 0.02, 0.02, 0.02, 0.01, 0.01, 0.01] if dataset == '2018May' else [0.02, 0.02, 0.1, 0.08, 0.01, 0.05, 0.02, 0.02, 0.02, 0.02, 0.0, 0.0, 0.01]
         Nfilters = Globals.nfilters
     elif dataset == '2022July':
         cmaps, mumaps, wavenumber = BlackLineRemoving(dir, files, cblack=-60, mu_scaling=True)
         mumin = np.empty(13)
         mumin.fill(0.01)
         Nfilters = 10
+    elif dataset == '2018May_completed':
+        cmaps, mumaps, wavenumber = ApplyPolynom(dir, files, spectrals)
+        mumin = [0.02, 0.02, 0.1, 0.08, 0.01, 0.05, 0.02, 0.02, 0.02, 0.02, 0.0, 0.0, 0.01]
+        Nfilters = Globals.nfilters
     # else:
     #     cmaps, mumaps, wavenumber = MuNormalization(files)
     #     mumin = [0.02, 0.05, 0.1, 0.08, 0.05, 0.05, 0.0, 0.0, 0.1, 0.08, 0.15, 0.05, 0.05]
@@ -170,7 +174,7 @@ def PlotMontageGlobalMaps(dataset):
             elif dataset == '2018May_completed':
                 # Retrive wavenumber corresponding to ifilt
                 _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
-                globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{wavnb}_global_maps_{adj_location}_adj.npy')
+                globalmap[ifilt, :, :] = np.load(f'../outputs/{dataset}/global_maps_figures/calib_{wavnb}_global_maps.npy')
             elif dataset == '2022July' or dataset == '2022August':
                 if ifilt == 4: 
                     _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt+1)
