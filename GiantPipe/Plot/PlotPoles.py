@@ -129,10 +129,10 @@ def PlotPolesFromGlobal(dataset, per_night):
         #         _, wavlg, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
         #         if dataset== '2018May': 
         #             plt.savefig(f"{dir}calib_{wavnb}_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-        #             # plt.savefig(f"{dir}calib_{wavnb}_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+        #             # plt.savefig(f"{dir}calib_{wavnb}_pole_maps_{adj_location}_adj.pdf", dpi=500, bbox_inches='tight')
         #         else:
         #             plt.savefig(f"{dir}calib_{wavnb}_pole_maps.png", dpi=150, bbox_inches='tight')
-        #             # plt.savefig(f"{dir}calib_{wavnb}_pole_maps.eps", dpi=150, bbox_inches='tight')
+        #             # plt.savefig(f"{dir}calib_{wavnb}_pole_maps.pdf", dpi=500, bbox_inches='tight')
         #         # Clear figure to avoid overlapping between plotting subroutines
         #         plt.close()
             
@@ -144,10 +144,10 @@ def PlotPolesFromGlobal(dataset, per_night):
         #         # Save north pole map figure of the current filter
         #         if dataset== '2018May':
         #             plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-        #             # plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+        #             # plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps_{adj_location}_adj.pdf", dpi=500, bbox_inches='tight')
         #         else:
         #             plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps.png", dpi=150, bbox_inches='tight')
-        #             # plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps.eps", dpi=150, bbox_inches='tight')
+        #             # plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps.pdf", dpi=500, bbox_inches='tight')
         #         # Clear figure to avoid overlapping between plotting subroutines
         #         plt.close()
         
@@ -159,10 +159,10 @@ def PlotPolesFromGlobal(dataset, per_night):
         #         # Save south pole map figure of the current filter 
         #         if dataset == '2018May':
         #             plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-        #             # plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+        #             # plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps_{adj_location}_adj.pdf", dpi=500, bbox_inches='tight')
         #         else:
         #             plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps.png", dpi=150, bbox_inches='tight')
-        #             # plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps.eps", dpi=150, bbox_inches='tight')
+        #             # plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps.pdf", dpi=500, bbox_inches='tight')
         #         # Clear figure to avoid overlapping between plotting subroutines
         #         plt.close()
 
@@ -230,7 +230,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                 iax +=1
         # Save north pole map figure of the current filter 
         plt.savefig(f"{dir}calib_all_north_pole_maps.png", dpi=150, bbox_inches='tight')
-        plt.savefig(f"{dir}calib_all_north_pole_maps.eps", dpi=150, bbox_inches='tight')
+        plt.savefig(f"{dir}calib_all_north_pole_maps.pdf", dpi=500, bbox_inches='tight')
         # Clear figure to avoid overlapping between plotting subroutines
         plt.close()
 
@@ -318,7 +318,7 @@ def PlotPolesFromGlobal(dataset, per_night):
                 iax +=1
         # Save south pole map figure of the current filter 
         plt.savefig(f"{dir}calib_all_south_pole_maps.png", dpi=150, bbox_inches='tight')
-        plt.savefig(f"{dir}calib_all_south_pole_maps.eps", dpi=150, bbox_inches='tight')
+        plt.savefig(f"{dir}calib_all_south_pole_maps.pdf", dpi=500, bbox_inches='tight')
         # Clear figure to avoid overlapping between plotting subroutines
         plt.close()
 
@@ -382,10 +382,10 @@ def PlotPolesFromGlobal(dataset, per_night):
                     _, wavlg, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                     if dataset== '2018May': 
                         plt.savefig(f"{dir}calib_{wavnb}_pole_maps_night_{inight}_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{wavnb}_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+                        # plt.savefig(f"{dir}calib_{wavnb}_pole_maps_{adj_location}_adj.pdf", dpi=500, bbox_inches='tight')
                     else:
                         plt.savefig(f"{dir}calib_{wavnb}_pole_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{wavnb}_pole_maps.eps", dpi=150, bbox_inches='tight')
+                        # plt.savefig(f"{dir}calib_{wavnb}_pole_maps.pdf", dpi=500, bbox_inches='tight')
                     # Clear figure to avoid overlapping between plotting subroutines
                     plt.close()
                 
@@ -397,10 +397,10 @@ def PlotPolesFromGlobal(dataset, per_night):
                     # Save north pole map figure of the current filter
                     if dataset== '2018May':
                         plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps_night_{inight}_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+                        # plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps_{adj_location}_adj.pdf", dpi=500, bbox_inches='tight')
                     else:
                         plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps.eps", dpi=150, bbox_inches='tight')
+                        # plt.savefig(f"{dir}calib_{wavnb}_north_pole_maps.pdf", dpi=500, bbox_inches='tight')
                     # Clear figure to avoid overlapping between plotting subroutines
                     plt.close()
             
@@ -412,10 +412,10 @@ def PlotPolesFromGlobal(dataset, per_night):
                     # Save south pole map figure of the current filter 
                     if dataset == '2018May':
                         plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps_night_{inight}_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+                        # plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps_{adj_location}_adj.pdf", dpi=500, bbox_inches='tight')
                     else:
                         plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps.eps", dpi=150, bbox_inches='tight')
+                        # plt.savefig(f"{dir}calib_{wavnb}_south_pole_maps.pdf", dpi=500, bbox_inches='tight')
                     # Clear figure to avoid overlapping between plotting subroutines
                     plt.close()
 
@@ -481,10 +481,10 @@ def PlotPolesFromGlobal(dataset, per_night):
             # Save south pole map figure of the current filter 
             if dataset == '2018May':
                 plt.savefig(f"{dir}calib_all_south_pole_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
-                # plt.savefig(f"{dir}calib_all_south_pole_maps.eps", dpi=150, bbox_inches='tight')
+                # plt.savefig(f"{dir}calib_all_south_pole_maps.pdf", dpi=500, bbox_inches='tight')
             else:
                 plt.savefig(f"{dir}calib_all_south_pole_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
-                # plt.savefig(f"{dir}calib_all_south_pole_maps.eps", dpi=150, bbox_inches='tight')
+                # plt.savefig(f"{dir}calib_all_south_pole_maps.pdf", dpi=500, bbox_inches='tight')
                 # Clear figure to avoid overlapping between plotting subroutines
                 plt.close()
 

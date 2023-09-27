@@ -119,7 +119,7 @@ def PlotMaps(dataset, files, spectrals):
                 if dataset == '2018May':
                     adj_location = 'average' if ifilt < 10 else 'southern'
                     plt.savefig(f"{dir}calib_{wavnb}_global_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-                    # plt.savefig(f"{dir}calib_{wavnb}_global_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+                    plt.savefig(f"{dir}calib_{wavnb}_global_maps_{adj_location}_adj.pdf", dpi=500, bbox_inches='tight')
                     # Clear figure to avoid overlapping between plotting subroutines
                     plt.close()
                     # Write global maps to np.array
@@ -130,7 +130,7 @@ def PlotMaps(dataset, files, spectrals):
                     #GlobalMapsNetCDF(dir, wavnb, globalmaps=globalmaps[ifilt, :, :])
                 else:
                     plt.savefig(f"{dir}calib_{wavnb}_global_maps.png", dpi=150, bbox_inches='tight')
-                    # plt.savefig(f"{dir}calib_{wavnb}_global_maps.eps", dpi=150, bbox_inches='tight')
+                    plt.savefig(f"{dir}calib_{wavnb}_global_maps.pdf", dpi=500, bbox_inches='tight')
                     # Clear figure to avoid overlapping between plotting subroutines
                     plt.close()
                     # Write global maps to np.array
@@ -221,10 +221,10 @@ def PlotMontageGlobalMaps(dataset):
     # Save south pole map figure of the current filter 
     if dataset == '2018May':
         plt.savefig(f"{dir}calib_all_global_maps.png", dpi=150, bbox_inches='tight')
-        # plt.savefig(f"{dir}calib_all_global_maps.eps", dpi=150, bbox_inches='tight')
+        plt.savefig(f"{dir}calib_all_global_maps.pdf", dpi=500, bbox_inches='tight')
     else:
         plt.savefig(f"{dir}calib_all_global_maps.png", dpi=150, bbox_inches='tight')
-        # plt.savefig(f"{dir}calib_all_global_maps.eps", dpi=150, bbox_inches='tight')
+        plt.savefig(f"{dir}calib_all_global_maps.pdf", dpi=500, bbox_inches='tight')
         # Clear figure to avoid overlapping between plotting subroutines
         plt.close()
 
@@ -277,7 +277,7 @@ def PlotMontageGlobalMaps(dataset):
     plt.xlabel("Emission angle cosine", size=20)
     # Save figure showing limb correction using polynomial adjustment method 
     plt.savefig(f"{dir}calib_all_wavl_polynomial_adjustment.png", dpi=150, bbox_inches='tight')
-    # plt.savefig(f"{directory}calib_all_wavl_polynomial_adjustment.eps", dpi=150, bbox_inches='tight')   
+    plt.savefig(f"{dir}calib_all_wavl_polynomial_adjustment.pdf", dpi=500, bbox_inches='tight')   
 
 
 
@@ -363,10 +363,10 @@ def PlotZoomMaps(dataset, central_lon, lat_target, lon_target, lat_window, lon_w
             _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
         if dataset == '2018May':
             plt.savefig(f"{dir}calib_{wavnb}_zoom_lon{lon_target}-lat{lat_target}_maps_{adj_location}_adj.png", dpi=150, bbox_inches='tight')
-            plt.savefig(f"{dir}calib_{wavnb}_zoom_lon{lon_target}-lat{lat_target}_maps_{adj_location}_adj.eps", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{dir}calib_{wavnb}_zoom_lon{lon_target}-lat{lat_target}_maps_{adj_location}_adj.pdf", dpi=150, bbox_inches='tight')
         else:
             plt.savefig(f"{dir}calib_{wavnb}_zoom_lon{lon_target}-lat{lat_target}_maps.png", dpi=150, bbox_inches='tight')
-            plt.savefig(f"{dir}calib_{wavnb}_zoom_lon{lon_target}-lat{lat_target}_maps.eps", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{dir}calib_{wavnb}_zoom_lon{lon_target}-lat{lat_target}_maps.pdf", dpi=150, bbox_inches='tight')
         # Clear figure to avoid overlapping between plotting subroutines
         plt.close()
             
@@ -467,7 +467,7 @@ def PlotMapsPerNight(dataset, files, spectrals):
                     _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                     if dataset == '2018May_completed':
                         plt.savefig(f"{dir}calib_{wavnb}_global_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{wavnb}_global_maps_night_{inight}.eps", dpi=150, bbox_inches='tight')
+                        plt.savefig(f"{dir}calib_{wavnb}_global_maps_night_{inight}.pdf", dpi=500, bbox_inches='tight')
                         # Clear figure to avoid overlapping between plotting subroutines
                         plt.close()
                         # Write global maps to np.array
@@ -503,7 +503,7 @@ def PlotMapsPerNight(dataset, files, spectrals):
                     _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                     if dataset == '2018May_completed':
                         plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_night_{inight}.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_night_{inight}.eps", dpi=150, bbox_inches='tight')
+                        plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_night_{inight}.pdf", dpi=500, bbox_inches='tight')
                         # Clear figure to avoid overlapping between plotting subroutines
                         plt.close()
                         # Write global maps to np.array
@@ -570,7 +570,7 @@ def PlotMapsPerNight(dataset, files, spectrals):
                     _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
                     if dataset == '2018May_completed':
                         plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_lon{lon_target}_lat{lat_target}_night_{inight}.png", dpi=150, bbox_inches='tight')
-                        # plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_night_{inight}.eps", dpi=150, bbox_inches='tight')
+                        plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_lon{lon_target}_lat{lat_target}_night_{inight}.pdf", dpi=500, bbox_inches='tight')
                         # Clear figure to avoid overlapping between plotting subroutines
                         plt.close()
                         # Write global maps to np.array
@@ -674,7 +674,7 @@ def PlotSubplotMapsPerNight(dataset):
             # Save global map figure of the current filter 
             _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=ifilt)
             plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_lon{lon_target}_lat{lat_target}_all_nights.png", dpi=150, bbox_inches='tight')
-            # plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_all_nights.eps", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_lon{lon_target}_lat{lat_target}_all_nights.pdf", dpi=500, bbox_inches='tight')
             # Clear figure to avoid overlapping between plotting subroutines
             plt.close()
             # Write global maps to np.array
@@ -857,7 +857,7 @@ def PlotSubplotMapsPerNightForJGRPaper(dataset):
     cbar.ax.set_title(r" T$_{B}^{'}$ [K]", size=20, pad=30)
     
     plt.savefig(f"{dir}calib_zonalpert_maps_lon{lon_target}_lat{lat_target}_all_nights.png", dpi=150, bbox_inches='tight')
-    # plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_all_nights.eps", dpi=150, bbox_inches='tight')
+    plt.savefig(f"{dir}calib_zonalpert_maps_lon{lon_target}_lat{lat_target}_all_nights.pdf", dpi=500, bbox_inches='tight')
     # Clear figure to avoid overlapping between plotting subroutines
     plt.close()
     # Write global maps to np.array
@@ -949,7 +949,7 @@ def PlotSubplotMapsPerNightForJGRPaper(dataset):
     
     _, _, wavnb, _, _ = SetWave(filename=None, wavelength=False, wavenumber=False, ifilt=0)
     plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_lon{lon_target}_lat{lat_target}_all_nights.png", dpi=150, bbox_inches='tight')
-    # plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_all_nights.eps", dpi=150, bbox_inches='tight')
+    plt.savefig(f"{dir}calib_{wavnb}_zonalpert_maps_lon{lon_target}_lat{lat_target}_all_nights.pdf", dpi=150, bbox_inches='tight')
     # Clear figure to avoid overlapping between plotting subroutines
     plt.close()
     # Write global maps to np.array

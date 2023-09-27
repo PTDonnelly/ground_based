@@ -14,7 +14,7 @@ def BinCentralPara(nfiles, spectrum, LCMIII):
         """Create central parallel average for each observation"""
 
         # Create np.array for all individual mean profiles (one per file)
-        single_paras = np.zeros((Globals.nlonbins, nfiles, 7))
+        single_paras = np.zeros((Globals.nlonbins, nfiles, 8))
         print('Binning singles...')
         # Loop over the spectrum array of each input file
         for ifile in range(nfiles):
@@ -42,11 +42,11 @@ def BinCentralPara(nfiles, spectrum, LCMIII):
                     if LCM2 >= 360:
                         adjusted_LCM2 = LCM2 - 360 if ilon >= 180 else LCM2
                         lon_keep = (lons <= adjusted_LCM2) if ilon >= 180 else (lons >= LCM1)
-                        print('+360', LCMIII[ifile], LCM1, LCM2, adjusted_LCM2, lon1, lon2, ilon, lons[box_edges & lon_keep])
+                        # print('+360', LCMIII[ifile], LCM1, LCM2, adjusted_LCM2, lon1, lon2, ilon, lons[box_edges & lon_keep])
                     elif LCM1 <= 0:
                         adjusted_LCM1 = LCM1 + 360 if ilon < 180 else LCM1
                         lon_keep = (lons <= LCM2) if ilon >= 180 else (lons >= adjusted_LCM1)
-                        print('-0', LCMIII[ifile], LCM1, adjusted_LCM1, LCM2, lon1, lon2, ilon, lons[box_edges & lon_keep])   
+                        # print('-0', LCMIII[ifile], LCM1, adjusted_LCM1, LCM2, lon1, lon2, ilon, lons[box_edges & lon_keep])   
                     else:
                         lon_keep = (lons > LCM1) & (lons <= LCM2)
                     # Filter the spectrum array using the determined conditions
@@ -60,6 +60,7 @@ def BinCentralPara(nfiles, spectrum, LCMIII):
                         rad_err  = bn.nanmean(spx[:, 6])
                         wavenum  = spx[:, 7][0]
                         view     = spx[:, 8][0]
+                        date     = spx[:, 9][0]
                         # Store individual paraional profiles
                         single_paras[ilon, ifile, 0] = clat
                         single_paras[ilon, ifile, 1] = clon
@@ -68,6 +69,7 @@ def BinCentralPara(nfiles, spectrum, LCMIII):
                         single_paras[ilon, ifile, 4] = rad_err
                         single_paras[ilon, ifile, 5] = wavenum
                         single_paras[ilon, ifile, 6] = view
+                        single_paras[ilon, ifile, 7] = date
         # Throw away zeros
         single_paras[single_paras == 0] = np.nan
 
@@ -77,7 +79,7 @@ def BinCentralPara(nfiles, spectrum, LCMIII):
         """Create central parallel average for each wavelength"""
 
         # Create np.array for all spectral mean profiles (one per filter)
-        spectral_paras = np.zeros((Globals.nlonbins, Globals.nfilters, 6))
+        spectral_paras = np.zeros((Globals.nlonbins, Globals.nfilters, 7))
 
         print('Binning spectrals...')
         # Loop over filters and create mean spectral profiles
@@ -98,6 +100,7 @@ def BinCentralPara(nfiles, spectrum, LCMIII):
                     rad      = bn.nanmax(spx[:, 3])
                     rad_err  = bn.nanmean(spx[:, 4])
                     wavenum  = spx[:, 5][0]
+                    view     = spx[:, 6][0]
                     # Store spectral paraional profiles
                     spectral_paras[ilon, ifilt, 0] = LCP
                     spectral_paras[ilon, ifilt, 1] = clon
@@ -105,6 +108,7 @@ def BinCentralPara(nfiles, spectrum, LCMIII):
                     spectral_paras[ilon, ifilt, 3] = rad
                     spectral_paras[ilon, ifilt, 4] = rad_err
                     spectral_paras[ilon, ifilt, 5] = wavenum
+                    spectral_paras[ilon, ifilt, 6] = view
         # Throw away zeros
         spectral_paras[spectral_paras == 0] = np.nan
 

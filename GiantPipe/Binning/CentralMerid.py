@@ -14,7 +14,7 @@ def BinCentralMerid(nfiles, spectrum, LCMIII):
         """Create central meridian average for each observation"""
 
         # Create np.array for all individual mean profiles (one per file)
-        single_merids = np.zeros((Globals.nlatbins, nfiles, 7))
+        single_merids = np.zeros((Globals.nlatbins, nfiles, 8))
 
         # Loop over latitudes and create individual mean profiles
         print('Binning singles...')
@@ -48,6 +48,7 @@ def BinCentralMerid(nfiles, spectrum, LCMIII):
                             rad_err  = bn.nanmean(spx[:, 6])
                             wavenum  = spx[:, 7][0]
                             view     = spx[:, 8][0]
+                            date     = spx[:, 9][0]
                             # Store individual meridional profiles
                             single_merids[ilat, ifile, 0] = clat
                             single_merids[ilat, ifile, 1] = LCM
@@ -55,8 +56,8 @@ def BinCentralMerid(nfiles, spectrum, LCMIII):
                             single_merids[ilat, ifile, 3] = rad
                             single_merids[ilat, ifile, 4] = rad_err
                             single_merids[ilat, ifile, 5] = wavenum
-                            # print(ilat, ifile, wavenum)
                             single_merids[ilat, ifile, 6] = view
+                            single_merids[ilat, ifile, 7] = date
         # Throw away zeros
         single_merids[single_merids == 0] = np.nan
 

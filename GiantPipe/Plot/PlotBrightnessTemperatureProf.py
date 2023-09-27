@@ -68,7 +68,8 @@ def PlotCompositeTBprofile(dataset):
                 axes[iaxes].plot([wjets_c[iwjet],wjets_c[iwjet]],[np.nanmin(dT_dy[ifilt, :]),np.nanmax(dT_dy[ifilt, :])],color='black',linestyle="dotted")
                 if iaxes==0: print('westward',wjets_c[iwjet])
             axes[iaxes].plot([-90,90],[np.nanmean(dT_dy[ifilt, :]),np.nanmean(dT_dy[ifilt, :])],linewidth=1.0,color="grey")
-            axes[iaxes].set_xlim(-75, 75)
+            axes[iaxes].set_xlim(-80, 80)
+            axes[iaxes].set_xticks([-80, -60, -40, -20, 0, 20, 40, 60, 80])
             axes[iaxes].tick_params(labelsize=20)
             axes[iaxes].set_title(ititle[iaxes]+f"    {wavelength}"+r" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=20)
             iaxes += 1
@@ -80,7 +81,7 @@ def PlotCompositeTBprofile(dataset):
     plt.ylabel("Zonal-mean Brightness Temperature gradient [K/km]", size=18)
     # Save figure 
     plt.savefig(f"{dir}calib_birghtness_temperature_gradient.png", dpi=150, bbox_inches='tight')
-    plt.savefig(f"{dir}calib_birghtness_temperature_gradient.eps", dpi=150, bbox_inches='tight')
+    plt.savefig(f"{dir}calib_birghtness_temperature_gradient.pdf", dpi=500, bbox_inches='tight')
     plt.close()
 
 
@@ -97,6 +98,7 @@ def PlotCompositeTBprofile(dataset):
                 plt.plot([wjets_c[iwjet],wjets_c[iwjet]],[np.nanmin(dT_dy[ifilt, :]),np.nanmax(dT_dy[ifilt, :])],color='black',linestyle="dotted")
             plt.plot([-90,90],[np.nanmean(dT_dy[ifilt, :]),np.nanmean(dT_dy[ifilt, :])],linewidth=1.0,color="grey")
             plt.xlim(-90,90)
+            plt.xticks([-90, -80, -60, -40, -20, 0, 20, 40, 60, 80, 90])
             plt.ylim(np.nanmin(dT_dy[ifilt, :]),np.nanmax(dT_dy[ifilt, :]))
             plt.tick_params(labelsize=15)       
             plt.xlabel("Planetocentric Latitude", size=18)
@@ -104,5 +106,5 @@ def PlotCompositeTBprofile(dataset):
             plt.title(r'$\frac{\partial \overline{T_B}}{\partial y}$'+f" at {wavelength}"+r'$\mu$m', fontfamily='sans-serif', loc='left', fontsize=18)
             # Save figure 
             plt.savefig(f"{dir}calib_{wavnb}_birghtness_temperature_gradient.png", dpi=150, bbox_inches='tight')
-            plt.savefig(f"{dir}calib_{wavnb}_birghtness_temperature_gradient.eps", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{dir}calib_{wavnb}_birghtness_temperature_gradient.pdf", dpi=500, bbox_inches='tight')
             plt.close()

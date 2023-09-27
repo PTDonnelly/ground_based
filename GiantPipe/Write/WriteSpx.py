@@ -134,7 +134,7 @@ def WriteCentreToLimbSpx(mode, spectrals):
     
     a = 1
 
-def WriteRegionalSpx(dataset, mode, spectrals):
+def WriteRegionalSpx(dataset, mode, spectrals, per_night, Nnight):
     """Create spectral input for NEMESIS using regional binning scheme.
        Populate .spxfile with radiances, measurement errors, and geometries."""
 
@@ -176,27 +176,49 @@ def WriteRegionalSpx(dataset, mode, spectrals):
     dir = f'../outputs/{dataset}/spxfiles_lat{Globals.lat_target}_lon{Globals.lon_target}_{Globals.latstep}x{Globals.lonstep}_no852_no887/'
     if not os.path.exists(dir):
         os.makedirs(dir)
-    
+    if per_night==True:
+        for inight in range(Nnight):
+        # Loop over latitudes and logitudes to create one .spxfile per pixel into the 2D selected maps
+            for ilat in range(Globals.nlatbins):
+                for ilon in range(Globals.nlonbins):
+                    # Extract variables and throw NaNs
+                    lats     = [spectrals[inight, ilat, ilon, ifilt, 0] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[inight, ilat, ilon, ifilt, 0]) == False]
+                    lons     = [spectrals[inight, ilat, ilon, ifilt, 1] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[inight, ilat, ilon, ifilt, 1]) == False]
+                    mus      = [spectrals[inight, ilat, ilon, ifilt, 2] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[inight, ilat, ilon, ifilt, 2]) == False]
+                    rads     = [spectrals[inight, ilat, ilon, ifilt, 3] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[inight, ilat, ilon, ifilt, 3]) == False]
+                    rad_errs = [spectrals[inight, ilat, ilon, ifilt, 4] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[inight, ilat, ilon, ifilt, 4]) == False]
+                    waves    = [spectrals[inight, ilat, ilon, ifilt, 5] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[inight, ilat, ilon, ifilt, 5]) == False]
+
+                    # Only write spxfile for longitudes and latitudes with spectral information
+                    if lats:
+                        if lons:
+                            # Open textfile
+                            with open(f"{dir}lat_{lats[0]}_lon_{lons[0]}_night{inight}.txt", 'w') as f:
+                                create_regional_spx(f, lats, lons, mus, rads, rad_errs, waves)
+                            # Open spxfile
+                            with open(f"{dir}lat_{lats[0]}_lon_{lons[0]}_night{inight}.spx", 'w') as f:
+                                create_regional_spx(f, lats, lons, mus, rads, rad_errs, waves)
+    else:
     # Loop over latitudes and logitudes to create one .spxfile per pixel into the 2D selected maps
-    for ilat in range(Globals.nlatbins):
-        for ilon in range(Globals.nlonbins):
-            # print(np.shape(LCPs))
-            # Extract variables and throw NaNs
-            lats     = [spectrals[ilat, ilon, ifilt, 0] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 0]) == False]
-            lons     = [spectrals[ilat, ilon, ifilt, 1] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 1]) == False]
-            mus      = [spectrals[ilat, ilon, ifilt, 2] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 2]) == False]
-            rads     = [spectrals[ilat, ilon, ifilt, 3] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 3]) == False]
-            rad_errs = [spectrals[ilat, ilon, ifilt, 4] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 4]) == False]
-            waves    = [spectrals[ilat, ilon, ifilt, 5] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 5]) == False]
-            # Only write spxfile for longitudes and latitudes with spectral information
-            if lats:
-                if lons:
-                    # Open textfile
-                    with open(f"{dir}lat_{lats[0]}_lon_{lons[0]}.txt", 'w') as f:
-                        create_regional_spx(f, lats, lons, mus, rads, rad_errs, waves)
-                    # Open spxfile
-                    with open(f"{dir}lat_{lats[0]}_lon_{lons[0]}.spx", 'w') as f:
-                        create_regional_spx(f, lats, lons, mus, rads, rad_errs, waves)
+        for ilat in range(Globals.nlatbins):
+            for ilon in range(Globals.nlonbins):
+                # print(np.shape(LCPs))
+                # Extract variables and throw NaNs
+                lats     = [spectrals[ilat, ilon, ifilt, 0] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 0]) == False]
+                lons     = [spectrals[ilat, ilon, ifilt, 1] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 1]) == False]
+                mus      = [spectrals[ilat, ilon, ifilt, 2] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 2]) == False]
+                rads     = [spectrals[ilat, ilon, ifilt, 3] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 3]) == False]
+                rad_errs = [spectrals[ilat, ilon, ifilt, 4] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 4]) == False]
+                waves    = [spectrals[ilat, ilon, ifilt, 5] for ifilt in range(Globals.nfilters) if np.isnan(spectrals[ilat, ilon, ifilt, 5]) == False]
+                # Only write spxfile for longitudes and latitudes with spectral information
+                if lats:
+                    if lons:
+                        # Open textfile
+                        with open(f"{dir}lat_{lats[0]}_lon_{lons[0]}.txt", 'w') as f:
+                            create_regional_spx(f, lats, lons, mus, rads, rad_errs, waves)
+                        # Open spxfile
+                        with open(f"{dir}lat_{lats[0]}_lon_{lons[0]}.spx", 'w') as f:
+                            create_regional_spx(f, lats, lons, mus, rads, rad_errs, waves)
 
 def WriteRegionalAverageSpx(dataset, mode, spectrals, per_night, Nnight):
     """Create spectral input for NEMESIS using average regional binning scheme.

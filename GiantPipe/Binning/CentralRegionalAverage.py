@@ -5,13 +5,13 @@ import operator
 import Globals
 from Tools.SetWave import SetWave
 
-def BinRegionalAverage(nfiles, spectrum, LCMIII, DATE, per_night, Nnight):
+def BinRegionalAverage(nfiles, spectrum, LCMIII, per_night, Nnight):
     """ Step 4: Create 2D aera average for each observation
         Step 5: Create 2D aera average for each wavelength"""
     
     print('Calculating average spectral of regional maps...')
 
-    def singles(nfiles, spectrum, LCMIII, DATE):
+    def singles(nfiles, spectrum, LCMIII):
         """Create 2D aera average for each observation"""
 
         # Create np.array for all individual mean profiles (one per file)
@@ -61,16 +61,13 @@ def BinRegionalAverage(nfiles, spectrum, LCMIII, DATE, per_night, Nnight):
                                 # Throw away hemisphere with negative beam
                                 view = np.mean(spx[:, 6])
                                 if np.any(spx):
-                                    # Change date format to store it as a float in singles_av_regions arrays:
-                                    DATE[ifile] = DATE[ifile].replace('T', '')
-                                    DATE[ifile] = DATE[ifile].replace('-', '')
-                                    DATE[ifile] = DATE[ifile].replace(':', '')
                                     # Pull out variables
                                     mu       = bn.nanmin(spx[:, 4])
                                     rad      = bn.nanmean(spx[:, 5])
                                     rad_err  = bn.nanmean(spx[:, 6])
                                     wavenum  = spx[:, 7][0]
                                     view     = spx[:, 8][0]
+                                    date     = spx[:, 9][0]
                                     # Store individual paraional profiles
                                     single_av_regions[ilat, ilon, ifile, 0] = Globals.lat_target
                                     single_av_regions[ilat, ilon, ifile, 1] = Globals.lon_target
@@ -78,9 +75,8 @@ def BinRegionalAverage(nfiles, spectrum, LCMIII, DATE, per_night, Nnight):
                                     single_av_regions[ilat, ilon, ifile, 3] = rad
                                     single_av_regions[ilat, ilon, ifile, 4] = rad_err
                                     single_av_regions[ilat, ilon, ifile, 5] = wavenum
-                                    # print(ilat, ilon, ifile, wavenum)
                                     single_av_regions[ilat, ilon, ifile, 6] = view
-                                    single_av_regions[ilat, ilon, ifile, 7] = float(DATE[ifile])
+                                    single_av_regions[ilat, ilon, ifile, 7] = date
         # Throw away zeros
         single_av_regions[single_av_regions == 0] = np.nan
 
@@ -91,7 +87,7 @@ def BinRegionalAverage(nfiles, spectrum, LCMIII, DATE, per_night, Nnight):
 
         if per_night == True:
                 # Create np.array for all spectral mean profiles (one per filter)
-            spectral_av_regions = np.zeros((Nnight, Globals.nlatbins, Globals.nlonbins, Globals.nfilters, 6))
+            spectral_av_regions = np.zeros((Nnight, Globals.nlatbins, Globals.nlonbins, Globals.nfilters, 8))
 
             # Set night limits 
             night_limits = [0, 20180524120000, 20180525120000, 20180526120000, 20180527120000]
@@ -123,6 +119,8 @@ def BinRegionalAverage(nfiles, spectrum, LCMIII, DATE, per_night, Nnight):
                                         rad      = bn.nanmax(spx[:, 3])
                                         rad_err  = bn.nanmean(spx[:, 4])
                                         wavenum  = spx[:, 5][0]
+                                        view     = spx[:, 6][0]
+                                        date     = spx[:, 7][0]
                                         # Store spectral paraional profiles
                                         spectral_av_regions[inight, ilat, ilon, ifilt, 0] = Globals.lat_target
                                         spectral_av_regions[inight, ilat, ilon, ifilt, 1] = Globals.lon_target
@@ -130,9 +128,12 @@ def BinRegionalAverage(nfiles, spectrum, LCMIII, DATE, per_night, Nnight):
                                         spectral_av_regions[inight, ilat, ilon, ifilt, 3] = rad
                                         spectral_av_regions[inight, ilat, ilon, ifilt, 4] = rad_err
                                         spectral_av_regions[inight, ilat, ilon, ifilt, 5] = wavenum
+                                        spectral_av_regions[inight, ilat, ilon, ifilt, 6] = view
+                                        spectral_av_regions[inight, ilat, ilon, ifilt, 7] = date
+
         else:
             # Create np.array for all spectral mean profiles (one per filter)
-            spectral_av_regions = np.zeros((Globals.nlatbins, Globals.nlonbins, Globals.nfilters, 6))
+            spectral_av_regions = np.zeros((Globals.nlatbins, Globals.nlonbins, Globals.nfilters, 7))
 
             print('Binning spectrals...')
             # Loop over filters and create mean spectral profiles
@@ -159,6 +160,7 @@ def BinRegionalAverage(nfiles, spectrum, LCMIII, DATE, per_night, Nnight):
                                     rad      = bn.nanmax(spx[:, 3])
                                     rad_err  = bn.nanmean(spx[:, 4])
                                     wavenum  = spx[:, 5][0]
+                                    view     = spx[:, 6][0]
                                     # Store spectral paraional profiles
                                     spectral_av_regions[ilat, ilon, ifilt, 0] = Globals.lat_target
                                     spectral_av_regions[ilat, ilon, ifilt, 1] = Globals.lon_target
@@ -166,12 +168,13 @@ def BinRegionalAverage(nfiles, spectrum, LCMIII, DATE, per_night, Nnight):
                                     spectral_av_regions[ilat, ilon, ifilt, 3] = rad
                                     spectral_av_regions[ilat, ilon, ifilt, 4] = rad_err
                                     spectral_av_regions[ilat, ilon, ifilt, 5] = wavenum
+                                    spectral_av_regions[ilat, ilon, ifilt, 6] = view
         # Throw away zeros
         spectral_av_regions[spectral_av_regions == 0] = np.nan
 
         return spectral_av_regions
 
-    singles = singles(nfiles, spectrum, LCMIII, DATE)
+    singles = singles(nfiles, spectrum, LCMIII)
     spectrals = spectrals(nfiles, spectrum, singles, per_night, Nnight)
 
     return singles, spectrals
