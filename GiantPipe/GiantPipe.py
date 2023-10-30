@@ -18,7 +18,7 @@ def main():
     from Plot.PlotProfiles import PlotParaProfiles
     from Plot.PlotProfiles import PlotGlobalSpectrals
     from Plot.PlotProfiles import PlotRegionalMaps
-    from Plot.PlotProfiles import PlotRegionalAverage
+    from Plot.PlotProfiles import PlotRegionalPerNight
     from Read.ReadNpy import ReadCentralMeridNpy
     from Read.ReadNpy import ReadCentralParallelNpy
     from Read.ReadNpy import ReadCentreToLimbNpy
@@ -37,10 +37,10 @@ def main():
     from Write.WriteSpx import WriteRegionalAverageSpx
 
     # Define flags to configure pipeline
-    calibrate   = False      # Read raw data and calibrate
+    calibrate   = True      # Read raw data and calibrate
     source      = 'fits'     # Source of data: local cmaps ('fits') or local numpy arrays ('npy')
     # Binning
-    bin_cmerid  = False     # Use central meridian binning scheme
+    bin_cmerid  = True     # Use central meridian binning scheme
     bin_cpara   = False     # Use central parallel binning scheme
     bin_ctl     = False     # Use centre-to-limb binning scheme
     bin_region  = False     # Use regional binning scheme (for a zoom 2D retrieval)
@@ -48,7 +48,7 @@ def main():
     # Output
     save        = True      # Store calculated profiles to local files
     plotting    = True      # Plot calculated profiles
-    mapping     = True      # Plot maps of observations or retrieval
+    mapping     = False      # Plot maps of observations or retrieval
     spx         = True      # Write spxfiles as spectral input for NEMESIS
     retrieval   = False      # Plot NEMESIS outputs 
 
@@ -78,7 +78,8 @@ def main():
     
     # Define calibration mode
     mode   = 'giantpipe'
-    dataset = '2018May'
+    dataset = '2018May_completed'
+    per_night = True
     # Point to observations
     files  = FindFiles(dataset=dataset, mode=mode+'_files')
     nfiles = len(files)
@@ -87,13 +88,13 @@ def main():
 
         # Generate arrays containing spatial and spectral information of each cylindrical map
         if bin_cmerid:
-            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_cmerid')
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(dataset=dataset, files=files, binning='bin_cmerid')
         if bin_cpara:
-            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_cpara')
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(dataset=dataset, files=files, binning='bin_cpara')
         if bin_region:
-            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_region')
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(dataset=dataset, files=files, binning='bin_region')
         if bin_av_region:
-            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(files=files, binning='bin_av_region')
+            spectrum, wavelength, wavenumber, LCMIII, DATE = RegisterMaps(dataset=dataset, files=files, binning='bin_av_region')
 
     if bin_cmerid:
         # Execute the central meridian binning scheme
@@ -128,7 +129,7 @@ def main():
 
         if plotting:
             # Plot mean central parallel profiles
-            PlotParaProfiles(dataset=dataset, mode=mode, files=files, singles=singles, spectrals=spectrals)
+            PlotParaProfiles(dataset=dataset, mode=mode, files=files, singles=singles, spectrals=spectrals, DATE=DATE)
 
         if spx:
             # Write mean central parallel profiles to spxfile
@@ -156,36 +157,37 @@ def main():
     if bin_region: 
         # Execute the bi-dimensional binning scheme 
         if 'fits' in source: 
-            singles, spectrals = BinRegional(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII)
+            singles, spectrals = BinRegional(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII, per_night=per_night, Nnight=4)
         if 'npy' in source:
             singles, spectrals = ReadRegionalNpy(dataset=dataset, mode=mode, return_singles=True, return_spectrals=True)
 
         if save:
             # Store calculated maps
-            WriteRegional(dataset=dataset, files=files, singles=singles, spectrals=spectrals)
+            WriteRegional(dataset=dataset, files=files, singles=singles, spectrals=spectrals, per_night=per_night, Nnight=4)
         if plotting:
             # Plot bi-dimensional maps
-            PlotRegionalMaps(dataset=dataset, mode=mode, spectrals=spectrals)
+            if per_night:
+                PlotRegionalPerNight(dataset=dataset, spectrals=spectrals, Nnight=4)
+            else:
+                PlotRegionalMaps(dataset=dataset, mode=mode, spectrals=spectrals)
         if spx:
             # Write bi-dimensional maps to spxfile
-            WriteRegionalSpx(dataset=dataset, mode=mode, spectrals=spectrals)
+            WriteRegionalSpx(dataset=dataset, mode=mode, spectrals=spectrals, per_night=per_night, Nnight=4)
     
     if bin_av_region: 
         # Execute the bi-dimensional binning scheme 
         if 'fits' in source: 
-            singles, spectrals = BinRegionalAverage(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII, DATE=DATE, per_night=True, Nnight=4)
+            singles, spectrals = BinRegionalAverage(nfiles=nfiles, spectrum=spectrum, LCMIII=LCMIII, per_night=per_night, Nnight=4)
         if 'npy' in source:
             singles, spectrals = ReadRegionalAverageNpy(dataset=dataset, mode=mode, return_singles=True, return_spectrals=True)
 
         if save:
             # Store calculated maps
-            WriteRegionalAverage(dataset=dataset, files=files, singles=singles, spectrals=spectrals, per_night=True, Nnight=4)
-        # if plotting:
-        #     # Plot bi-dimensional maps
-        #     PlotRegionalAverage(dataset=dataset, mode=mode, spectrals=spectrals)
+            WriteRegionalAverage(dataset=dataset, files=files, singles=singles, spectrals=spectrals, per_night=per_night, Nnight=4)
+
         if spx:
             # Write bi-dimensional maps to spxfile
-            WriteRegionalAverageSpx(dataset=dataset, mode=mode, spectrals=spectrals, per_night=True, Nnight=4)
+            WriteRegionalAverageSpx(dataset=dataset, mode=mode, spectrals=spectrals, per_night=per_night, Nnight=4)
 
     ############################################################
     # Read in calibrated data, calculated profiles or retrieved
@@ -198,30 +200,30 @@ def main():
         from Plot.PlotPseudoWindShear import PlotPseudoWindShear, PlotCompositePseudoWindShear
         from Plot.PlotBrightnessTemperatureProf import PlotCompositeTBprofile
 
-        dataset = '2018May'
+    #     dataset = '2018May'
 
-    ### Point to location of observations
-        files       = FindFiles(dataset=dataset, mode='_files')
-    # # # Plot cylindrical maps
-    #     if bin_cmerid:
-    # #     #     # Create plots and save global maps into npy arrays
-    #         PlotMaps(dataset, files, spectrals)
-    #     if not bin_cmerid:
-    #     #     # Read in individual calibration coefficients
-    #         _, spectrals = ReadCentralMeridNpy(dataset=dataset, mode=mode, return_singles=False, return_spectrals=True)
-    #     #     # Create plots and save global maps into npy arrays
-    #         PlotMaps(dataset, files, spectrals)
+    # ### Point to location of observations
+    #     files       = FindFiles(dataset=dataset, mode=mode+'_files')
+    # # Plot cylindrical maps
+        if bin_cmerid:
+        # Create plots and save global maps into npy arrays
+            PlotMaps(dataset, files, spectrals)
+        if not bin_cmerid:
+        #     # Read in individual calibration coefficients
+            _, spectrals = ReadCentralMeridNpy(dataset=dataset, mode=mode, return_singles=False, return_spectrals=True)
+        #     # Create plots and save global maps into npy arrays
+            PlotMaps(dataset, files, spectrals)
             
     # Plot pole maps from global maps npy arrays
         # PlotZoomMaps(dataset=dataset, central_lon=180, lat_target=-20, lon_target=285, lat_window=15, lon_window=30)
         PlotPolesFromGlobal(dataset=dataset, per_night=False)
-        # PlotMontageGlobalMaps(dataset=dataset)
-        # PlotMapsPerNight(dataset=dataset, files=files, spectrals=spectrals)
+        PlotMontageGlobalMaps(dataset=dataset)
+        PlotMapsPerNight(dataset=dataset, files=files, spectrals=spectrals)
         # PlotSubplotMapsPerNight(dataset=dataset)
-        # PlotSubplotMapsPerNightForJGRPaper(dataset=dataset)
+        PlotSubplotMapsPerNightForJGRPaper(dataset=dataset)
         # PlotPseudoWindShear(dataset=dataset)
-        # PlotCompositePseudoWindShear(dataset=dataset)
-        # PlotCompositeTBprofile(dataset=dataset)
+        PlotCompositePseudoWindShear(dataset=dataset)
+        PlotCompositeTBprofile(dataset=dataset)
         
     ############################################################
     # Read in spectral inputs for NEMESIS and plot
@@ -263,16 +265,16 @@ def main():
         # PlotRetrievedTemperatureMaps()
 
         # PlotRetrievedRadianceMeridian(over_axis="latitude")
-        # PlotRetrievedRadianceMeridianSuperpose(over_axis="latitude")
+        PlotRetrievedRadianceMeridianSuperpose(over_axis="latitude")
         # PlotRetrievedRadianceMap()
         
-        # # # # # # PlotAerosolPriorProfiles()
-        # # # # # # PlotRetrievedAerosolProfile()
-        # PlotRetrievedAerosolCrossSection(over_axis="latitude")
+        # # # # # # # PlotAerosolPriorProfiles()
+        # # # # # # # PlotRetrievedAerosolProfile()
+        # # PlotRetrievedAerosolCrossSection(over_axis="latitude")
         # PlotRetrievedAerosolsMeridianProfiles(over_axis="latitude")
         # PlotRetrievedAerosolMaps()
         
-        # # # # # # PlotChiSquareOverNy(over_axis="latitude")
+        # # # # # # # PlotChiSquareOverNy(over_axis="latitude")
         # PlotChiSquareOverNySuperpose(over_axis="latitude")
         # PlotChiSquareMap()
         
@@ -280,7 +282,7 @@ def main():
         
         # PlotRetrievedGasesProfile(over_axis="latitude")
         # # # # PlotRetrievedGasesCrossSection(over_axis="latitude")
-        # PlotRetrievedGasesMeridianProfiles(over_axis="latitude")
+        PlotRetrievedGasesMeridianProfiles(over_axis="latitude")
         # PlotRetrievedGasesMeridianProfilesSuperposed(over_axis="latitude")
         # PlotComparisonParametricGasesHydrocarbons()
         # PlotRetrievedGasesMaps()
@@ -288,7 +290,7 @@ def main():
         # stat_test()
         # # PlotCheckPente()
         # PlotAllForAuroraOverTime()
-        PlotSolarWindActivity()
+        # PlotSolarWindActivity()
 
         # PlotContributionFunction()
 

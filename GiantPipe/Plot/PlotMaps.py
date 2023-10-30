@@ -90,7 +90,7 @@ def PlotMaps(dataset, files, spectrals):
                         TBmaps[ifile, :, :] = cmaps[ifile, :, :]                
                     
                         res = ma.masked_where(mumaps[ifile, :, :] < mumin[ifilt], TBmaps[ifile, :, :])
-                        res = ma.masked_where(((res > 201)), res)
+                        # res = ma.masked_where(((res > 201)), res)
                         res = ma.masked_where(((res < 100)), res)
                         TBmaps[ifile,:,:] = res.filled(np.nan)
 

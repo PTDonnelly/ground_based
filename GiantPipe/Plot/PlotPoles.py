@@ -231,6 +231,7 @@ def PlotPolesFromGlobal(dataset, per_night):
         # Save north pole map figure of the current filter 
         plt.savefig(f"{dir}calib_all_north_pole_maps.png", dpi=150, bbox_inches='tight')
         plt.savefig(f"{dir}calib_all_north_pole_maps.pdf", dpi=500, bbox_inches='tight')
+        plt.savefig(f"{dir}calib_all_north_pole_maps.eps", dpi=500, bbox_inches='tight')
         # Clear figure to avoid overlapping between plotting subroutines
         plt.close()
 
@@ -319,6 +320,7 @@ def PlotPolesFromGlobal(dataset, per_night):
         # Save south pole map figure of the current filter 
         plt.savefig(f"{dir}calib_all_south_pole_maps.png", dpi=150, bbox_inches='tight')
         plt.savefig(f"{dir}calib_all_south_pole_maps.pdf", dpi=500, bbox_inches='tight')
+        plt.savefig(f"{dir}calib_all_south_pole_maps.eps", dpi=500, bbox_inches='tight')
         # Clear figure to avoid overlapping between plotting subroutines
         plt.close()
 

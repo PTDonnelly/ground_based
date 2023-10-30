@@ -825,7 +825,7 @@ def ReadContributionFunctions(filepath, over_axis):
 
             # Read covariance matrices
             sa, sm, sn, st = [np.empty((nx, nx)) for _ in range(4)]
-            nlines = int(nx / 5) # Look I'm sorry okay, this is not my fault
+            nlines = int(np.ceil(nx / 5 )) # Look I'm sorry okay, this is not my fault
             for ix in range(nx):       
                 lines = read_s_matrices(f=f, nlines=nlines)
                 sa[ix, :] = [element for line in lines for element in line]
@@ -838,7 +838,7 @@ def ReadContributionFunctions(filepath, over_axis):
             
             # Read ??? matrices
             aa = np.empty((nx, nx))
-            nlines = int(nx / 5) # Look I'm sorry okay, this is not my fault
+            nlines = int(np.ceil(nx / 5 )) # Look I'm sorry okay, this is not my fault
             for ix in range(nx):       
                 lines = read_s_matrices(f=f, nlines=nlines)
                 aa[ix, :] = [element for line in lines for element in line]

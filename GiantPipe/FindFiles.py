@@ -9,34 +9,34 @@ def FindFiles(dataset, mode):
             # If you don't have DRM-calibrated data, use raw
             source = '' if 'drm' in mode else ''
             # If you don't have GiantPipe-calibrated data, use DRM-calibrated data
-            source = 're' if 'giantpipe' in mode else ''
+            source = 'cal_' if 'giantpipe' in mode else ''
 
-            files = [f"{data_dir}{source}wvisir_ARIII_2022-08-08T09:31:26.7435_Jupiter_clean_withchop.fits.gz",
-                    f"{data_dir}{source}wvisir_ARIII_2022-08-08T09:33:34.0508_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_J7.9_2022-08-08T09:00:03.8923_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_J7.9_2022-08-08T09:03:45.0335_Jupiter_clean_withchop.fits.gz",
-                    f"{data_dir}{source}wvisir_NEII_1_2022-08-08T09:21:42.8034_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_NEII_1_2022-08-08T09:23:38.0434_Jupiter_clean_withchop.fits.gz",
-                    f"{data_dir}{source}wvisir_NEII_2_2022-08-08T08:55:36.0719_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_NEII_2_2022-08-08T08:57:30.0303_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_PAH1_2022-08-08T08:42:44.7602_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_PAH1_2022-08-08T08:48:34.0350_Jupiter_clean_withchop.fits.gz",
-                    f"{data_dir}{source}wvisir_Q1_2022-08-08T09:17:07.8085_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_Q1_2022-08-08T09:19:08.0291_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_Q2_2022-08-08T09:12:38.2404_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_Q2_2022-08-08T09:14:36.0496_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_Q3_2022-08-08T09:08:07.8862_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_Q3_2022-08-08T09:10:03.0153_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_SIV_1_2022-08-08T09:36:22.2992_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_SIV_1_2022-08-08T09:38:14.0589_Jupiter_clean_withchop.fits.gz", 
-                    f"{data_dir}{source}wvisir_SIV_2_2022-08-08T08:51:10.0615_Jupiter_clean_withchop.fits.gz",
-                    f"{data_dir}{source}wvisir_SIV_2_2022-08-08T08:53:04.0444_Jupiter_clean_withchop.fits.gz"]
+            files = [f"{data_dir}{source}wvisir_ARIII_2022-08-08T09_31_26.7435_Jupiter_clean_withchop.fits.gz",
+                    f"{data_dir}{source}wvisir_ARIII_2022-08-08T09_33_34.0508_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_J7.9_2022-08-08T09_00_03.8923_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_J7.9_2022-08-08T09_03_45.0335_Jupiter_clean_withchop.fits.gz",
+                    f"{data_dir}{source}wvisir_NEII_1_2022-08-08T09_21_42.8034_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_NEII_1_2022-08-08T09_23_38.0434_Jupiter_clean_withchop.fits.gz",
+                    f"{data_dir}{source}wvisir_NEII_2_2022-08-08T08_55_36.0719_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_NEII_2_2022-08-08T08_57_30.0303_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_PAH1_2022-08-08T08_42_44.7602_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_PAH1_2022-08-08T08_48_34.0350_Jupiter_clean_withchop.fits.gz",
+                    f"{data_dir}{source}wvisir_Q1_2022-08-08T09_17_07.8085_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_Q1_2022-08-08T09_19_08.0291_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_Q2_2022-08-08T09_12_38.2404_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_Q2_2022-08-08T09_14_36.0496_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_Q3_2022-08-08T09_08_07.8862_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_Q3_2022-08-08T09_10_03.0153_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_SIV_1_2022-08-08T09_36_22.2992_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_SIV_1_2022-08-08T09_38_14.0589_Jupiter_clean_withchop.fits.gz", 
+                    f"{data_dir}{source}wvisir_SIV_2_2022-08-08T08_51_10.0615_Jupiter_clean_withchop.fits.gz",
+                    f"{data_dir}{source}wvisir_SIV_2_2022-08-08T08_53_04.0444_Jupiter_clean_withchop.fits.gz"]
 
         if dataset=='2022July':        
             # If you don't have DRM-calibrated data, use raw
             source = '' if 'drm' in mode else ''
             # If you don't have GiantPipe-calibrated data, use DRM-calibrated data
-            source = 're' if 'giantpipe' in mode else ''
+            source = 'cal_' if 'giantpipe' in mode else ''
             
             files = [f"{data_dir}{source}wvisir_ARIII_2022-07-06T09:16:38.0577_Jupiter_clean_withchop.fits.gz", 
                     f"{data_dir}{source}wvisir_ARIII_2022-07-06T09:18:42.4238_Jupiter_clean_withchop.fits.gz",
@@ -61,9 +61,9 @@ def FindFiles(dataset, mode):
 
         if dataset=='2018May':
             # If you don't have DRM-calibrated data, use raw
-            source = 'cal_' if 'drm' in mode else ''
+            source = '' if 'drm' in mode else ''
             # If you don't have GiantPipe-calibrated data, use DRM-calibrated data
-            source = 'recal_' if 'giantpipe' in mode else 'cal_'
+            source = 're' if 'giantpipe' in mode else ''
 
 
             files = [f"{data_dir}{source}wvisir_ARIII_2018-05-25T03_45_53.1419_Jupiter_clean_withchop.fits.gz",
@@ -174,9 +174,9 @@ def FindFiles(dataset, mode):
         if dataset=='2018May_completed':
 
             # If you don't have DRM-calibrated data, use raw
-            source = 'cal_' if 'drm' in mode else ''
+            source = '' if 'drm' in mode else ''
             # If you don't have GiantPipe-calibrated data, use DRM-calibrated data
-            source = 'recal_' if 'giantpipe' in mode else 'cal_'
+            source = 'cal_' if 'giantpipe' in mode else ''
             
             files = [f"{data_dir}{source}wvisir_ARIII_2018-05-24T06_19_24.2857_Jupiter_clean_withchop.fits.gz",
                     f"{data_dir}{source}wvisir_ARIII_2018-05-24T06_21_28.6241_Jupiter_clean_withchop.fits.gz",
@@ -459,19 +459,6 @@ def FindFiles(dataset, mode):
                     f"{data_dir}{source}wvisir_SIV_2018-05-27T03_52_32.7902_Jupiter_clean_withchop.fits.gz",
                     f"{data_dir}{source}wvisir_SIV_2018-05-27T03_54_48.9331_Jupiter_clean_withchop.fits.gz"]
  
-        # files = [f"{data_dir}{source}wvisir_ARIII_2018-05-25T03_45_53.1419_Jupiter_clean_withchop.fits.gz",
-        #         f"{data_dir}{source}wvisir_J7.9_2018-05-24T02_49_57.5419_Jupiter_clean_withchop.fits.gz",
-        #         f"{data_dir}{source}wvisir_NEII_1_2018-05-24T06_10_42.6362_Jupiter_clean_withchop.fits.gz",
-        #         f"{data_dir}{source}wvisir_NEII_2_2018-05-24T02_45_35.7531_Jupiter_clean_withchop.fits.gz",
-        #         f"{data_dir}{source}wvisir_PAH1_2018-05-24T02_36_43.5199_Jupiter_clean_withchop.fits.gz",
-        #         f"{data_dir}{source}wvisir_PAH2_2_2018-05-24T06_41_15.5878_Jupiter_cburst_withchop.fits.gz",
-        #         f"{data_dir}{source}wvisir_PAH2_2018-05-24T06_33_21.6415_Jupiter_clean_withchop.fits.gz",
-        #         f"{data_dir}{source}wvisir_Q1_2018-05-25T04_24_52.2863_Jupiter_clean_withchop.fits.gz",
-        #         f"{data_dir}{source}wvisir_Q2_2018-05-25T04_18_05.8435_Jupiter_clean_withchop.fits.gz",
-        #         f"{data_dir}{source}wvisir_Q3_2018-05-25T04_14_46.2779_Jupiter_clean_withchop.fits.gz",
-        #         f"{data_dir}{source}wvisir_SIV_1_2018-05-24T06_24_13.7864_Jupiter_clean_withchop.fits.gz",
-        #         f"{data_dir}{source}wvisir_SIV_2_2018-05-24T04_53_42.6259_Jupiter_clean_withchop.fits.gz",
-        #         f"{data_dir}{source}wvisir_SIV_2018-05-27T03_54_48.9331_Jupiter_clean_withchop.fits.gz"]
 
     if 'singles' in mode:
         profile_dir = f"../outputs/{dataset}/single_merid_profiles/"

@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.interpolate import CubicSpline
 import Globals
 from Tools.SetWave import SetWave
 from Read.ReadZonalWind import ReadZonalWind
@@ -51,6 +52,21 @@ def PlotCompositeTBprofile(dataset):
         for iy in range(Globals.ny):
             zonalmean[ifilt, iy] = np.nanmean(globalmaps[ifilt, iy, :])
         dT_dy[ifilt,:] = np.gradient(zonalmean[ifilt, :],y, edge_order=2)
+    # Removing the large spike located at the equator coming from the transition between two cylindrcal maps 
+    latremoved = (lat <= 0.25) & (lat >= -0.25)
+    for ifilt in range(Globals.nfilters):
+        # Zonal mean of the global maps
+        dT_dy[ifilt,latremoved] = np.nan
+    # Interpolating the removing value
+    latinterp = (lat <= 1.25) & (lat >= -1.25)
+    rawlat = lat[latinterp]
+    xnew = np.linspace(np.min(rawlat), np.max(rawlat), num=len(rawlat))
+    print(np.shape(xnew))
+    for ifilt in range(Globals.nfilters):
+        rawdata = dT_dy[ifilt,latinterp]
+        interpdata = np.interp(xnew, rawdata,rawlat)
+        print(rawlat, rawdata, interpdata)
+        # dT_dy[ifilt,latinterp] = interpdata
     # Create a composite figure with all filters
     Nlines = 11
     fig, axes = plt.subplots(Nlines, 1, figsize=(8,18), sharex=True)
@@ -68,14 +84,15 @@ def PlotCompositeTBprofile(dataset):
                 axes[iaxes].plot([wjets_c[iwjet],wjets_c[iwjet]],[np.nanmin(dT_dy[ifilt, :]),np.nanmax(dT_dy[ifilt, :])],color='black',linestyle="dotted")
                 if iaxes==0: print('westward',wjets_c[iwjet])
             axes[iaxes].plot([-90,90],[np.nanmean(dT_dy[ifilt, :]),np.nanmean(dT_dy[ifilt, :])],linewidth=1.0,color="grey")
-            axes[iaxes].set_xlim(-80, 80)
-            axes[iaxes].set_xticks([-80, -60, -40, -20, 0, 20, 40, 60, 80])
+            axes[iaxes].set_xlim(-70, 70)
+            axes[iaxes].set_xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
+            axes[iaxes].tick_params(axis='x', labelrotation=45)
             axes[iaxes].tick_params(labelsize=20)
             axes[iaxes].set_title(ititle[iaxes]+f"    {wavelength}"+r" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=20)
             iaxes += 1
     plt.subplots_adjust(hspace=0.5)
     # hide tick and tick label of the big axis
-    plt.axes([0.01, 0.1, 0.9, 0.8], frameon=False) 
+    plt.axes([0.01, 0.09, 0.9, 0.8], frameon=False) 
     plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)        
     plt.xlabel("Planetocentric Latitude", size=18)
     plt.ylabel("Zonal-mean Brightness Temperature gradient [K/km]", size=18)
@@ -99,7 +116,7 @@ def PlotCompositeTBprofile(dataset):
             plt.plot([-90,90],[np.nanmean(dT_dy[ifilt, :]),np.nanmean(dT_dy[ifilt, :])],linewidth=1.0,color="grey")
             plt.xlim(-90,90)
             plt.xticks([-90, -80, -60, -40, -20, 0, 20, 40, 60, 80, 90])
-            plt.ylim(np.nanmin(dT_dy[ifilt, :]),np.nanmax(dT_dy[ifilt, :]))
+            # plt.ylim(np.nanmin(dT_dy[ifilt, :]),np.nanmax(dT_dy[ifilt, :]))
             plt.tick_params(labelsize=15)       
             plt.xlabel("Planetocentric Latitude", size=18)
             plt.ylabel('[K/km]', size=18)

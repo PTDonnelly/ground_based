@@ -24,7 +24,6 @@ def GetCylandMuMaps(files):
     for ifile, fpath in enumerate(files):
         ## Step 1: Read img, cmap and mufiles
         imghead, _, cylhead, cyldata, _, mudata = ReadFits(filepath=f"{fpath}")
-
         ## Step 2: Geometric registration of pixel information
         # Save flag depending on Northern (1) or Southern (-1) viewing
         chopang = imghead['HIERARCH ESO TEL CHOP POSANG']
@@ -93,8 +92,7 @@ def PolynomialAdjust(directory, files, spectrals):
     # Define local inputs
     Nfiles = len(files)
     lat = np.arange(-89.75,90,step=0.5) # Latitude range from pole-to-pole
-    mumin = [0.15, 0.15, 0.02, 0.25, 0.3, 0.2, 0.5, 0.5, 0.15, 0.3, 0.6, 0.5, 0.05]
-
+    mumin = [0.15, 0.15, 0.02, 0.25, 0.3, 0.2, 0.5, 0.5, 0.15, 0.3, 0.01, 0.05, 0.05]
     # Define local arrays to store selected latitude band spectral data
     bandcmaps   = np.empty((Globals.nfilters, Globals.ny, Globals.nx))
     bandmumaps  = np.empty((Globals.nfilters, Globals.ny, Globals.nx))
@@ -364,10 +362,13 @@ def ApplyPolynom(directory, files, spectrals):
     for ifilt in range(Globals.nfilters):
         adj_location= 'average' if ifilt < 10 else 'southern'
         if ifilt != 6 and ifilt != 7:
+            
             # Get filter index for spectral profiles
             waves = spectrals[:, ifilt, 5]
+            print(np.shape(waves))
             wave  = waves[(waves > 0)][0]
             _, _, _, _, ifilt = SetWave(filename=None, wavelength=False, wavenumber=wave, ifilt=False)
+            print(ifilt, wave, adj_location)
             # Get polynome coefficient calculating for 2018May dataset 
             
             coeff = np.load(f'../outputs/2018May/global_maps_figures/calib_{wave}_polynomial_coefficients_{adj_location}.npy')

@@ -41,19 +41,19 @@ if not os.path.exists(dir):
 prior = 'jupiter_v2023'#, 'jupiter_v2016']
 
 retrieval_test = [
-            f"{prior}_temp_ktable-highreso_no852_no887",
-            f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_ktable-highreso_no852_no887",
-            f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_ktable-highreso_no852_no887",
-            f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_NH3_ktable-highreso_no852_no887",
-            f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_NH3_ktable-highreso_no852_no887",
-            f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6pknee02mbar_ktable-highreso_no852_no887",
-            f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6_ktable-highreso_no852_no887",
-            f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
-            f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_NH3_ktable-highreso_no852_no887",
-            f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_NH3p_ktable-highreso_no852_no887",
-            f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_NH3p_ktable-highreso_no852_no887",
-            f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_NH3p_ktable-highreso_no852_no887",
-            # f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2r-C2H6r_ktable-highreso_no852_no887"
+            f"JGRPreview_{prior}_temp_ktable-highreso_no852_no887",
+            f"JGRPreview_{prior}_temp_aerosol1-10mu-800mbar-05scale-01_ktable-highreso_no852_no887",
+            f"JGRPreview_{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_ktable-highreso_no852_no887",
+            f"JGRPreview_{prior}_temp_aerosol1-10mu-800mbar-05scale-01_NH3_ktable-highreso_no852_no887",
+            f"JGRPreview_{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6-NH3_ktable-highreso_no852_no887",
+            f"JGRPreview_{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6pknee02mbar_ktable-highreso_no852_no887",
+            f"JGRPreview_{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6_ktable-highreso_no852_no887",
+            f"JGRPreview_{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
+            # f"JGRPreview_{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar-NH3_ktable-highreso_no852_no887",
+            # f"JGRPreview_{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6-NH3p_ktable-highreso_no852_no887",
+            # f"JGRPreview_{prior}_temp_aerosol1-10mu-800mbar-05scale-01_NH3p_ktable-highreso_no852_no887",
+            # f"JGRPreview_{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar-NH3p_ktable-highreso_no852_no887",
+            # f"JGRPreview_{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2r-C2H6r_ktable-highreso_no852_no887"
         ]
 
 # Definition selected retrieval tests names (for simpler labelisation on figures)
@@ -69,8 +69,8 @@ test_names = [
             r'Temp Aer C$_2$H$_{2,p}$ C$_2$H$_{6,p}$ NH$_{3}$', 
             r'Temp Aer C$_2$H$_{2}$ C$_2$H$_{6}$ NH$_{3,p}$', 
             r'Temp Aer NH$_{3,p}$', 
-            r'Temp Aer C$_2$H$_{2,p}$ C$_2$H$_{6,p}$ NH$_{3,p}$',
-            #r'Temp Aer C$_2$H$_{2,r}$ C$_2$H$_{6,r}$'
+            r'Temp Aer C$_2$H$_{2,p}$ C$_2$H$_{6,p}$ NH$_{3,p}$'
+            # #r'Temp Aer C$_2$H$_{2,r}$ C$_2$H$_{6,r}$'
             ] 
 
 
@@ -84,7 +84,10 @@ def PlotContributionFunction(over_axis="latitude"):
     for iprior in prior:
         retrieval_test = [
             
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
+            f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_ktable-highreso_no852_no887",
+        
+            f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
+            f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6_ktable-highreso_no852_no887",
             
         ]
         ntest = len(retrieval_test)
@@ -118,14 +121,16 @@ def PlotContributionFunction(over_axis="latitude"):
                 ax[irow[iax]][icol[iax]].set_yscale("log")
                 ax[irow[iax]][icol[iax]].grid()
                 ax[irow[iax]][icol[iax]].invert_yaxis()
-                ax[irow[iax]][icol[iax]].tick_params(labelsize=15)
-                ax[irow[iax]][icol[iax]].set_xticks([-90, -60, -30, 0, 30, 60 ])
+                ax[irow[iax]][icol[iax]].tick_params(labelsize=12)
+                ax[irow[iax]][icol[iax]].tick_params(axis='x', labelrotation=45)
+                ax[irow[iax]][icol[iax]].set_xlim(-90, 90)
+                ax[irow[iax]][icol[iax]].set_xticks([-90,-80, -60, -40, -20, 0, 20, 40, 60, 80, 90])
                 ax[irow[iax]][icol[iax]].set_yticks([10000, 100, 1, 0.01])
                 ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=12)
                 im.cmap.set_under('w')
                 im.set_clim(0.15)
                 iax+=1 
-            plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
+            plt.axes([0.1, 0.09, 0.8, 0.8], frameon=False) 
             plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
             plt.xlabel("Planetocentric Latitude", size=18)
             plt.ylabel("Pressure [mbar]", size=18)
@@ -138,6 +143,7 @@ def PlotContributionFunction(over_axis="latitude"):
             cbar.ax.set_title("Normalized dR/dx", size=15, pad=15)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}contribution_fonctions.png", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{subdir}contribution_fonctions.pdf", dpi=500, bbox_inches='tight')
             plt.close()
 
 
@@ -218,7 +224,7 @@ def PlotChiSquareOverNy(over_axis):
                 plt.xlabel("Planetocentric Latitude", size=20)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}{itest}_chisquare.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_chisquare.eps", dpi=100)
+            plt.savefig(f"{subdir}{itest}_chisquare.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -233,7 +239,7 @@ def PlotChiSquareOverNySuperpose(over_axis):
     # Create the array to store chisquare over latitude for each test 
     maxchisg = []
     # Plot Figure of chisq/ny over latitude
-    fig, axes = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+    fig, axes = plt.subplots(1, 1, figsize=(10, 6), sharex=True)
     # Loop over each prior used for retrievals tests
     for i, itest in enumerate(retrieval_test):
         print(f"        ...{itest}")
@@ -241,28 +247,30 @@ def PlotChiSquareOverNySuperpose(over_axis):
         # Read retrieved profiles from .prf outputs files
         chisquare, latitude, nlat = ReadLogFiles(filepath=f"{fpath}{itest}", over_axis=over_axis)
         maxchisg.append(np.nanmax(chisquare))
-        axes[0].plot(latitude, chisquare, lw=2, color = col, label=f"{test_names[i]}")
-        if np.nanmax(chisquare) <= 1:
-            axes[1].plot(latitude, chisquare, lw=2, color = col, label=f"{test_names[i]}")
+        axes.plot(latitude, chisquare, lw=2, color = col, label=f"{test_names[i]}")
+        # if np.nanmax(chisquare) <= 1.5:
+        # axes[1].plot(latitude, chisquare, lw=2, color = col, label=f"{test_names[i]}")
         # axes[1].legend()
-    axes[0].set_title("(a)", fontfamily='sans-serif', loc='left', fontsize=15)
+    axes.set_title("(a)", fontfamily='sans-serif', loc='left', fontsize=15)
     maxchi = np.nanmax(maxchisg)
     if maxchi > 1:
-        axes[0].set_ylim(0, ceil(maxchi))
-        axes[0].set_yticks(np.arange(ceil(maxchi)+1))
+        axes.set_ylim(0, 2.5)
+        axes.set_yticks(np.arange(3))
     else:
-        axes[0].set_ylim(0, 1)
-        axes[0].set_yticks(np.arange(0, 1.01, 0.1))
-    axes[0].set_xlim(-90, 90)
-    axes[0].tick_params(labelsize=15)
-    axes[0].grid()
+        axes.set_ylim(0, 1)
+        axes.set_yticks(np.arange(0, 1.01, 0.1))
+    axes.set_xlim(-70, 70)
+    axes.set_xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
+    axes.tick_params(labelsize=15)
+    axes.grid()
 
-    axes[1].set_title("(b)", fontfamily='sans-serif', loc='left', fontsize=15)
-    axes[1].set_ylim(0,1.0,0.1)
-    axes[1].set_xlim(-90, 90)
-    axes[1].tick_params(labelsize=15) 
-    axes[1].grid()
-    handles, labels = axes[0].get_legend_handles_labels() 
+    # axes[1].set_title("(b)", fontfamily='sans-serif', loc='left', fontsize=15)
+    # axes[1].set_ylim(0,2.0,0.2)
+    # axes[1].set_xlim(-70, 70)
+    # axes[1].set_xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
+    # axes[1].tick_params(labelsize=15) 
+    # axes[1].grid()
+    handles, labels = axes.get_legend_handles_labels() 
 
     plt.axes([0.1, 0.08, 0.8, 0.85], frameon=False) 
     plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
@@ -273,8 +281,8 @@ def PlotChiSquareOverNySuperpose(over_axis):
     elif over_axis=="latitude":
         plt.xlabel("Planetocentric Latitude", size=20)
     # Save figure in the retrievals outputs directory
-    plt.savefig(f"{subdir}chisquare_comparison.png", dpi=150, bbox_inches='tight')
-    #plt.savefig(f"{subdir}{itest}_chisquare.eps", dpi=100)
+    plt.savefig(f"{subdir}chisquare_comparison_noparam.png", dpi=150, bbox_inches='tight')
+    plt.savefig(f"{subdir}chisquare_comparison_noparam.pdf", dpi=500, bbox_inches='tight')
     # Close figure to avoid overlapping between plotting subroutines
     plt.close()
 
@@ -315,7 +323,7 @@ def PlotChiSquareMap(over_axis="2D"):
             cbar.ax.set_title("$\chi^{2}/N_y$", size=15, pad=15)
             # Save figure showing calibation method 
             plt.savefig(f"{subdir}chisquare_maps.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{dir}{wave}_radiance_maps.eps", dpi=900)
+            plt.savefig(f"{subdir}chisquare_maps.pdf", dpi=500, bbox_inches='tight')
             # Clear figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -439,7 +447,7 @@ def PlotRetrievedTemperature(over_axis):
                     plt.xlabel("Planetocentric Latitude", size=20)
                 # Save figure in the retrievals outputs directory
                 plt.savefig(f"{subdir}{itest}_retrieved_temperature_{pressure[ilev]}mbar.png", dpi=150, bbox_inches='tight')
-                #plt.savefig(f"{subdir}{itest}_retrieved_temperature_{pressure[ilev]}mbar.eps", dpi=100)
+                plt.savefig(f"{subdir}{itest}_retrieved_temperature_{pressure[ilev]}mbar.pdf", dpi=500, bbox_inches='tight')
                 # Close figure to avoid overlapping between plotting subroutines
                 plt.close()
 
@@ -485,7 +493,7 @@ def PlotRetrievedTemperatureProfile(over_axis):
                 plt.ylabel(f"Presssure [mbar]", size=20)
                 # Save figure in the retrievals outputs directory
                 plt.savefig(f"{subdir}{itest}_retrieved_temperature_profile_at_{latitude[ilat]}.png", dpi=150, bbox_inches='tight')
-                #plt.savefig(f"{subdir}{itest}_retrieved_temperature_profile_at_{latitude[ilat]}.eps", dpi=100)
+                plt.savefig(f"{subdir}{itest}_retrieved_temperature_profile_at_{latitude[ilat]}.pdf", dpi=500, bbox_inches='tight')
                 # Close figure to avoid overlapping between plotting subroutines
                 plt.close()
 
@@ -543,7 +551,7 @@ def PlotRetrievedTemperatureProfileSuperpose(over_axis):
             plt.ylabel(f"Presssure [mbar]", size=20)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}temperature_profile_at_{latitude[ilat]}.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_retrieved_temperature_profile_at_{latitude[ilat]}.eps", dpi=100)
+            plt.savefig(f"{subdir}temperature_profile_at_{latitude[ilat]}.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -558,20 +566,6 @@ def PlotRetrievedTemperatureCrossSection(over_axis):
     prior = ['jupiter_v2023']#, 'jupiter_v2016']
     # Loop over each prior used for retrievals tests
     for iprior in prior:
-        retrieval_test = [
-            f"{iprior}_temp_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_NH3_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_NH3_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6pknee02mbar_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_NH3_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_NH3p_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_NH3p_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_NH3p_ktable-highreso_no852_no887",
-                    ]
         ntest = len(retrieval_test)
         # Loop over each retrieval tests for the current prior file
         for itest in retrieval_test:
@@ -596,7 +590,8 @@ def PlotRetrievedTemperatureCrossSection(over_axis):
             for iwjet in range(0,nwjet):
                 plt.plot([wjets_c[iwjet],wjets_c[iwjet]],[0.1, 1000],color='black',linestyle="dotted")
             plt.ylim(0.1, 1000)
-            # plt.xlim(-80, 80)
+            plt.xlim(-70, 70)
+            plt.xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
             plt.yscale('log')
             plt.gca().invert_yaxis()
             plt.tick_params(labelsize=15)        
@@ -612,7 +607,7 @@ def PlotRetrievedTemperatureCrossSection(over_axis):
             cbar.ax.set_title("[K]",fontsize=15)   
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}retrieved_temperature_zonal_wind.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_retrieved_temperature_zonal_wind.eps", dpi=100)
+            plt.savefig(f"{subdir}retrieved_temperature_zonal_wind.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -622,7 +617,8 @@ def PlotRetrievedTemperatureCrossSection(over_axis):
             im = plt.contourf(latitude, pressure, temperature, cmap='viridis', levels=levels_cmap)
             plt.contour(latitude, pressure, temperature, levels=levels_cmap, colors="white", linewidths=0.5)            
             plt.ylim(0.1, 1000)
-            # plt.xlim(-80, 80)
+            plt.xlim(-70, 70)
+            plt.xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
             plt.yscale('log')
             plt.gca().invert_yaxis()
             plt.tick_params(labelsize=15)     
@@ -638,7 +634,7 @@ def PlotRetrievedTemperatureCrossSection(over_axis):
             cbar.ax.set_title("[K]",fontsize=15)   
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}retrieved_temperature.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_retrieved_temperature.eps", dpi=100)
+            plt.savefig(f"{subdir}retrieved_temperature.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -709,7 +705,7 @@ def PlotRetrievedTemperatureMaps(over_axis="2D"):
             plt.ylabel("Planetocentric Latitude", size=18)
             # Save figure showing calibation method 
             plt.savefig(f"{subdir}{itest}_temperature_maps.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_temperature_maps.eps", dpi=900)
+            plt.savefig(f"{subdir}{itest}_temperature_maps.pdf", dpi=500, bbox_inches='tight')
             # Clear figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -751,7 +747,7 @@ def PlotRetrievedTemperatureMaps(over_axis="2D"):
             plt.ylabel("Planetocentric Latitude", size=18)
             # Save figure showing calibation method 
             plt.savefig(f"{subdir}{itest}_temperature_residual_maps.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
+            plt.savefig(f"{subdir}{itest}_temperature_residual_maps.pdf", dpi=500, bbox_inches='tight')
             # Clear figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -766,20 +762,6 @@ def PlotWindShearFromRetrievedTemperature(over_axis):
     prior = ['jupiter_v2023']#, 'jupiter_v2016']
     # Loop over each prior used for retrievals tests
     for iprior in prior:
-        retrieval_test = [
-            f"{iprior}_temp_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_NH3_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_NH3_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6pknee02mbar_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_NH3_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_NH3p_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_NH3p_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_NH3p_ktable-highreso_no852_no887",
-                    ]
         ntest = len(retrieval_test)
         # Loop over each prior used for retrievals tests
         for itest in retrieval_test:
@@ -807,7 +789,8 @@ def PlotWindShearFromRetrievedTemperature(over_axis):
             for iwjet in range(0,nwjet):
                 plt.plot([wjets_c[iwjet],wjets_c[iwjet]],[0.1, 10000],color='black',linestyle="dotted") 
             plt.ylim(0.1, 1000)
-            # plt.xlim(-80, 80)
+            plt.xlim(-70, 70)
+            plt.xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
             plt.yscale('log')
             plt.gca().invert_yaxis()
             plt.tick_params(labelsize=15)       
@@ -822,7 +805,7 @@ def PlotWindShearFromRetrievedTemperature(over_axis):
             cbar.ax.set_title(r'[m s$^{-1}$ km$^{-1}$]',fontsize=15)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}retrieved_windshear.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_retrieved_windshear_profile_at_{latitude[ilat]}.eps", dpi=100)
+            plt.savefig(f"{subdir}retrieved_windshear.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -845,7 +828,8 @@ def PlotWindShearFromRetrievedTemperature(over_axis):
             # plt.plot(xs, ys) 
             plt.gca().add_patch(Rectangle((-6, pressure[-1]), len(ix), 100000, facecolor="grey"))
             plt.ylim(0.1, 1000)
-            # plt.xlim(-80, 80)
+            plt.xlim(-70, 70)
+            plt.xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
             plt.yscale('log')
             plt.gca().invert_yaxis()
             # plt.gca().add_patch(Rectangle((ix[0], iy[0]), len(ix), len(iy), facecolor="grey"))
@@ -861,7 +845,8 @@ def PlotWindShearFromRetrievedTemperature(over_axis):
             cbar.ax.set_title(r'[m s$^{-1}$ km$^{-1}$]',fontsize=15, pad=20)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}retrieved_windshear_mask.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_retrieved_windshear_profile_at_{latitude[ilat]}.eps", dpi=100)
+            with plt.rc_context({'image.composite_image': False}):
+                plt.savefig(f"{subdir}retrieved_windshear_mask.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -877,7 +862,8 @@ def PlotWindShearFromRetrievedTemperature(over_axis):
             for iwjet in range(0,nwjet):
                 plt.plot([wjets_c[iwjet],wjets_c[iwjet]],[0.1, 10000],color='black',linestyle="dotted") 
             plt.ylim(0.1, 1000)
-            # plt.xlim(-80, 80)
+            plt.xlim(-70, 70)
+            plt.xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
             plt.yscale('log')
             plt.gca().invert_yaxis()
             plt.tick_params(labelsize=15)       
@@ -892,7 +878,7 @@ def PlotWindShearFromRetrievedTemperature(over_axis):
             cbar.ax.set_title(r'[K km$^{-1}$]',fontsize=15, pad=20)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}retrieved_dTdy.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_retrieved_dTdy_profile_at_{latitude[ilat]}.eps", dpi=100)
+            plt.savefig(f"{subdir}retrieved_dTdy.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -923,14 +909,15 @@ def PlotWindShearFromRetrievedTemperature(over_axis):
                 
             elif over_axis=="latitude":
                 plt.xlabel("Planetocentric Latitude", size=20)
-                plt.xlim(-90, 90)
+                plt.xlim(-70, 70)
+                plt.xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
             plt.ylabel(f"Thermal gradient "+r'[K km$^{-1}$]', size=20)
             plt.ylim(dtdymin, dtdymax)
             plt.grid()
             
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}retrieved_dTdy_at_{ptarget}mbar.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_retrieved_dTdy_profile_at_{latitude[ilat]}.eps", dpi=100)
+            plt.savefig(f"{subdir}retrieved_dTdy_at_{ptarget}mbar.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -974,7 +961,7 @@ def PlotRetrievedRadiance(over_axis):
                 plt.ylabel("Radiance [nW cm$^{-2}$ sr$^{-1}$ [cm$^{-1}$]$^{-1}$]", size=20)
                 # Save figure in the retrievals outputs directory
                 plt.savefig(f"{subdir}{itest}_retrieved_radiance_at_{latitude[ilat]}.png", dpi=150, bbox_inches='tight')
-                #plt.savefig(f"{subdir}{itest}_retrieved_radiance_at_{latitude[ilat]}.eps", dpi=100)
+                plt.savefig(f"{subdir}{itest}_retrieved_radiance_at_{latitude[ilat]}.pdf", dpi=500)
                 # Close figure to avoid overlapping between plotting subroutines
                 plt.close()
 
@@ -1034,7 +1021,7 @@ def PlotRetrievedRadianceMeridian(over_axis):
                 plt.ylabel("Radiance [nW cm$^{-2}$ sr$^{-1}$ [cm$^{-1}$]$^{-1}$]", size=15)
                 # Save figure in the retrievals outputs directory
                 plt.savefig(f"{subdir}{itest}_retrieved_merid_radiance_at_{wavenumb[ifilt, 1]}.png", dpi=150, bbox_inches='tight')
-                #plt.savefig(f"{subdir}{itest}_retrieved_radiance_at_{latitude[ilat]}.eps", dpi=100)
+                plt.savefig(f"{subdir}{itest}_retrieved_merid_radiance_at_{wavenumb[ifilt, 1]}.pdf", dpi=500, bbox_inches='tight')
                 # Close figure to avoid overlapping between plotting subroutines
                 plt.close()
 
@@ -1069,7 +1056,7 @@ def PlotRetrievedRadianceMeridian(over_axis):
                 
                 # Save figure in the retrievals outputs directory
                 plt.savefig(f"{subdir}{itest}_residual_merid_radiance_at_{wavenumb[ifilt, 1]}.png", dpi=150, bbox_inches='tight')
-                #plt.savefig(f"{subdir}{itest}_retrieved_radiance_at_{latitude[ilat]}.eps", dpi=100)
+                plt.savefig(f"{subdir}{itest}_residual_merid_radiance_at_{wavenumb[ifilt, 1]}.pdf", dpi=500, bbox_inches='tight')
                 # Close figure to avoid overlapping between plotting subroutines
                 plt.close()
 
@@ -1079,8 +1066,11 @@ def PlotRetrievedRadianceMeridianSuperpose(over_axis):
 # Definition selected retrieval tests names (for simpler labelisation on figures)
     test_names = [
             r'Temp',
-            r'Temp Aer C$_2$H$_2$ C$_2$H$_{6,p}$',
-            r'Temp Aer C$_2$H$_{2,p}$ C$_2$H$_{6,p}$',
+            r'Temp Aer C$_2$H$_2$ C$_2$H$_6$',
+            
+            r'Temp Aer C$_2$H$_{2,p}$ C$_2$H$_6$',
+            # r'Temp Aer C$_2$H$_2$ C$_2$H$_{6,p}$',
+            # r'Temp Aer C$_2$H$_{2,p}$ C$_2$H$_{6,p}$',
             ] 
     print('Plotting NEMESIS retrieved radiance meridians (superpose figure of several tests)...')
     
@@ -1089,11 +1079,12 @@ def PlotRetrievedRadianceMeridianSuperpose(over_axis):
     # Loop over each prior used for retrievals tests
     for iprior in prior:
         retrieval_test = [
-            f"{iprior}_temp_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6pknee02mbar_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
-            # f"{prior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2r-C2H6r_ktable-highreso_no852_no887"
-        ]
+            f"JGRPreview_{iprior}_temp_ktable-highreso_no852_no887",
+            f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_ktable-highreso_no852_no887",
+            f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6_ktable-highreso_no852_no887",
+            # f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6pknee02mbar_ktable-highreso_no852_no887",
+            # f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
+            ]
         ntest = len(retrieval_test)
         radiance = np.empty((ntest, Globals.nfilters, 177))
         rad_fit = np.empty((ntest, Globals.nfilters, 177))
@@ -1133,10 +1124,12 @@ def PlotRetrievedRadianceMeridianSuperpose(over_axis):
                 plt.xlabel("System III West Longitude", size=15)
             elif over_axis=="latitude":
                 plt.xlabel("Planetocentric Latitude", size=15)
+                plt.xlim(-70, 70)
+                plt.xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
             plt.ylabel("Radiance [nW cm$^{-2}$ sr$^{-1}$ [cm$^{-1}$]$^{-1}$]", size=15)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}comparison_merid_radiance_at_{wavenumb[ifilt, 1]}.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}comparison_merid_radiance_at_{wavenumb[ifilt, 1]}.eps", dpi=100)
+            plt.savefig(f"{subdir}comparison_merid_radiance_at_{wavenumb[ifilt, 1]}.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -1165,15 +1158,17 @@ def PlotRetrievedRadianceMeridianSuperpose(over_axis):
             # plt.plot(latitude, rad_fit[iretrieve, ifilt, :], lw=2, label=f"{itest}"[14:32])
             # plt.plot(latitude, rad_fit[iretrieve, ifilt, :], lw=2, label=f"{itest}"[14:])
             iretrieve +=1
-        ax[irow[iax]][icol[iax]].tick_params(labelsize=18)
+        ax[irow[iax]][icol[iax]].tick_params(labelsize=16)
         ax[irow[iax]][icol[iax]].set_title(ititle[iax]+f"    {(wavl)}"+" $\mu$m", fontfamily='sans-serif', loc='left', fontsize=15)
         ax[irow[iax]][icol[iax]].grid()
-        ax[irow[iax]][icol[iax]].set_xlim(-90, 90)
+        ax[irow[iax]][icol[iax]].set_xlim(-70, 70)
+        ax[irow[iax]][icol[iax]].set_xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
+        ax[irow[iax]][icol[iax]].tick_params(axis='x', labelrotation=45)
         iax+=1
     
     handles, labels = ax[0][0].get_legend_handles_labels()  
     fig.legend(handles, labels,fontsize=15, bbox_to_anchor=[0.9, 0.9])
-    plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
+    plt.axes([0.1, 0.09, 0.8, 0.8], frameon=False) 
     plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)        
     if over_axis=="longitude":
         plt.xlabel("System III West Longitude", size=20)
@@ -1182,7 +1177,7 @@ def PlotRetrievedRadianceMeridianSuperpose(over_axis):
     plt.ylabel("Radiance [nW cm$^{-2}$ sr$^{-1}$ [cm$^{-1}$]$^{-1}$]", size=20)
     # Save figure in the retrievals outputs directory
     plt.savefig(f"{subdir}comparison_merid_radiance_all_wavl.png", dpi=150, bbox_inches='tight')
-    #plt.savefig(f"{subdir}comparison_merid_radiance_at_{wavenumb[ifilt, 1]}.eps", dpi=100)
+    plt.savefig(f"{subdir}comparison_merid_radiance_all_wavl.pdf", dpi=500, bbox_inches='tight')
     # Close figure to avoid overlapping between plotting subroutines
     plt.close()
 
@@ -1251,7 +1246,7 @@ def PlotRetrievedRadianceMap(over_axis="2D"):
             plt.ylabel("Planetocentric Latitude", size=18)
             # Save figure showing calibation method 
             plt.savefig(f"{subdir}{itest}_all_filters_radiance_maps.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
+            plt.savefig(f"{subdir}{itest}_all_filters_radiance_maps.pdf", dpi=500, bbox_inches='tight')
             # Clear figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -1290,7 +1285,7 @@ def PlotRetrievedRadianceMap(over_axis="2D"):
             plt.ylabel("Planetocentric Latitude", size=18)
             # Save figure showing calibation method 
             plt.savefig(f"{subdir}{itest}_all_filters_rad_fit_maps.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
+            plt.savefig(f"{subdir}{itest}_all_filters_rad_fit_maps.pdf", dpi=500, bbox_inches='tight')
             # Clear figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -1335,7 +1330,7 @@ def PlotRetrievedRadianceMap(over_axis="2D"):
             plt.ylabel("Planetocentric Latitude", size=18)
             # Save figure showing calibation method 
             plt.savefig(f"{subdir}{itest}_all_filters_rad_residual_maps.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{dir}{wave}_calibration_merid_profiles.eps", dpi=900)
+            plt.savefig(f"{subdir}{itest}_all_filters_rad_residual_maps.pdf", dpi=500, bbox_inches='tight')
             # Clear figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -1392,7 +1387,7 @@ def PlotRetrievedAerosolProfile(over_axis):
                 plt.ylabel(f"Height [km]", size=20)
                 # Save figure in the retrievals outputs directory
                 plt.savefig(f"{subdir}{itest}_retrieved_aerosol_profile_at_{latitude[ilat]}.png", dpi=150, bbox_inches='tight')
-                #plt.savefig(f"{subdir}{itest}_retrieved_aerosol_profile_at_{latitude[ilat]}.eps", dpi=100)
+                plt.savefig(f"{subdir}{itest}_retrieved_aerosol_profile_at_{latitude[ilat]}.pdf", dpi=500, bbox_inches='tight')
                 # Close figure to avoid overlapping between plotting subroutines
                 plt.close()
 
@@ -1446,7 +1441,7 @@ def PlotRetrievedAerosolCrossSection(over_axis):
             plt.ylabel(f"Pressure [mbar]", size=20)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}{itest}_retrieved_aerosol.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_retrieved_aerosol_profile_at_{latitude[ilat]}.eps", dpi=100)
+            plt.savefig(f"{subdir}{itest}_retrieved_aerosol.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -1503,7 +1498,7 @@ def PlotRetrievedAerosolMaps(over_axis="2D"):
             cbar.ax.tick_params(labelsize=15)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}{itest}_aerosol_vertical_cross_section_at_alt{float(height[height_index[0][0], lat_max_index[0][0], lon_max_index[0][0]])}.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_aerosol_vertical_cross_section_at_alt{float(height[height_index[0][0]])lat_max_index[}][0].elon_max_index[ps[0]", dpi=100)
+            plt.savefig(f"{subdir}{itest}_aerosol_vertical_cross_section_at_alt{float(height[height_index[0][0], lat_max_index[0][0], lon_max_index[0][0]])}.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -1524,7 +1519,7 @@ def PlotRetrievedAerosolMaps(over_axis="2D"):
             cbar.ax.set_title(f"Cumulative aerosol \n optical depth at 1 bar", fontsize=12, pad=15)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}{itest}_aerosol_scale_factor_from-mre.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_aerosol_scale_factor_from-mre.eps", dpi=100)
+            plt.savefig(f"{subdir}{itest}_aerosol_scale_factor_from-mre.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -1571,12 +1566,14 @@ def PlotRetrievedAerosolsMeridianProfiles(over_axis):
             plt.tick_params(labelsize=18)            
             plt.grid()
             plt.xlabel(f"Planetocentric Latitude", size=20)                
-            plt.xlim(-90, 90)
+            plt.xlim(-70, 70)
+            plt.xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
             plt.ylim(0, 2)
             plt.title(f"Cumulative Aerosol opacity at 1 bar", size=20)
             # plt.gca().set_yscale("log")
             # plt.legend(bbox_to_anchor=(0,1.1,1,0.2), loc="lower left", mode="expand", fontsize=12)
             plt.savefig(f"{subdir}cumul_aerosol_opacity_1bar.png", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{subdir}cumul_aerosol_opacity_1bar.pdf", dpi=500, bbox_inches='tight')
             plt.close()
 
 
@@ -1627,7 +1624,7 @@ def PlotRetrievedGasesProfile(over_axis):
                     plt.legend(fontsize=20) 
                     # Save figure in the retrievals outputs directory
                     plt.savefig(f"{subdir}{itest}_retrieved_gas_{gases_name}_profile_at_{latitude[ilat]}.png", dpi=150, bbox_inches='tight')
-                    #plt.savefig(f"{subdir}{itest}_retrieved_temperature_zonal_wind.eps", dpi=100)
+                    plt.savefig(f"{subdir}{itest}_retrieved_gas_{gases_name}_profile_at_{latitude[ilat]}.pdf", dpi=500, bbox_inches='tight')
                     # Close figure to avoid overlapping between plotting subroutines
                     plt.close()
 
@@ -1677,7 +1674,7 @@ def PlotRetrievedGasesProfileSuperpose(over_axis):
             plt.legend(fontsize=20) 
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}{itest}_retrieved_gas_{gases_name}_profile_at_{latitude[ilat]}.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_retrieved_temperature_zonal_wind.eps", dpi=100)
+            plt.savefig(f"{subdir}{itest}_retrieved_gas_{gases_name}_profile_at_{latitude[ilat]}.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -1740,7 +1737,7 @@ def PlotRetrievedGasesCrossSection(over_axis):
                 cbar.set_label(f"Retrieved {gases_name}", fontsize=20)   
                 # Save figure in the retrievals outputs directory
                 plt.savefig(f"{subdir}{itest}_retrieved_gas_{gases_name}.png", dpi=150, bbox_inches='tight')
-                #plt.savefig(f"{subdir}{itest}_retrieved_temperature.eps", dpi=100)
+                plt.savefig(f"{subdir}{itest}_retrieved_gas_{gases_name}.pdf", dpi=500, bbox_inches='tight')
                 # Close figure to avoid overlapping between plotting subroutines
                 plt.close()
 
@@ -1810,7 +1807,7 @@ def PlotRetrievedGasesMaps(over_axis="2D"):
                 plt.ylabel("Planetocentric Latitude", size=18)
                 # Save figure showing calibation method 
                 plt.savefig(f"{subdir}{itest}_gas_{gases_name}_maps_at_11_pressure_levels.png", dpi=150, bbox_inches='tight')
-                #plt.savefig(f"{subdir}{itest}_gases_maps_at_11_pressure_levels.eps", dpi=900)
+                plt.savefig(f"{subdir}{itest}_gas_{gases_name}_maps_at_11_pressure_levels.pdf", dpi=500, bbox_inches='tight')
                 # Clear figure to avoid overlapping between plotting subroutines
                 plt.close()
 
@@ -1836,7 +1833,7 @@ def PlotRetrievedGasesMaps(over_axis="2D"):
                 plt.ylabel("Planetocentric Latitude", size=15)
                 # Save figure showing calibation method 
                 plt.savefig(f"{subdir}{itest}_gas_{gases_name}_maps_at_pressure_{ptarget[ipressure]}.png", dpi=150, bbox_inches='tight')
-                #plt.savefig(f"{subdir}{itest}_gases_maps_at_11_pressure_levels.eps", dpi=900)
+                plt.savefig(f"{subdir}{itest}_gas_{gases_name}_maps_at_pressure_{ptarget[ipressure]}.pdf", dpi=500, bbox_inches='tight')
                 # Clear figure to avoid overlapping between plotting subroutines
                 plt.close()
 
@@ -1849,9 +1846,12 @@ def PlotRetrievedGasesMeridianProfiles(over_axis):
     # Loop over each prior used for retrievals tests
     for iprior in prior:
         retrieval_test = [
-        
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
-            
+            f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_ktable-highreso_no852_no887",
+            f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6pknee02mbar_ktable-highreso_no852_no887",
+
+            f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
+            f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6_ktable-highreso_no852_no887",
+
                     ]
         ntest = len(retrieval_test)
         # Reading previous studies observations:
@@ -1915,33 +1915,6 @@ def PlotRetrievedGasesMeridianProfiles(over_axis):
                                                     gas_fsh, gas_fsherr, gas_fshfit, gas_errfshfit, \
                                                     gas_abunerr, \
                                                     _, _  = ReadmreFiles(filepath=f"{fpath}{itest}", over_axis="latitude", gas_name=['C2H2', 'C2H4', 'C2H6'])
-            # if i == 0:
-            #     ind_pres = np.where(pressure >= 1.)
-            #     # plt.plot(Fletcher16CIRSlatitude, Fletcher16CIRSgases[ind_pres[0][-1], :, 2], color='blue', lw=1, marker='x', markersize=5, label='Cassini Fletcher+ 2016')
-            #     plt.plot(Sinclair_lat, Sinclair_c2h2, lw=1, marker='v', markersize=7, label='Cassini Sinclair+ 2017')
-            #     plt.legend()
-            #     plt.show()           
-            # reducedlat = np.where((latitude >0)&(latitude<20))
-            # lat= latitude[reducedlat]
-            # for ilat in range(len(lat)):
-            #     col = cmap(ilat/len(lat))
-            #     plt.plot(gas_abunerr[0,:,ilat], pressure, label=f"err lat {lat[ilat]}", lw=1, marker='.', color=col, alpha=0.6)
-            # # plt.plot(gases[:, 90, 2], pressure, label="prf", lw=1, marker='.')
-            # plt.gca().set_xscale("log")
-            # plt.gca().set_yscale("log")
-            # plt.gca().invert_yaxis()
-            # plt.legend()
-            # lat_average = np.where((latitude > -85) & (latitude < -75))
-            # c2h4 = gases[:, lat_average, 3]
-            # c2h4_average = np.empty((120))
-            # for z in range(len(pressure)):
-            #     c2h4_average[z] = np.nanmean(c2h4[z, :])
-            # print(c2h4_average)
-            # plt.plot(c2h4_average, pressure)
-            # plt.gca().set_xscale("log")
-            # plt.gca().set_yscale("log")
-            # plt.gca().invert_yaxis()
-            # plt.show()
 
             ptarget = [800., 500., 300., 100., 10., 5., 3., 2., 1., 0.5, 0.1, 0.05, 0.01]
             for ipressure in range(len(ptarget)):
@@ -1962,61 +1935,6 @@ def PlotRetrievedGasesMeridianProfiles(over_axis):
                         c2h6_err[ilat] = np.nanmax(gas_abunerr[2, ind_pres[0][-1], :])
                     else:
                         c2h6_err[ilat] = gases[ind_pres[0][-1], ilat, 4]*gas_errscalefit[2,ilat]
-
-                # fig = plt.figure(figsize=(10, 6))
-                # plt.title(r'C$_{2}$H$_{2}$'+f" at {ptarget[ipressure]} mbar")
-                # # Current work 
-                # plt.errorbar(latitude, gases[ind_pres[0][-1], :, 2], yerr=c2h2_err[:], color='grey', lw=1, marker='.', markersize=7, 
-                #             markerfacecolor='black', markeredgewidth=0, alpha=0.7, capthick=0.4, label=r'VLT/VISIR 2018 May 24$^{th}$-27$^{th}$')
-                # # Nixon et al., 2016 Icarus data. Cassini CIRS flyby data 2000
-                # plt.plot(NixonVoyagerlatitude, NixonVoyagerc2h2[ind_Nixpres[0][-1], :], color='red', lw=1, marker='*', markersize=7, label=r'Nixon et al.,(2010)     Voyager 1/IRIS 1979')
-                # # Nixon et al., 2016 Icarus data. Cassini CIRS flyby data 2000
-                # plt.plot(NixonCIRSlatitude, NixonCIRSc2h2[ind_Nixpres[0][-1], :], color='dodgerblue', lw=1, marker='P', markersize=7, label=r'Nixon et al.,(2010)    Cassini/CIRS 2000/2001')
-                # # Fletcher et al., 2016 Icarus data. Cassini CIRS flyby data 2000
-                # plt.plot(Fletcher16CIRSlatitude, Fletcher16CIRSgases[ind_pres[0][-1], :, 2], color='blue', lw=1, marker='x', markersize=5, label=r'Fletcher et al.,(2016)  Cassini/CIRS 2000/2001')
-                # # Fletcher et al., 2016 Icarus data. IRTF TEXES data 2014
-                # plt.plot(Fletcher16TEXESlatitude, Fletcher16TEXESgases[ind_pres[0][-1], :, 3], color='green', lw=1, marker='d', markersize=5, label=r'Fletcher et al.,(2016)  IRTF/TEXES 2014')
-                # # Melin et al,. 2018 Icarus data. IRTF TEXES data 2013-2017
-                # plt.plot(Melin18TEXESlatitude, Melin18TEXESgases[ind_pres[0][-1], :, 3], color='limegreen', lw=1, marker='p', markersize=5, label=r'Melin et al.,(2018)     IRTF/TEXES 2017 January')
-                # if ptarget[ipressure] == 1.:
-                #     # Sinclair et al,. 2017 Icarus PartI data
-                #     plt.plot(Sinclair_lat, Sinclair_c2h2, color='orange', lw=1, marker='v', markersize=5, label=r'Sinclair et al.,(2017)   Cassini/CIRS 2000/2001')
-                # plt.tick_params(labelsize=12)            
-                # plt.grid()
-                # plt.xlabel(f"Planetocentric Latitude", size=20)                
-                # plt.xlim(-90, 90)
-                # plt.ylabel(f"Volume Mixing Ratio", size=20)
-                # # plt.gca().set_yscale("log")
-                # plt.legend(bbox_to_anchor=(0,1.1,1,0.2), loc="lower left", mode="expand", fontsize=12)
-                # plt.savefig(f"{subdir}hydrocarbons_C2H2_at{ptarget[ipressure]}mbar_comparison_with_previous_studies.png", dpi=150, bbox_inches='tight')
-                # plt.close()
-
-                # fig = plt.figure(figsize=(10, 6))
-                # plt.title(r'C$_{2}$H$_{6}$'+f" at {ptarget[ipressure]} mbar")
-                # # Current work
-                # plt.errorbar(latitude, gases[ind_pres[0][-1], :, 4], yerr=c2h6_err[:], color='grey', lw=1, marker='.', markersize=7, 
-                #             markerfacecolor='black', markeredgewidth=0, alpha=0.7, capthick=0.4, label=r'VLT/VISIR 2018 May 24$^{th}$-27$^{th}$')
-                # # Nixon et al., 2016 Icarus data. Cassini CIRS flyby data 2000
-                # plt.plot(NixonVoyagerlatitude, NixonVoyagerc2h6[ind_Nixpres[0][-1], :], color='red', lw=1, marker='*', markersize=7, label=r'Nixon et al.,(2010) Voyager 1/IRIS')
-                # # Nixon et al., 2016 Icarus data. Cassini CIRS flyby data 2000
-                # plt.plot(NixonCIRSlatitude, NixonCIRSc2h6[ind_Nixpres[0][-1], :], color='dodgerblue', lw=1, marker='P', markersize=7, label=r'Nixon et al.,(2010) Cassini/CIRS')
-                # # Fletcher et al., 2016 Icarus data. Cassini CIRS flyby data 2000
-                # plt.plot(Fletcher16CIRSlatitude, Fletcher16CIRSgases[ind_pres[0][-1], :, 4], color='blue', lw=1, marker='x', markersize=5, label=r'Fletcher et al.,(2016) Cassini/CIRS')
-                # # Fletcher et al., 2016 Icarus data. IRTF TEXES data 2014
-                # plt.plot(Fletcher16TEXESlatitude, Fletcher16TEXESgases[ind_pres[0][-1], :, 5], color='green', lw=1, marker='d', markersize=5, label=r'Fletcher et al.,(2016) IRTF/TEXES 2014')
-                # # Melin et al,. 2018 Icarus data. IRTF TEXES data 2013-2017
-                # plt.plot(Melin18TEXESlatitude, Melin18TEXESgases[ind_pres[0][-1], :, 5], color='limegreen', lw=1, marker='p', markersize=5, label=r'Melin et al.,(2018) IRTF/TEXES 2017 January')
-                # if ptarget[ipressure] == 1.:
-                #     # Sinclair et al,. 2017 Icarus PartI data
-                #     plt.plot(Sinclair_lat, Sinclair_c2h6, color='orange', lw=1, marker='v', markersize=5, label=r'Sinclair et al.,(2017) Cassini/CIRS 2000/2001')
-                # plt.tick_params(labelsize=12)            
-                # plt.grid()
-                # plt.xlabel(f"Planetocentric Latitude", size=20)
-                # plt.xlim(-90, 90)
-                # plt.ylabel(f"Volume Mixing Ratio", size=20)
-                # plt.legend(bbox_to_anchor=(0,1.1,1,0.2), loc="lower left", mode="expand", fontsize=10)
-                # plt.savefig(f"{subdir}hydrocarbons_C2H6_at{ptarget[ipressure]}mbar_comparison_with_previous_studies.png", dpi=150, bbox_inches='tight')
-                # plt.close()
 
                 fig = plt.figure(figsize=(10, 4))
                 plt.title(f"Temperature at {ptarget[ipressure]} mbar")
@@ -2040,6 +1958,7 @@ def PlotRetrievedGasesMeridianProfiles(over_axis):
                 plt.ylabel(f"Temperature [K]", size=20)
                 plt.legend(bbox_to_anchor=(0,1.1,1,0.2), loc="lower left", mode="expand", fontsize=12)
                 plt.savefig(f"{subdir}temperature_at{ptarget[ipressure]}mbar_comparison_with_previous_studies.png", dpi=150, bbox_inches='tight')
+                plt.savefig(f"{subdir}temperature_at{ptarget[ipressure]}mbar_comparison_with_previous_studies.pdf", dpi=500, bbox_inches='tight')
                 plt.close()
                 
 
@@ -2068,7 +1987,8 @@ def PlotRetrievedGasesMeridianProfiles(over_axis):
                 ax[iax].plot(Melin18TEXESlatitude, Melin18TEXEStemp[ind_pres[0][-1], :], color='limegreen', lw=1, marker='p', markersize=5, label=r'Melin et al.,(2018) IRTF/TEXES 2017 January')
                 ax[iax].grid()
                 ax[iax].tick_params(labelsize=18)
-                ax[iax].set_xlim(-90, 90)
+                ax[iax].set_xlim(-70, 70)
+                ax[iax].set_xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
             handles, labels = ax[0].get_legend_handles_labels()  
             fig.legend(handles, labels, bbox_to_anchor=(0.11,0.9,0.8,0.2), loc="lower left", mode="expand", fontsize=15)
             plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
@@ -2076,6 +1996,7 @@ def PlotRetrievedGasesMeridianProfiles(over_axis):
             plt.xlabel(f"Planetocentric Latitude", size=20)
             plt.ylabel(f"Temperature [K]", size=20)
             plt.savefig(f"{subdir}temperature_at_several_pressures_comparison_with_previous_studies.png", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{subdir}temperature_at_several_pressures_comparison_with_previous_studies.pdf", dpi=500, bbox_inches='tight')
             plt.close()
 
 
@@ -2083,7 +2004,7 @@ def PlotRetrievedGasesMeridianProfiles(over_axis):
 
 
 
-            ptarget = [0.1, 0.5, 1., 5., 100., 300.]
+            ptarget = [0.1, 0.5, 1.]#, 5., 100., 300.]
             for ipres in range(len(ptarget)):
                 ind_pres = np.where(pressure >= ptarget[ipres])
                 ind_Nixpres = np.where(NixonCIRSpressure >= ptarget[ipres])
@@ -2120,13 +2041,11 @@ def PlotRetrievedGasesMeridianProfiles(over_axis):
                 ax[0].plot(Melin18TEXESlatitude, Melin18TEXESgases[ind_pres[0][-1], :, 3], color='limegreen', lw=1, marker='p', markersize=5, label=r'Melin et al.,(2018) IRTF/TEXES 2017 January')
                 # Sinclair et al,. 2017 Icarus PartI data
                 if ptarget[ipres] == 1.:
-                    ax[0].errorbar(Sinclair_lat, Sinclair_c2h2, Sinclair_c2h2err, color='orange', lw=1, marker='v', markersize=5, 
-                            markerfacecolor='orange', markeredgewidth=2, alpha=1, capthick=2, label=r'Sinclair et al.,(2017) Cassini/CIRS 2000/2001')
+                    ax[0].plot(Sinclair_lat, Sinclair_c2h2, color='orange', lw=0, marker='v', markersize=8, label=r'Sinclair et al.,(2017) Cassini/CIRS 2000/2001')
                 # VLT/VISIR
                 ax[0].errorbar(latitude, gases[ind_pres[0][-1], :, 2], yerr=c2h2_err, color='grey', lw=1, marker='.', markersize=7, 
                             markerfacecolor='black', markeredgewidth=0, alpha=0.7, capthick=0.4, label=r'VLT/VISIR 2018 May 24$^{th}$-27$^{th}$')
                 ax[0].set_yscale("log")
-                ax[0].set_xlim(-90, 90)
                 ax[0].grid()
                 ax[0].tick_params(labelsize=18)
                 t = ax[0].yaxis.get_offset_text()
@@ -2147,23 +2066,13 @@ def PlotRetrievedGasesMeridianProfiles(over_axis):
                 ax[1].plot(Melin18TEXESlatitude, Melin18TEXESgases[ind_pres[0][-1], :, 5], color='limegreen', lw=1, marker='p', markersize=5)
                 # Sinclair et al,. 2017 Icarus PartI data
                 if ptarget[ipres] == 1.:
-                    ax[1].errorbar(Sinclair_lat, Sinclair_c2h6, Sinclair_c2h6err, color='orange', lw=1, marker='v', markersize=5, 
-                            markerfacecolor='orange', markeredgewidth=2, alpha=1, capthick=2)
+                    ax[1].plot(Sinclair_lat, Sinclair_c2h6, color='orange', lw=0, marker='v', markersize=8)
                 ax[1].grid()
-                ax[1].set_xlim(-90, 90)
+                ax[1].set_xlim(-70, 70)
+                ax[1].set_xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
                 ax[1].tick_params(labelsize=18) 
                 t = ax[1].yaxis.get_offset_text()
                 t.set_x(-0.06)
-                # third subplot with C2H4
-                # ax[2].set_title(ititle[2]+r'      C$_{2}$H$_{4}$', size=18, fontfamily='sans-serif', loc='left')
-                # ax[2].errorbar(latitude, gases[ind_pres[0][-1], :, 3], gases[ind_pres[0][-1], :, 3]*gas_errscalefit[1, :], color='grey', lw=1, marker='.', markersize=7, 
-                #             markerfacecolor='black', markeredgewidth=0, alpha=0.7, capthick=0.4)
-                # ax[2].set_yscale("log")
-                # ax[2].set_xlim(-90, 90)
-                # ax[2].grid()
-                # ax[2].tick_params(labelsize=18)
-                # t = ax[2].yaxis.get_offset_text()
-                # t.set_x(-0.06)
                 handles, labels = ax[0].get_legend_handles_labels()  
                 fig.legend(handles, labels, bbox_to_anchor=(0.11,0.92,0.8,0.2), loc="lower left", mode="expand", fontsize=15)
                 plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
@@ -2171,130 +2080,9 @@ def PlotRetrievedGasesMeridianProfiles(over_axis):
                 plt.xlabel(f"Planetocentric Latitude", size=20)
                 plt.ylabel(f"Volume Mixing Ratio", size=20)
                 plt.savefig(f"{subdir}hydrocarbons_at_{ptarget[ipres]}mbar_comparison_with_previous_studies.png", dpi=150, bbox_inches='tight')
+                plt.savefig(f"{subdir}hydrocarbons_at_{ptarget[ipres]}mbar_comparison_with_previous_studies.pdf", dpi=500, bbox_inches='tight')
                 plt.close()
-
-                fig, ax = plt.subplots(2, 1, figsize=(10, 9), sharex=True, sharey=False)
-                # first subplot with C2H2
-                ax[0].set_title(ititle[0]+r'      C$_{2}$H$_{2}$', size=18, fontfamily='sans-serif', loc='left')
-                # Nixon et al., 2016 Icarus data. Cassini CIRS flyby data 2000
-                ax[0].plot(NixonVoyagerlatitude, NixonVoyagerc2h2[ind_Nixpres[0][-1], :], color='red', lw=1, marker='*', markersize=7, label=r'Nixon et al.,(2010) Voyager 1/IRIS 1979')
-                # Nixon et al., 2016 Icarus data. Cassini CIRS flyby data 2000
-                ax[0].plot(NixonCIRSlatitude, NixonCIRSc2h2[ind_Nixpres[0][-1], :], color='dodgerblue', lw=1, marker='P', markersize=7, label=r'Nixon et al.,(2010) Cassini/CIRS 2000/2001')
-                # Fletcher et al., 2016 Icarus data. Cassini CIRS flyby data 2000
-                ax[0].plot(Fletcher16CIRSlatitude, Fletcher16CIRSgases[ind_pres[0][-1], :, 2], color='blue', lw=1, marker='x', markersize=5, label=r'Fletcher et al.,(2016) Cassini/CIRS 2000/2001')
-                # Fletcher et al., 2016 Icarus data. IRTF TEXES data 2014
-                ax[0].plot(Fletcher16TEXESlatitude, Fletcher16TEXESgases[ind_pres[0][-1], :, 3], color='green', lw=1, marker='d', markersize=5, label=r'Fletcher et al.,(2016) IRTF/TEXES 2014')
-                # Melin et al,. 2018 Icarus data. IRTF TEXES data 2013-2017
-                ax[0].plot(Melin18TEXESlatitude, Melin18TEXESgases[ind_pres[0][-1], :, 3], color='limegreen', lw=1, marker='p', markersize=5, label=r'Melin et al.,(2018) IRTF/TEXES 2017 January')
-                # # Sinclair et al,. 2017 Icarus PartI data
-                # if ptarget[ipres] == 1.:
-                #     ax[0].errorbar(Sinclair_lat, Sinclair_c2h2, Sinclair_c2h2err, color='orange', lw=1, marker='v', markersize=5, 
-                #             markerfacecolor='orange', markeredgewidth=2, alpha=1, capthick=2, label=r'Sinclair et al.,(2017) Cassini/CIRS 2000/2001')
-                # VLT/VISIR
-                ax[0].errorbar(latitude, gases[ind_pres[0][-1], :, 2], yerr=c2h2_err, color='grey', lw=1, marker='.', markersize=7, 
-                            markerfacecolor='black', markeredgewidth=0, alpha=0.7, capthick=0.4, label=r'VLT/VISIR 2018 May 24$^{th}$-27$^{th}$')
-                # ax[0].set_yscale("log")
-                ax[0].set_ylim(0.3e-7, 0.8e-6)
-                ax[0].set_xlim(-70, 70)
-                ax[0].grid()
-                ax[0].tick_params(labelsize=18)
-                t = ax[0].yaxis.get_offset_text()
-                t.set_x(-0.06)
-                # second subplot with C2H6
-                ax[1].set_title(ititle[1]+r'      C$_{2}$H$_{6}$', size=18, fontfamily='sans-serif', loc='left')
-                ax[1].errorbar(latitude, gases[ind_pres[0][-1], :, 4], c2h6_err, color='grey', lw=1, marker='.', markersize=7, 
-                            markerfacecolor='black', markeredgewidth=0, alpha=0.6, capthick=0.4)
-                # Nixon et al., 2016 Icarus data. Cassini CIRS flyby data 2000
-                ax[1].plot(NixonVoyagerlatitude, NixonVoyagerc2h6[ind_Nixpres[0][-1], :], color='red', lw=1, marker='*', markersize=7)
-                # Nixon et al., 2016 Icarus data. Cassini CIRS flyby data 2000
-                ax[1].plot(NixonCIRSlatitude, NixonCIRSc2h6[ind_Nixpres[0][-1], :], color='dodgerblue', lw=1, marker='P', markersize=7)
-                # Fletcher et al., 2016 Icarus data. Cassini CIRS flyby data 2000
-                ax[1].plot(Fletcher16CIRSlatitude, Fletcher16CIRSgases[ind_pres[0][-1], :, 4], color='blue', lw=1, marker='x', markersize=5)
-                # Fletcher et al., 2016 Icarus data. IRTF TEXES data 2014
-                ax[1].plot(Fletcher16TEXESlatitude, Fletcher16TEXESgases[ind_pres[0][-1], :, 5], color='green', lw=1, marker='d', markersize=5)
-                # Melin et al,. 2018 Icarus data. IRTF TEXES data 2013-2017
-                ax[1].plot(Melin18TEXESlatitude, Melin18TEXESgases[ind_pres[0][-1], :, 5], color='limegreen', lw=1, marker='p', markersize=5)
-                # Sinclair et al,. 2017 Icarus PartI data
-                # if ptarget[ipres] == 1.:
-                #     ax[1].errorbar(Sinclair_lat, Sinclair_c2h6, Sinclair_c2h6err, color='orange', lw=1, marker='v', markersize=5, 
-                #             markerfacecolor='orange', markeredgewidth=2, alpha=1, capthick=2)
-                ax[1].grid()
-                ax[1].set_xlim(-70, 70)
-                ax[1].tick_params(labelsize=18) 
-                t = ax[1].yaxis.get_offset_text()
-                t.set_x(-0.06)
-                # third subplot with C2H4
-                # ax[2].set_title(ititle[2]+r'      C$_{2}$H$_{4}$', size=18, fontfamily='sans-serif', loc='left')
-                # ax[2].errorbar(latitude, gases[ind_pres[0][-1], :, 3], gases[ind_pres[0][-1], :, 3]*gas_errscalefit[1, :], color='grey', lw=1, marker='.', markersize=7, 
-                #             markerfacecolor='black', markeredgewidth=0, alpha=0.7, capthick=0.4)
-                # ax[2].set_yscale("log")
-                # ax[2].set_xlim(-90, 90)
-                # ax[2].grid()
-                # ax[2].tick_params(labelsize=18)
-                # t = ax[2].yaxis.get_offset_text()
-                # t.set_x(-0.06)
-                handles, labels = ax[0].get_legend_handles_labels()  
-                fig.legend(handles, labels, bbox_to_anchor=(0.11,0.92,0.8,0.2), loc="lower left", mode="expand", fontsize=15)
-                plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
-                plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)            
-                plt.xlabel(f"Planetocentric Latitude", size=20)
-                plt.ylabel(f"Volume Mixing Ratio", size=20)
-                plt.savefig(f"{subdir}hydrocarbons_at_{ptarget[ipres]}mbar_comparison_with_previous_studies_latlim70.png", dpi=150, bbox_inches='tight')
-                plt.close()
-               
-                 
-            fig, ax = plt.subplots(2, 2, figsize=(14, 9), sharex=True, sharey=False)
-            # first subplot with VMR fit
-            ax[0][0].set_title(ititle[0]+r'      C$_{2}$H$_{2}$, Volume Mixing Ratio fit', size=18, fontfamily='sans-serif', loc='left')
-            ax[0][0].errorbar(latitude, gas_vmrfit[0, :], yerr=gas_errvmrfit[0, :], color='grey', lw=1, marker='.', markersize=7, 
-                        markerfacecolor='black', markeredgewidth=0, alpha=0.7, capthick=0.4, label=r'VLT/VISIR 2018 May 24$^{th}$-27$^{th}$')
-            ax[0][0].plot(latitude, gas_vmr[0, :], color='blue', lw=3, label="prior parameters")
-            ax[0][0].set_yscale("log")
-            ax[0][0].set_xlim(-90, 90)
-            ax[0][0].grid()
-            ax[0][0].tick_params(labelsize=18)
-            t = ax[0][0].yaxis.get_offset_text()
-            t.set_x(-0.07)
-            # second subplot with FSH fit
-            ax[1][0].set_title(ititle[1]+r'      C$_{2}$H$_{2}$, Factional Scale Height fit', size=18, fontfamily='sans-serif', loc='left')
-            ax[1][0].errorbar(latitude, gas_fshfit[0, :], yerr=gas_errfshfit[0, :], color='grey', lw=1, marker='.', markersize=7, 
-                        markerfacecolor='black', markeredgewidth=0, alpha=0.7, capthick=0.4, label=r'VLT/VISIR 2018 May 24$^{th}$-27$^{th}$')
-            ax[1][0].plot(latitude, gas_fsh[0, :], color='blue', lw=3, label="prior parameters")
-            ax[1][0].grid()
-            ax[1][0].set_xlim(-90, 90)
-            ax[1][0].set_ylim(99.5, 100.5)
-            ax[1][0].tick_params(labelsize=18) 
-            t = ax[1][0].yaxis.get_offset_text()
-            t.set_x(-0.06) 
-            # first subplot with VMR fit
-            ax[0][1].set_title(ititle[2]+r'      C$_{2}$H$_{6}$, Volume Mixing Ratio fit', size=18, fontfamily='sans-serif', loc='left')
-            ax[0][1].errorbar(latitude, gas_vmrfit[2, :], yerr=gas_errvmrfit[2, :], color='grey', lw=1, marker='.', markersize=7, 
-                        markerfacecolor='black', markeredgewidth=0, alpha=0.7, capthick=0.4, label=r'VLT/VISIR 2018 May 24$^{th}$-27$^{th}$')
-            ax[0][1].plot(latitude, gas_vmr[2, :], color='blue', lw=3, label="prior parameters")
-            # ax[0][1].set_yscale("log")
-            ax[0][1].set_xlim(-90, 90)
-            ax[0][1].grid()
-            ax[0][1].tick_params(labelsize=18)
-            t = ax[0][1].yaxis.get_offset_text()
-            t.set_x(-0.08)
-            # second subplot with FSH fit
-            ax[1][1].set_title(ititle[3]+r'      C$_{2}$H$_{6}$, Factional Scale Height fit', size=18, fontfamily='sans-serif', loc='left')
-            ax[1][1].errorbar(latitude, gas_fshfit[2, :], yerr=gas_errfshfit[2, :], color='grey', lw=1, marker='.', markersize=7, 
-                        markerfacecolor='black', markeredgewidth=0, alpha=0.7, capthick=0.4, label=r'VLT/VISIR 2018 May 24$^{th}$-27$^{th}$')
-            ax[1][1].plot(latitude, gas_fsh[2, :], color='blue', lw=3, label="prior parameters")
-            ax[1][1].grid()
-            ax[1][1].set_xlim(-90, 90)
-            ax[1][1].tick_params(labelsize=18) 
-            t = ax[1][1].yaxis.get_offset_text()
-            t.set_x(-0.06) 
-            handles, labels = ax[0][0].get_legend_handles_labels()  
-            fig.legend(handles, labels, bbox_to_anchor=(0.11,0.92,0.8,0.2), loc="lower left", mode="expand", fontsize=15)
-            plt.axes([0.09, 0.1, 0.8, 0.8], frameon=False) 
-            plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)            
-            plt.xlabel(f"Planetocentric Latitude", size=20)
-            plt.ylabel(f"Factional Scale Height     Volume Mixing Ratio", size=20)
-            plt.savefig(f"{subdir}hydrocarbons_VMR-FSH_latitude_variations.png", dpi=150, bbox_inches='tight')
-            plt.close()
+ 
 
 def PlotRetrievedGasesMeridianProfilesSuperposed(over_axis):
 
@@ -2305,8 +2093,10 @@ def PlotRetrievedGasesMeridianProfilesSuperposed(over_axis):
     # Loop over each prior used for retrievals tests
     for iprior in prior:
         retrieval_test = [
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6pknee02mbar_ktable-highreso_no852_no887",
-            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
+            f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6_ktable-highreso_no852_no887",
+
+            # f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6pknee02mbar_ktable-highreso_no852_no887",
+            f"JGRPreview_{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887",
             # f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2r-C2H6r_ktable-highreso_no852_no887",
             # "jupiter_v2023_temp_aerosol1-10mu-800mbar-05scale-01_C2H2-C2H6_ktable-highreso_no852_no887_7mucal30NS",
             # "jupiter_v2023_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H6pknee02mbar_ktable-highreso_no852_no887_7mucal30NS",
@@ -2418,7 +2208,6 @@ def PlotRetrievedGasesMeridianProfilesSuperposed(over_axis):
                 ax[0].plot(Sinclair_lat, Sinclair_c2h2, color='magenta', lw=0, marker='v', markersize=5, label=r'Sinclair et al.,(2017) Cassini/CIRS 2000/2001')
             
             ax[0].set_yscale("log")
-            ax[0].set_xlim(-90, 90)
             ax[0].grid()
             ax[0].tick_params(labelsize=18)
             t = ax[0].yaxis.get_offset_text()
@@ -2446,20 +2235,11 @@ def PlotRetrievedGasesMeridianProfilesSuperposed(over_axis):
             if ptarget[ipres] == 1.:
                 ax[1].plot(Sinclair_lat, Sinclair_c2h6, color='magenta', lw=0, marker='v', markersize=5)
             ax[1].grid()
-            ax[1].set_xlim(-90, 90)
+            ax[1].set_xlim(-70, 70)
+            ax[1].set_xticks([-70, -60, -40, -20, 0, 20, 40, 60, 70])
             ax[1].tick_params(labelsize=18) 
             t = ax[1].yaxis.get_offset_text()
             t.set_x(-0.06)
-            # third subplot with C2H4
-            # ax[2].set_title(ititle[2]+r'      C$_{2}$H$_{4}$', size=18, fontfamily='sans-serif', loc='left')
-            # ax[2].errorbar(latitude, gases[ind_pres[0][-1], :, 3], gases[ind_pres[0][-1], :, 3]*gas_errscalefit[1, :], color='grey', lw=1, marker='.', markersize=7, 
-            #             markerfacecolor='black', markeredgewidth=0, alpha=0.7, capthick=0.4)
-            # ax[2].set_yscale("log")
-            # ax[2].set_xlim(-90, 90)
-            # ax[2].grid()
-            # ax[2].tick_params(labelsize=18)
-            # t = ax[2].yaxis.get_offset_text()
-            # t.set_x(-0.06)
             handles, labels = ax[0].get_legend_handles_labels()  
             fig.legend(handles, labels, bbox_to_anchor=(0.11,0.92,0.8,0.2), loc="lower left", mode="expand", fontsize=15)
             plt.axes([0.1, 0.1, 0.8, 0.8], frameon=False) 
@@ -2467,6 +2247,7 @@ def PlotRetrievedGasesMeridianProfilesSuperposed(over_axis):
             plt.xlabel(f"Planetocentric Latitude", size=20)
             plt.ylabel(f"Volume Mixing Ratio", size=20)
             plt.savefig(f"{subdir}hydrocarbons_at_{ptarget[ipres]}mbar_comparison_with_previous_studies.png", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{subdir}hydrocarbons_at_{ptarget[ipres]}mbar_comparison_with_previous_studies.pdf", dpi=500, bbox_inches='tight')
             plt.close()
 
 
@@ -2526,6 +2307,7 @@ def PlotRadianceParametricTest():
     plt.ylabel('Residual (%)', size=18)     
     plt.xlabel(r'Wavenumbers (cm$^{-1}$)', size=18, labelpad=15)
     plt.savefig(f"{subdir}residual_radiance_reduce_spxfile.png", dpi=150, bbox_inches='tight')
+    plt.savefig(f"{subdir}residual_radiance_reduce_spxfile.pdf", dpi=500, bbox_inches='tight')
     plt.close()
 
 def PlotComparisonParametricGasesHydrocarbons():
@@ -2550,10 +2332,7 @@ def PlotComparisonParametricGasesHydrocarbons():
     for iprior in prior:
         
         retrieval_test = [
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H4-C2H6pknee02mbar_no852_no887",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H4-C2H6pknee02mbar_NH3_no852_no887",
-                        f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H2pknee005mbar-vmrerr0.8-fsh100.0step10.0-C2H4-C2H6pknee02mbar_NH3p-kneefit-vmrJuno-fsh0.15-1.0_no852_no887",
-             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H6_no852_no887",
+            f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H6_no852_no887",
             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H6_ktable-highreso_no852_no887",
             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H6pknee02mbar_no852_no887",
             f"{iprior}_temp_aerosol1-10mu-800mbar-05scale-01_C2H6pknee02mbar_ktable-highreso_no852_no887",
@@ -2583,7 +2362,7 @@ def PlotComparisonParametricGasesHydrocarbons():
                     
                     col = cmap(i/ntest)
                     # Read ChiSquare values from log files
-                    chisquare, latitude, nlat = ReadLogFiles(filepath=f"{fpath}{itest}", over_axis="latitude")
+                    chisquare, latitude, nlat = ReadLogFiles(filepath=f"{fpath}{itest}/", over_axis="latitude")
                     # Read profile data from NEMESIS prior file 
                     _, prior_p, _, _, prior_gases, _, _, _ = ReadTemperatureGasesPriorProfile(f"{fpath}{itest}/core_1/")    
                     # Read retrieved profiles from .prf outputs files
@@ -2661,6 +2440,7 @@ def PlotComparisonParametricGasesHydrocarbons():
                 plt.ylabel(f"Presssure [mbar]", size=20)
                 plt.legend(handles, labels, bbox_to_anchor=(1.04, 1), loc="upper left",fontsize=12)
                 plt.savefig(f"{subdir}parametric_test_gases_hydrocarbons_profiles_lat_{latitude[ind_lat[0][0]]}_reduce_cmaps_data.png", dpi=150, bbox_inches='tight')
+                plt.savefig(f"{subdir}parametric_test_gases_hydrocarbons_profiles_lat_{latitude[ind_lat[0][0]]}_reduce_cmaps_data.pdf", dpi=500, bbox_inches='tight')
                 plt.close()
 
             # Setting figure grid of subplots
@@ -2722,6 +2502,7 @@ def PlotComparisonParametricGasesHydrocarbons():
             plt.legend(handles, labels, bbox_to_anchor=(1.04, 1), loc="upper left",fontsize=12)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}parametric_test_gases_hydrocarbons.png", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{subdir}parametric_test_gases_hydrocarbons.pdf", dpi=500, bbox_inches='tight')
             plt.close()
 
 def PlotComparisonParametricGasesHydrocarbonsParallel():
@@ -2788,6 +2569,7 @@ def PlotComparisonParametricGasesHydrocarbonsParallel():
             handles, labels = sixtysouth_prf.get_legend_handles_labels()  
             fig.legend(handles, labels, loc='upper right')
             plt.savefig(f"{dir}parametric_test_gases_hydrocarbons_profiles_lon_{longitude[ind_lat[0][0]]}_reduce_cmaps_data.png", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{dir}parametric_test_gases_hydrocarbons_profiles_lon_{longitude[ind_lat[0][0]]}_reduce_cmaps_data.pdf", dpi=500, bbox_inches='tight')
             plt.close()
 
 
@@ -2842,6 +2624,7 @@ def PlotComparisonParametricGasesHydrocarbonsParallel():
         fig.legend(handles, labels, loc='upper center') 
         # Save figure in the retrievals outputs directory
         plt.savefig(f"{dir}parametric_test_gases_hydrocarbons_profiles_reduce_cmaps_data.png", dpi=150, bbox_inches='tight')
+        plt.savefig(f"{dir}parametric_test_gases_hydrocarbons_profiles_reduce_cmaps_data.pdf", dpi=500, bbox_inches='tight')
         plt.close()
 
 
@@ -2904,7 +2687,7 @@ def PlotAllForAuroraOverTime():
             plt.xticks(ticks=np.arange(1,4,step=1), labels=night_labels)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}aurora_over_time_chisquare.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_chisquare.eps", dpi=100)
+            plt.savefig(f"{subdir}aurora_over_time_chisquare.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -2932,7 +2715,7 @@ def PlotAllForAuroraOverTime():
             plt.ylabel(f"Presssure [mbar]", size=20)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}aurora_over_time_temperature_profile_allnight.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_retrieved_temperature_profile_at_{latitude[ilat]}.eps", dpi=100)
+            plt.savefig(f"{subdir}aurora_over_time_temperature_profile_allnight.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -2976,7 +2759,7 @@ def PlotAllForAuroraOverTime():
             plt.ylabel(f"Presssure [mbar]", size=20)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}aurora_over_time_temperature_profile_allnight_from-mre.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_retrieved_temperature_profile_at_{latitude[ilat]}.eps", dpi=100)
+            plt.savefig(f"{subdir}aurora_over_time_temperature_profile_allnight_from-mre.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -3058,6 +2841,7 @@ def PlotAllForAuroraOverTime():
             plt.xlabel(f"Volume Mixing Ratio", size=20)
             plt.ylabel(f"Presssure [mbar]", size=20)
             plt.savefig(f"{subdir}aurora_over_time_gases_hydrocarbons_profiles.png", dpi=150, bbox_inches='tight')
+            plt.savefig(f"{subdir}aurora_over_time_gases_hydrocarbons_profiles.pdf", dpi=500, bbox_inches='tight')
             plt.close()
 
             # # Mapping the hydrocarbons scale factor from .mre file
@@ -3079,7 +2863,7 @@ def PlotAllForAuroraOverTime():
             plt.ylabel(f"Hydrocarbons scale factor", size=20)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}aurora_over_time_hydrocarbons_scale_factor_from-mre.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_hydrocarbons_scale_factor_from-mre.eps", dpi=100)
+            plt.savefig(f"{subdir}aurora_over_time_hydrocarbons_scale_factor_from-mre.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -3093,7 +2877,7 @@ def PlotAllForAuroraOverTime():
             plt.ylabel(f"Aerosol scale factor", size=20)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}aurora_over_time_aerosol_scale_factor_from-mre.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_aerosol_scale_factor_from-mre.eps", dpi=100)
+            plt.savefig(f"{subdir}aurora_over_time_aerosol_scale_factor_from-mre.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -3115,7 +2899,7 @@ def PlotAllForAuroraOverTime():
             plt.ylabel(f"Height [km]", size=20)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}aurora_over_time_retrieved_aerosol_profile.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_retrieved_aerosol_profile_at_{latitude[ilat]}.eps", dpi=100)
+            plt.savefig(f"{subdir}aurora_over_time_retrieved_aerosol_profile.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close()
 
@@ -3135,7 +2919,7 @@ def PlotAllForAuroraOverTime():
                     # Save figure in the retrievals outputs directory
                     plt.legend()
                     plt.savefig(f"{subdir}{wave}_aurora_over_time_radiance_time_evoltion.png", dpi=150, bbox_inches='tight')
-                    #plt.savefig(f"{subdir}{itest}_radiance_time_evoltion.eps", dpi=100)
+                    plt.savefig(f"{subdir}{wave}_aurora_over_time_radiance_time_evoltion.pdf", dpi=500, bbox_inches='tight')
                     # Close figure to avoid overlapping between plotting subroutines
                     plt.close() 
                     iplot+=1
@@ -3174,7 +2958,7 @@ def PlotAllForAuroraOverTime():
             plt.ylabel('Radiance [nW cm$^{-2}$ sr$^{-1}$ [cm$^{-1}$]$^{-1}$]', size=20)
             # Save figure in the retrievals outputs directory
             plt.savefig(f"{subdir}aurora_over_time_all_filters_radiance_time_evoltion.png", dpi=150, bbox_inches='tight')
-            #plt.savefig(f"{subdir}{itest}_radiance_time_evoltion.eps", dpi=100)
+            plt.savefig(f"{subdir}aurora_over_time_all_filters_radiance_time_evoltion.pdf", dpi=500, bbox_inches='tight')
             # Close figure to avoid overlapping between plotting subroutines
             plt.close() 
             
@@ -3224,6 +3008,7 @@ def PlotSolarWindActivity():
     # plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)            
     plt.xlabel(f"Time ", size=20)
     plt.savefig(f"{subdir}solar_wind_activity_time_variations_OMNIdataInputs.png", dpi=150, bbox_inches='tight')
+    plt.savefig(f"{subdir}solar_wind_activity_time_variations_OMNIdataInputs.pdf", dpi=500, bbox_inches='tight')
     plt.close()
 
     fig, ax = plt.subplots(1, 1, figsize=(6, 5), sharex=True)
@@ -3240,4 +3025,5 @@ def PlotSolarWindActivity():
     # plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)            
     plt.xlabel(f"Time ", size=20)
     plt.savefig(f"{subdir}heliocentric_longitude_from_opposition_time_variations_OMNIdataInputs.png", dpi=150, bbox_inches='tight')
+    plt.savefig(f"{subdir}heliocentric_longitude_from_opposition_time_variations_OMNIdataInputs.pdf", dpi=500, bbox_inches='tight')
     plt.close()
